@@ -245,18 +245,19 @@
 - [ ] Add 12 hard questions
 - [ ] Update EXAM-CHEAT-SHEET.md
 
-### Day 11 - Aug 23 - RAG Setup [2.5 hrs]
-- [ ] Install ChromaDB (Docker or npm)
-- [ ] Build document loader
+### Day 11 - Aug 23 - Vectra Setup [2.5 hrs]
+- [ ] Install Vectra (npm install vectra)
+- [ ] Build vector store module
+- [ ] Create embedding functions
 - [ ] Load MCP spec content
 - [ ] Test basic retrieval
 - [ ] Update SESSION-LOG.md
 
-### Day 12 - Aug 24 - RAG Integration [2.5 hrs]
-- [ ] Connect RAG to quiz engine
+### Day 12 - Aug 24 - Vectra Integration [2.5 hrs]
+- [ ] Connect Vectra to quiz engine
 - [ ] Test "explain this concept" feature
 - [ ] Add source citations
-- [ ] Test RAG accuracy
+- [ ] Test retrieval accuracy
 - [ ] Update SESSION-LOG.md
 
 ### Day 13 - Aug 25 - Use Cases [2.5 hrs]
@@ -272,7 +273,7 @@
 - [ ] RAG testing
 - [ ] Update SESSION-LOG.md
 
-**Week 2 Milestone:** Complete quiz bank + RAG-powered explanations
+**Week 2 Milestone:** Complete quiz bank + Vectra-powered explanations
 
 ---
 
@@ -410,7 +411,7 @@
 | Week | Target | Status | Score |
 |------|--------|--------|-------|
 | Week 1 | Quiz MVP working | [ ] | ___% |
-| Week 2 | RAG + Complete bank | [ ] | ___% |
+| Week 2 | Vectra + Complete bank | [ ] | ___% |
 | Week 3 | Full practice exam | [ ] | ___% |
 | Week 4 | 80%+ score | [ ] | ___% |
 | **EXAM** | **MCPA Certified!** | [ ] | ___% |

@@ -20,7 +20,6 @@ A local training bot that helps you study for the MCPA certification by:
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (LTS version)
-- [Docker](https://www.docker.com/) (for ChromaDB) OR npm
 - [Goose](https://github.com/anthropics/goose) (you already have it!)
 
 ### Installation
@@ -32,19 +31,13 @@ cd mcpa-bot
 # 2. Install dependencies
 npm install
 
-# 3. Start ChromaDB (Option A: Docker)
-docker run -p 8000:8000 chromadb/chroma
-
-# OR Option B: Local
-npm run start:chroma
-
-# 4. Start the quiz server
+# 3. Start the quiz server
 npm run start:quiz
 
-# 5. Start the web interface
+# 4. Start the web interface
 npm run start:web
 
-# 6. Open browser
+# 5. Open browser
 http://localhost:3000
 ```
 
@@ -63,7 +56,7 @@ mcpa-bot/
 ├── data/
 │   ├── schemas/            # JSON schemas
 │   ├── questions/          # Question bank
-│   └── chroma/             # Vector DB storage
+│   └── vectra/             # Vector DB storage (local)
 ├── docs/                   # Learning materials
 │   ├── ARCHITECTURE.md     # Why things are built this way
 │   ├── DECISIONS.md        # Technical decisions log
@@ -115,7 +108,7 @@ By building this, you'll understand:
 
 - **MCP Protocol** - How it works, why it exists
 - **RAG Systems** - Retrieval-Augmented Generation
-- **Vector Databases** - ChromaDB basics
+- **Vector Databases** - Vectra (local vector storage)
 - **MCP Servers** - Building your own
 - **Node.js** - Backend development
 - **System Design** - Architecture decisions

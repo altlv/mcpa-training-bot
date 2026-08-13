@@ -63,17 +63,24 @@ Your training bot uses MCP servers so:
 
 ## Why Each Component Exists
 
-### 1. ChromaDB (Vector Database)
+### 1. Vectra (Vector Database)
 
-**What it does:** Stores your documents as numerical representations (vectors)
+**What it does:** Stores your documents as numerical representations (vectors) for semantic search
 
 **Why not just use a text file?**
 - Text files: "Find me info about JSON-RPC" -> Scan entire file, slow
-- ChromaDB: "Find me info about JSON-RPC" -> Instant semantic search
+- Vectra: "Find me info about JSON-RPC" -> Instant semantic search
 
 **Analogy:**
 - Text file = Looking through a book page by page
-- ChromaDB = Having an index that says "JSON-RPC is discussed on pages 45, 67, 89"
+- Vectra = Having an index that says "JSON-RPC is discussed on pages 45, 67, 89"
+
+**Why Vectra (not ChromaDB)?**
+- Pure Node.js (no Docker required)
+- No server to run
+- Stores data locally in a folder
+- Simple API, beginner-friendly
+- Can upgrade to ChromaDB later if needed
 
 **Why local?**
 - No API costs
@@ -181,7 +188,7 @@ mcpa-bot/
 ├── data/
 │   ├── schemas/        # Data formats (JSON schemas)
 │   ├── questions/      # Question bank
-│   └── chroma/         # Vector database files
+│   └── vectra/         # Vector database files (local storage)
 ├── docs/               # Learning materials
 │   ├── ARCHITECTURE.md # This file!
 │   ├── LEARNING.md     # What you learned

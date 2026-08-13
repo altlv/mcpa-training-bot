@@ -216,6 +216,34 @@ When you make a choice, add it here:
 
 ---
 
+## Decision 011: Use Vectra (not ChromaDB)
+**Date:** 2026-08-13
+**Decision:** Vectra as vector database instead of ChromaDB
+**Alternatives considered:**
+- ChromaDB (Docker)
+- ChromaDB (cloud)
+- Pinecone
+- Weaviate
+- Simple JSON search
+
+**Why Vectra?**
+1. No Docker required (your PC can't run virtualization)
+2. Pure Node.js (no external server)
+3. Stores data locally in a folder
+4. Simple API, easy to learn
+5. Good stepping stone to more complex vector DBs later
+
+**Why not ChromaDB?**
+- Requires Docker (virtualization disabled on your PC)
+- More complex setup
+- Better for production, overkill for learning
+
+**Trade-off:** Less feature-rich than ChromaDB, but perfect for learning.
+
+**Upgrade path:** When Docker becomes available, can migrate to ChromaDB with minimal code changes.
+
+---
+
 ## Key Principles Behind Decisions
 
 1. **Learning first** - Optimize for understanding, not performance
