@@ -1,9 +1,9 @@
-# 🎯 MCPA Exam Cheat Sheet
+# MCPA Exam Cheat Sheet
 ## Fill this in as you study - Review before exam!
 
 ---
 
-## 📋 Quick Reference Card
+## Quick Reference Card
 
 ### MCP in 30 Seconds
 - **MCP** = Model Context Protocol (USB for AI)
@@ -13,7 +13,7 @@
 
 ---
 
-## 🏗️ Architecture (Ch2)
+## Architecture (Ch2)
 
 ### The Three Participants
 | Participant | Role | Example |
@@ -24,9 +24,9 @@
 
 ### Cardinality (EXAM FAVORITE!)
 ```
-Host ──► Many Clients
-Client ──► One Server
-Client ──► Many Servers (via multiple clients)
+Host --> Many Clients
+Client --> One Server
+Client --> Many Servers (via multiple clients)
 ```
 
 ### Transports
@@ -37,14 +37,14 @@ Client ──► Many Servers (via multiple clients)
 
 ---
 
-## 📨 JSON-RPC 2.0 (Ch3)
+## JSON-RPC 2.0 (Ch3)
 
 ### Message Types
 | Type | Direction | Has ID? | Example |
 |------|-----------|---------|---------|
-| **Request** | Both | ✅ Yes | `{"jsonrpc":"2.0","method":"tools/list","id":1}` |
-| **Response** | Both | ✅ Yes | `{"jsonrpc":"2.0","result":{},"id":1}` |
-| **Notification** | Both | ❌ No | `{"jsonrpc":"2.0","method":"notifications/initialized"}` |
+| **Request** | Both | Yes | `{"jsonrpc":"2.0","method":"tools/list","id":1}` |
+| **Response** | Both | Yes | `{"jsonrpc":"2.0","result":{},"id":1}` |
+| **Notification** | Both | No | `{"jsonrpc":"2.0","method":"notifications/initialized"}` |
 
 ### Error Codes (MEMORIZE!)
 | Code | Name | Meaning |
@@ -57,7 +57,7 @@ Client ──► Many Servers (via multiple clients)
 
 ---
 
-## 🔧 Server Features (Ch4)
+## Server Features (Ch4)
 
 ### Tools
 ```json
@@ -98,7 +98,7 @@ Client ──► Many Servers (via multiple clients)
 
 ---
 
-## 🖥️ Client Features (Ch5)
+## Client Features (Ch5)
 
 | Feature | Purpose | Exam Hint |
 |---------|---------|-----------|
@@ -108,7 +108,7 @@ Client ──► Many Servers (via multiple clients)
 
 ---
 
-## 🔒 Security (Ch7-8)
+## Security (Ch7-8)
 
 ### Four Key Principles
 1. **User Consent** - User must approve actions
@@ -118,13 +118,13 @@ Client ──► Many Servers (via multiple clients)
 
 ### OAuth 2.1 Flow (EXAM HEAVY!)
 ```
-1. Client → Auth Server: "User wants to access server"
-2. Auth Server → User: "Do you authorize?"
-3. User → Auth Server: "Yes"
-4. Auth Server → Client: "Here's authorization code"
-5. Client → Auth Server: "Exchange code for token"
-6. Auth Server → Client: "Here's access token"
-7. Client → Resource Server: "Here's token, give me data"
+1. Client -> Auth Server: "User wants to access server"
+2. Auth Server -> User: "Do you authorize?"
+3. User -> Auth Server: "Yes"
+4. Auth Server -> Client: "Here's authorization code"
+5. Client -> Auth Server: "Exchange code for token"
+6. Auth Server -> Client: "Here's access token"
+7. Client -> Resource Server: "Here's token, give me data"
 ```
 
 ### Token Types
@@ -136,7 +136,7 @@ Client ──► Many Servers (via multiple clients)
 
 ---
 
-## 🌐 Use Cases (Ch9)
+## Use Cases (Ch9)
 
 ### Who Builds What?
 | Who | Builds | Example |
@@ -146,13 +146,13 @@ Client ──► Many Servers (via multiple clients)
 | **Infrastructure** | Hosts, Gateways | Claude Desktop, Goose |
 
 ### Portability Benefit
-- Write server ONCE → Use in ANY MCP client
+- Write server ONCE -> Use in ANY MCP client
 - No vendor lock-in
 - Ecosystem grows faster
 
 ---
 
-## 🏛️ AAIF (Ch10)
+## AAIF (Ch10)
 
 ### What is AAIF?
 - **Agentic AI Foundation** - Non-profit
@@ -169,7 +169,7 @@ Client ──► Many Servers (via multiple clients)
 
 ---
 
-## 🧠 Memory Hooks
+## Memory Hooks
 
 ### For Architecture:
 > "Host has Clients, Clients talk to Servers"
@@ -180,8 +180,8 @@ Client ──► Many Servers (via multiple clients)
 > (Notification = text message, no reply expected)
 
 ### For OAuth:
-> "Authorization Code Flow = User says yes → Get code → Exchange for token"
-> (Like checking into a hotel: ID → Room key → Access room)
+> "Authorization Code Flow = User says yes -> Get code -> Exchange for token"
+> (Like checking into a hotel: ID -> Room key -> Access room)
 
 ### For Tools vs Resources:
 > "Tools DO things, Resources ARE things"
@@ -189,9 +189,9 @@ Client ──► Many Servers (via multiple clients)
 
 ---
 
-## ⚠️ Common Exam Traps
+## Common Exam Traps
 
-### Trap 1:混淆 Tools and Resources
+### Trap 1: Confusing Tools and Resources
 - Tools = Functions (can cause side effects)
 - Resources = Data (read-only)
 
@@ -208,7 +208,7 @@ Client ──► Many Servers (via multiple clients)
 
 ---
 
-## 📊 Confidence Tracker
+## Confidence Tracker
 
 Rate yourself 1-5 after studying each topic:
 
@@ -224,11 +224,11 @@ Rate yourself 1-5 after studying each topic:
 | Use Cases | ___/5 | |
 | AAIF | ___/5 | |
 
-**Target:** All topics ≥ 4/5 before exam
+**Target:** All topics >= 4/5 before exam
 
 ---
 
-## 🎯 Last-Minute Review (Exam Day)
+## Last-Minute Review (Exam Day)
 
 1. **Architecture diagram** - Can you draw it from memory?
 2. **JSON-RPC message types** - Request/Response/Notification?
@@ -238,7 +238,7 @@ Rate yourself 1-5 after studying each topic:
 
 ---
 
-## 📝 Your Notes Here
+## Your Notes Here
 
 ### Things that surprised me:
 - 
@@ -259,4 +259,4 @@ Rate yourself 1-5 after studying each topic:
 
 *Last updated: 2026-08-13*
 *Exam date: 2026-09-12*
-*Status: Filling in as you study* 📚
+*Status: Filling in as you study*

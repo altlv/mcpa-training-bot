@@ -15,7 +15,7 @@ After each task or phase, fill in what you learned. This is YOUR space to reflec
 
 ---
 
-## 📚 Phase 0: Foundation
+## Phase 0: Foundation
 
 ### Task 0.1: What is MCP?
 **Date:** ___________
@@ -80,7 +80,7 @@ After each task or phase, fill in what you learned. This is YOUR space to reflec
 
 ---
 
-## 📚 Phase 1: Knowledge Base (RAG)
+## Phase 1: Knowledge Base (RAG)
 
 ### Task 1.1: Project Structure
 **Date:** ___________
@@ -166,7 +166,7 @@ After each task or phase, fill in what you learned. This is YOUR space to reflec
 
 ---
 
-## 📚 Phase 2: Quiz Engine
+## Phase 2: Quiz Engine
 
 ### Task 2.1: Question Schema
 **Date:** ___________
@@ -252,7 +252,7 @@ After each task or phase, fill in what you learned. This is YOUR space to reflec
 
 ---
 
-## 📚 Phase 3: Chat Interface
+## Phase 3: Chat Interface
 
 ### Task 3.1: UI Choice
 **Date:** ___________
@@ -317,7 +317,7 @@ After each task or phase, fill in what you learned. This is YOUR space to reflec
 
 ---
 
-## 📚 Phase 4: Progress Tracking
+## Phase 4: Progress Tracking
 
 ### Task 4.1: Progress Schema
 **Date:** ___________
@@ -361,7 +361,7 @@ After each task or phase, fill in what you learned. This is YOUR space to reflec
 
 ---
 
-## 📚 Phase 5: Smart Features
+## Phase 5: Smart Features
 
 ### Task 5.1: Adaptive Difficulty
 **Date:** ___________
@@ -426,7 +426,7 @@ After each task or phase, fill in what you learned. This is YOUR space to reflec
 
 ---
 
-## 📚 Phase 6: Polish & Documentation
+## Phase 6: Polish & Documentation
 
 ### Task 6.1-6.5: Final Documentation
 **Date:** ___________
@@ -449,7 +449,7 @@ After each task or phase, fill in what you learned. This is YOUR space to reflec
 
 ---
 
-## 🎓 Final Reflections
+## Final Reflections
 
 ### What I'm most proud of:
 - 
@@ -473,7 +473,7 @@ After each task or phase, fill in what you learned. This is YOUR space to reflec
 
 ---
 
-## 📊 Key Learnings Summary
+## Key Learnings Summary
 
 After completing the project, summarize your top 10 learnings:
 
@@ -490,7 +490,7 @@ After completing the project, summarize your top 10 learnings:
 
 ---
 
-## 💡 Quotes to Remember
+## Quotes to Remember
 
 Add quotes that resonated with you:
 

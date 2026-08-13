@@ -195,7 +195,7 @@
 
 ---
 
-## 📝 How to Add New Decisions
+## How to Add New Decisions
 
 When you make a choice, add it here:
 
@@ -216,7 +216,7 @@ When you make a choice, add it here:
 
 ---
 
-## 🎯 Key Principles Behind Decisions
+## Key Principles Behind Decisions
 
 1. **Learning first** - Optimize for understanding, not performance
 2. **Local-first** - Avoid cloud costs and complexity

@@ -1,10 +1,10 @@
-# 🎓 MCPA Training Bot
+# MCPA Training Bot
 
 **Your personal study buddy for the Model Context Protocol Associate certification!**
 
 ---
 
-## 🌟 What Is This?
+## What Is This?
 
 A local training bot that helps you study for the MCPA certification by:
 - Quizzing you on MCP concepts
@@ -12,11 +12,11 @@ A local training bot that helps you study for the MCPA certification by:
 - Adapting to your learning style
 - Using RAG to pull from official documentation
 
-**Built with MCP, for learning MCP.** Meta, right? 😄
+**Built with MCP, for learning MCP.**
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (LTS version)
@@ -50,7 +50,7 @@ http://localhost:3000
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 mcpa-bot/
@@ -74,7 +74,7 @@ mcpa-bot/
 
 ---
 
-## 🎯 How to Use
+## How to Use
 
 ### Take a Quiz
 1. Open the web interface
@@ -97,7 +97,7 @@ mcpa-bot/
 
 ---
 
-## 📚 Learning Path
+## Learning Path
 
 **Start here:**
 
@@ -109,7 +109,7 @@ mcpa-bot/
 
 ---
 
-## 🧠 What You'll Learn
+## What You'll Learn
 
 By building this, you'll understand:
 
@@ -123,7 +123,7 @@ By building this, you'll understand:
 
 ---
 
-## ❓ FAQ
+## FAQ
 
 **Q: Is this free?**
 A: Yes! Everything runs locally. No API costs.
@@ -142,7 +142,7 @@ A: Ask Goose! That's what it's for. Or check the docs.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 This is your personal learning project! But if you want to improve it:
 
@@ -154,7 +154,7 @@ This is your personal learning project! But if you want to improve it:
 
 ---
 
-## 📝 Documentation
+## Documentation
 
 - `ARCHITECTURE.md` - System design & why things work this way
 - `DECISIONS.md` - Technical choices & trade-offs
@@ -163,7 +163,7 @@ This is your personal learning project! But if you want to improve it:
 
 ---
 
-## 🎓 About MCPA
+## About MCPA
 
 The **Model Context Protocol Associate (MCPA)** certification validates your knowledge of:
 - MCP architecture & components
@@ -176,7 +176,7 @@ Learn more: [modelcontextprotocol.io](https://modelcontextprotocol.io)
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Anthropic** - For creating MCP and Goose
 - **AAIF** - For the MCPA certification
@@ -184,12 +184,12 @@ Learn more: [modelcontextprotocol.io](https://modelcontextprotocol.io)
 
 ---
 
-## 📧 Questions?
+## Questions?
 
 Ask Goose! Or open an issue on GitHub.
 
 ---
 
-**Happy Learning! 🚀**
+**Happy Learning!**
 
-*Built with ❤️ using Goose*
+*Built with Goose*

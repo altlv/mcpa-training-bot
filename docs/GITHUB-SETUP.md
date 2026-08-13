@@ -1,4 +1,4 @@
-# 🚀 GitHub Setup Guide
+# GitHub Setup Guide
 ## Connect your local repo to GitHub
 
 ---
@@ -13,8 +13,8 @@
    - **Repository name:** `mcpa-training-bot`
    - **Description:** `Personal MCPA certification training bot with quiz engine, RAG, and progress tracking`
    - **Visibility:** 
-     - ✅ **Public** (if you want to show portfolio)
-     - ✅ **Private** (if you want to keep it personal)
+     - Public (if you want to show portfolio)
+     - Private (if you want to keep it personal)
    - **DO NOT** check "Add a README file" (you already have one!)
    - **DO NOT** check "Add .gitignore" (you already have one!)
 
@@ -42,7 +42,7 @@ git push -u origin main
 ### Step 3: Verify
 
 1. Refresh your GitHub repository page
-2. You should see all your files! 🎉
+2. You should see all your files!
 
 ---
 
@@ -66,12 +66,12 @@ gh auth login
 # Create repository
 gh repo create mcpa-training-bot --public --source=. --remote=origin --push
 
-# Done! 🎉
+# Done!
 ```
 
 ---
 
-## 📋 Your Remote URL
+## Your Remote URL
 
 After creating the repo, your URL will be:
 ```
@@ -80,17 +80,17 @@ https://github.com/YOUR-USERNAME/mcpa-training-bot.git
 
 ---
 
-## 🎯 Repository Settings (Recommended)
+## Repository Settings (Recommended)
 
 ### Enable GitHub Pages (Optional)
 If you want to host your quiz bot online later:
-1. Go to Settings → Pages
+1. Go to Settings -> Pages
 2. Source: Deploy from branch
 3. Branch: main, folder: /public
 4. Save
 
 ### Add Topics (Helps Discovery)
-Go to "About" section → Edit → Add topics:
+Go to "About" section -> Edit -> Add topics:
 - `mcp`
 - `model-context-protocol`
 - `training`
@@ -106,7 +106,7 @@ Personal MCPA (Model Context Protocol Associate) certification training bot. Fea
 
 ---
 
-## 📝 First Commit Checklist
+## First Commit Checklist
 
 Your initial commit includes:
 
@@ -120,11 +120,11 @@ Your initial commit includes:
 - [x] docs/SESSION-LOG.md - Session tracker
 - [x] .gitignore - Ignore rules
 
-**Total:** 8 files, 2170 lines of documentation! 📚
+**Total:** 9 files, 2800+ lines of documentation!
 
 ---
 
-## 🔄 Daily Git Workflow
+## Daily Git Workflow
 
 After each study session:
 
@@ -136,7 +136,7 @@ git status
 git add .
 
 # Commit with meaningful message
-git commit -m "📝 Day X: [What you did]"
+git commit -m "Day X: [What you did]"
 
 # Push to GitHub
 git push
@@ -144,15 +144,15 @@ git push
 
 ### Commit Message Examples
 ```bash
-git commit -m "📖 Day 1: Read MCP intro, set up project"
-git commit -m "💻 Day 4: Built quiz MCP server"
-git commit -m "🧪 Day 7: Week 1 review, 80% on quiz"
-git commit -m "🎯 Day 20: First practice exam - 72%"
+git commit -m "Day 1: Read MCP intro, set up project"
+git commit -m "Day 4: Built quiz MCP server"
+git commit -m "Day 7: Week 1 review, 80% on quiz"
+git commit -m "Day 20: First practice exam - 72%"
 ```
 
 ---
 
-## 🎓 Portfolio Benefits
+## Portfolio Benefits
 
 Having this on GitHub shows:
 
@@ -170,7 +170,7 @@ Having this on GitHub shows:
 
 ---
 
-## ❓ Troubleshooting
+## Troubleshooting
 
 ### "Permission denied"
 ```bash
@@ -200,7 +200,7 @@ git push -u origin main --force
 
 ---
 
-## 🎉 Success Checklist
+## Success Checklist
 
 After setup, verify:
 
@@ -213,6 +213,6 @@ After setup, verify:
 
 ---
 
-**Ready? Create your GitHub repo and run those commands! 🚀**
+**Ready? Create your GitHub repo and run those commands!**
 
 When done, tell me your GitHub URL and I'll help you verify everything looks good!

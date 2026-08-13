@@ -3,53 +3,53 @@
 
 ---
 
-## 🎯 The Big Picture
+## The Big Picture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                     YOUR MCPA TRAINING BOT                      │
-│                                                                 │
-│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐       │
-│  │   You       │ ──► │   Chat      │ ──► │   Quiz      │       │
-│  │   (Human)   │ ◄── │   Interface │ ◄── │   Engine    │       │
-│  └─────────────┘     └─────────────┘     └──────┬──────┘       │
-│                                                  │              │
-│                                                  ▼              │
-│                                          ┌─────────────┐       │
-│                                          │   RAG       │       │
-│                                          │   (ChromaDB)│       │
-│                                          └──────┬──────┘       │
-│                                                  │              │
-│                                                  ▼              │
-│                                          ┌─────────────┐       │
-│                                          │  Your       │       │
-│                                          │  Documents  │       │
-│                                          └─────────────┘       │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
++---------------------------------------------------------------------+
+|                     YOUR MCPA TRAINING BOT                          |
+|                                                                     |
+|  +-------------+     +-------------+     +-------------+           |
+|  |   You       | --> |   Chat      | --> |   Quiz      |           |
+|  |   (Human)   | <-- |   Interface | <-- |   Engine    |           |
+|  +-------------+     +-------------+     +------+------+           |
+|                                                  |                  |
+|                                                  v                  |
+|                                          +-------------+           |
+|                                          |   RAG       |           |
+|                                          |   (ChromaDB)|           |
+|                                          +------+------+           |
+|                                                  |                  |
+|                                                  v                  |
+|                                          +-------------+           |
+|                                          |  Your       |           |
+|                                          |  Documents  |           |
+|                                          +-------------+           |
+|                                                                     |
++---------------------------------------------------------------------+
 ```
 
 ---
 
-## 🤔 Why MCP (Model Context Protocol)?
+## Why MCP (Model Context Protocol)?
 
 ### The Problem It Solves
 Without MCP:
 ```
-App A ──► Tool A (custom integration)
-App A ──► Tool B (different integration)
-App A ──► Tool C (yet another integration)
-App B ──► Tool A (different integration again!)
+App A --> Tool A (custom integration)
+App A --> Tool B (different integration)
+App A --> Tool C (yet another integration)
+App B --> Tool A (different integration again!)
 ```
 Every tool needs a custom integration. Chaos!
 
 With MCP:
 ```
-App A ──┐
-        ├──► MCP ──► Tool A
-App B ──┤         Tool B
-        │         Tool C
-App C ──┘
+App A -+
+       +--> MCP --> Tool A
+App B -+           Tool B
+       |           Tool C
+App C -+
 ```
 **One standard, many tools.** Like USB for AI!
 
@@ -61,15 +61,15 @@ Your training bot uses MCP servers so:
 
 ---
 
-## 📦 Why Each Component Exists
+## Why Each Component Exists
 
 ### 1. ChromaDB (Vector Database)
 
 **What it does:** Stores your documents as numerical representations (vectors)
 
 **Why not just use a text file?**
-- Text files: "Find me info about JSON-RPC" → Scan entire file, slow
-- ChromaDB: "Find me info about JSON-RPC" → Instant semantic search
+- Text files: "Find me info about JSON-RPC" -> Scan entire file, slow
+- ChromaDB: "Find me info about JSON-RPC" -> Instant semantic search
 
 **Analogy:**
 - Text file = Looking through a book page by page
@@ -89,7 +89,7 @@ Your training bot uses MCP servers so:
 **Why a separate server (not just a function)?**
 - **Testability:** Can test quiz logic independently
 - **Reusability:** Other apps can use your quiz engine
-- **Separation of concerns:** Quiz logic ≠ UI logic
+- **Separation of concerns:** Quiz logic != UI logic
 
 **Why MCP specifically?**
 - Standard interface (any MCP client can use it)
@@ -145,22 +145,22 @@ const server = {
 
 ---
 
-## 🔌 How MCP Servers Talk to Each Other
+## How MCP Servers Talk to Each Other
 
 ```
-┌──────────────┐         ┌──────────────┐
-│ Quiz Server  │         │Knowledge Server│
-│              │         │              │
-│ "I need info │ ──────► │ "Here's the │
-│  about X"    │         │  content"   │
-│              │ ◄────── │              │
-└──────┬───────┘         └──────────────┘
-       │
-       ▼
-┌──────────────┐
-│   You        │
-│ (see answer) │
-└──────────────┘
++--------------+         +--------------+
+| Quiz Server  |         |Knowledge Server|
+|              |         |              |
+| "I need info | ------> | "Here's the |
+|  about X"    |         |  content"   |
+|              | <------ |              |
++------+-------+         +--------------+
+       |
+       v
++--------------+
+|   You        |
+| (see answer) |
++--------------+
 ```
 
 **Why separate servers?**
@@ -170,7 +170,7 @@ const server = {
 
 ---
 
-## 📁 Why This Folder Structure?
+## Why This Folder Structure?
 
 ```
 mcpa-bot/
@@ -191,13 +191,13 @@ mcpa-bot/
 ```
 
 **Why this way?**
-- **Separation:** Frontend (public/) ≠ Backend (src/)
+- **Separation:** Frontend (public/) != Backend (src/)
 - **Data isolation:** Database files don't mix with code
 - **Documentation:** Learning materials are FIRST CLASS citizens
 
 ---
 
-## 🧪 Why Testing Matters (Your QA Background!)
+## Why Testing Matters (Your QA Background!)
 
 As a QA tester, you know:
 - Code breaks in unexpected ways
@@ -213,7 +213,7 @@ As a QA tester, you know:
 
 ---
 
-## 🚀 Why Local-First?
+## Why Local-First?
 
 | Cloud Approach | Local Approach |
 |----------------|----------------|
@@ -227,7 +227,7 @@ As a QA tester, you know:
 
 ---
 
-## 📚 Why Documentation is Built-In
+## Why Documentation is Built-In
 
 This file exists because:
 1. **Future you** will forget why you made choices
@@ -239,7 +239,7 @@ This file exists because:
 
 ---
 
-## 🎓 Learning Path Through This Code
+## Learning Path Through This Code
 
 Start here:
 1. **ARCHITECTURE.md** (this file) - Big picture
@@ -250,7 +250,7 @@ Start here:
 
 ---
 
-## ❓ Questions to Ask Yourself
+## Questions to Ask Yourself
 
 After reading this:
 1. Can I explain what MCP is in 2 sentences?
@@ -258,10 +258,10 @@ After reading this:
 3. Why is the quiz engine a separate server?
 4. How do MCP servers communicate?
 
-If yes → You understand the architecture!
-If no → Reread the relevant section, or ask me!
+If yes -> You understand the architecture!
+If no -> Reread the relevant section, or ask me!
 
 ---
 
 *Last updated: 2026-08-13*
-*Created by: Your friendly MCPA Training Bot project*
+*Created by: Your MCPA Training Bot project*

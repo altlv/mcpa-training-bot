@@ -1,9 +1,9 @@
-# 🚀 Getting Started Guide
-## For Absolute Beginners (That's You!)
+# Getting Started Guide
+## For Absolute Beginners
 
 ---
 
-## 🎯 Your First Task: Understand MCP
+## Your First Task: Understand MCP
 
 Before writing any code, let's understand what we're building with.
 
@@ -33,7 +33,7 @@ Take a photo and save it in `docs/images/` (create the folder).
 
 ---
 
-## 🛠️ Your Second Task: Set Up Your Workspace
+## Your Second Task: Set Up Your Workspace
 
 ### Step 1: Create Project Folder
 Open a terminal (Command Prompt or PowerShell) and run:
@@ -62,7 +62,7 @@ If you see files, it worked!
 
 ---
 
-## 🧪 Your Third Task: Test Your QA Skills
+## Test Your QA Skills
 
 You're a QA tester. Let's test the setup!
 
@@ -94,7 +94,7 @@ Record your test results in `docs/LEARNING.md` under "Phase 0, Task 0.2".
 
 ---
 
-## 📝 Your Fourth Task: Document Your Journey
+## Document Your Journey
 
 Create a file called `docs/LEARNING.md` (if it doesn't exist) and add:
 
@@ -124,19 +124,19 @@ Create a file called `docs/LEARNING.md` (if it doesn't exist) and add:
 
 ---
 
-## 🎉 Congratulations!
+## Congratulations!
 
 You've completed your first tasks! You've:
-- ✅ Learned what MCP is
-- ✅ Set up your workspace
-- ✅ Applied your QA skills
-- ✅ Started documenting
+- [x] Learned what MCP is
+- [x] Set up your workspace
+- [x] Applied your QA skills
+- [x] Started documenting
 
 **Next:** Move to Task 0.3 in `TODO.md` (Architecture Understanding).
 
 ---
 
-## 💡 Pro Tips for Beginners
+## Pro Tips for Beginners
 
 ### 1. It's Okay Not to Understand Everything
 Programming is like learning a language. You don't need to know every word to have a conversation.
@@ -158,7 +158,7 @@ Your brain learns while resting. If you're frustrated, walk away for 10 minutes.
 
 ---
 
-## 🆘 Stuck? Try This
+## Stuck? Try This
 
 **Problem:** "I don't understand what MCP is"
 **Solution:** Read the intro page again, then ask Goose to explain it differently.
@@ -174,7 +174,7 @@ Your brain learns while resting. If you're frustrated, walk away for 10 minutes.
 
 ---
 
-## 📊 Track Your Time
+## Track Your Time
 
 Start a timer when you begin. Write down how long each task takes.
 
@@ -191,7 +191,7 @@ This helps you:
 
 ---
 
-## 🎓 Your QA Advantage
+## Your QA Advantage
 
 As a tester, you already have superpowers:
 
@@ -207,7 +207,7 @@ As a tester, you already have superpowers:
 
 ---
 
-## 🌟 Mindset Shift
+## Mindset Shift
 
 **Old mindset:** "I'm insecure about coding"
 **New mindset:** "I'm learning to code, and that's brave"
@@ -220,14 +220,14 @@ As a tester, you already have superpowers:
 
 ---
 
-## 🚀 Ready for More?
+## Ready for More?
 
 Complete the tasks in this guide, then move to:
 - `TODO.md` - Task breakdown
 - `ARCHITECTURE.md` - System design
 - `DECISIONS.md` - Why choices were made
 
-**You've got this! 💪**
+**You've got this!**
 
 ---
 
