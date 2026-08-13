@@ -1,0 +1,95 @@
+# MCPA Training Bot - .gitignore
+# ================================
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+out/
+
+# Runtime data
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# OS-specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Database files
+*.sqlite
+*.sqlite3
+data/chroma/  # ChromaDB local data (regenerable)
+
+# Quiz data (regenerable, but track schemas)
+# data/questions/bank.json  # Uncomment if you want to track question bank
+
+# Session logs (personal, don't track)
+# docs/SESSION-LOG.md  # Uncomment if you want to keep private
+
+# Learning journal (personal, don't track)
+# docs/LEARNING.md  # Uncomment if you want to keep private
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Docker (if using ChromaDB via Docker)
+docker-compose.override.yml
+
+# Local development
+*.local
+
+# Backup files
+*.bak
+*.backup
+
+# Archive
+archive/
+
+# Images (if too large)
+# docs/images/  # Uncomment if images get too big
+
+# ================================
+# What IS tracked (important!):
+# ✓ Source code (src/)
+# ✓ Configuration (package.json, etc.)
+# ✓ Documentation (README.md, ARCHITECTURE.md, etc.)
+# ✓ Schemas (data/schemas/)
+# ✓ Public assets (public/)
+# ✓ Tests (tests/)
+# ✓ TODO.md
+# ✓ .gitignore itself
+# ================================
