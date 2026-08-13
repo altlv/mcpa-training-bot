@@ -1,0 +1,27 @@
+{
+  "name": "mcpa-bot",
+  "version": "1.0.0",
+  "description": "**Your personal study buddy for the Model Context Protocol Associate certification!**",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/altlv/mcpa-training-bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/altlv/mcpa-training-bot/issues"
+  },
+  "homepage": "https://github.com/altlv/mcpa-training-bot#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

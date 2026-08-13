@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mcpa-bot.com/schemas/question.json",
+  "title": "MCPA Training Question",
+  "description": "Schema for quiz questions in the MCPA Training Bot. Use 'answer' for single-select (mcq), 'answers' for multiple-select (mcq-multi/multi_select).",
+  "type": "object",
+  "required": ["id", "chapter", "type", "difficulty", "question", "options", "explanation"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique question identifier (e.g., 'ch1-q1' for single, 'ch1-m1' for multiple-select)",
+      "pattern": "^ch[0-9]+-[qm][0-9]+$"
+    },
+    "chapter": {
+      "type": "integer",
+      "description": "Chapter number (1-10)",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "type": {
+      "type": "string",
+      "description": "Question type: 'mcq' or 'multi_select' for single-select, 'mcq-multi' for multiple-select",
+      "enum": ["mcq", "mcq-multi", "multi_select", "true-false", "scenario"]
+    },
+    "difficulty": {
+      "type": "string",
+      "description": "Difficulty level",
+      "enum": ["easy", "medium", "hard"]
+    },
+    "question": {
+      "type": "string",
+      "description": "The question text"
+    },
+    "options": {
+      "type": "array",
+      "description": "Answer options (for mcq type)",
+      "items": {
+        "type": "object",
+        "required": ["letter", "text"],
+        "properties": {
+          "letter": {
+            "type": "string",
+            "enum": ["A", "B", "C", "D"]
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "minItems": 2,
+      "maxItems": 4
+    },
+    "answer": {
+      "type": "string",
+      "description": "Correct answer letter (A, B, C, or D) for single-select questions"
+    },
+    "answers": {
+      "type": "array",
+      "description": "Correct answer letters for multiple-select questions (e.g., ['A', 'C'])",
+      "items": {
+        "type": "string",
+        "enum": ["A", "B", "C", "D"]
+      },
+      "minItems": 2,
+      "maxItems": 4
+    },
+    "explanation": {
+      "type": "string",
+      "description": "Why this answer is correct"
+    },
+    "tags": {
+      "type": "array",
+      "description": "Topic tags for filtering",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

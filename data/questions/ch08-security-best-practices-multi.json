@@ -1,0 +1,335 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 8 (Multi-Select): Security & Trust",
+    "protocolVersion": "2026-07-28",
+    "chapter": 8,
+    "chapterName": "Security & Trust",
+    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
+    "questionCount": 8
+  },
+  "questions": [
+    {
+      "id": "ch8-m1",
+      "chapter": 8,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which risks does the token passthrough anti-pattern create? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Circumvention of security controls like rate limiting and traffic monitoring that depend on token audience"
+        },
+        {
+          "letter": "B",
+          "text": "Loss of accountability: downstream logs attribute requests to the wrong identity"
+        },
+        {
+          "letter": "C",
+          "text": "The server becoming a proxy for data exfiltration with stolen tokens"
+        },
+        {
+          "letter": "D",
+          "text": "Trust-boundary breakage: a token accepted by multiple services lets one compromise spread"
+        },
+        {
+          "letter": "E",
+          "text": "Improved latency due to skipped validation"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "All four risks are documented reasons the spec forbids passthrough. 'Improved latency' is not a recognized benefit — validation must happen.",
+      "tags": [
+        "security",
+        "token-passthrough"
+      ]
+    },
+    {
+      "id": "ch8-m2",
+      "chapter": 8,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which SSRF mitigations should server-deployed MCP clients implement when fetching OAuth-related URLs? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Require HTTPS, allowing http:// only for loopback during development"
+        },
+        {
+          "letter": "B",
+          "text": "Block private and reserved IP ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16)"
+        },
+        {
+          "letter": "C",
+          "text": "Validate redirect targets with the same rules instead of blindly following them"
+        },
+        {
+          "letter": "D",
+          "text": "Hand-roll custom IP-parsing validation to catch encoding tricks"
+        },
+        {
+          "letter": "E",
+          "text": "Consider egress proxies (e.g., Smokescreen) that block internal destinations by design"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ],
+      "explanation": "A, B, C, and E are the documented mitigations. D is explicitly warned against: avoid manual IP validation, since attackers exploit octal/hex/IPv4-mapped-IPv6 encodings that custom parsers miss.",
+      "tags": [
+        "security",
+        "ssrf"
+      ]
+    },
+    {
+      "id": "ch8-m3",
+      "chapter": 8,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Before executing a one-click local MCP server configuration, the client MUST... (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "show the exact command that will be executed, without truncation"
+        },
+        {
+          "letter": "B",
+          "text": "clearly identify it as a potentially dangerous operation that executes code"
+        },
+        {
+          "letter": "C",
+          "text": "require explicit user approval before proceeding"
+        },
+        {
+          "letter": "D",
+          "text": "allow the user to cancel"
+        },
+        {
+          "letter": "E",
+          "text": "upload the command to a central review service first"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "The four MUSTs are full command display, danger identification, explicit approval, and cancellation. Central review is not required (sandboxing and dangerous-pattern warnings are SHOULDs).",
+      "tags": [
+        "security",
+        "local-servers",
+        "consent"
+      ]
+    },
+    {
+      "id": "ch8-m4",
+      "chapter": 8,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which of these are listed as common scope-design MISTAKES? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Publishing all possible scopes in scopes_supported"
+        },
+        {
+          "letter": "B",
+          "text": "Using wildcard or omnibus scopes like *, all, or full-access"
+        },
+        {
+          "letter": "C",
+          "text": "Bundling unrelated privileges to preempt future prompts"
+        },
+        {
+          "letter": "D",
+          "text": "Emitting precise scope challenges instead of the full catalog"
+        },
+        {
+          "letter": "E",
+          "text": "Treating claimed scopes in a token as sufficient without server-side authorization logic"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ],
+      "explanation": "A, B, C, and E are on the common-mistakes list. Emitting precise challenges (D) is the recommended behavior, not a mistake.",
+      "tags": [
+        "security",
+        "scopes",
+        "least-privilege"
+      ]
+    },
+    {
+      "id": "ch8-m5",
+      "chapter": 8,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which mitigations does the security-best-practices doc give for the confused deputy problem? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Obtain per-client user consent — do not rely on a consent cookie set for a different dynamically-registered client"
+        },
+        {
+          "letter": "B",
+          "text": "Treat a static client ID fronting many downstream clients as a high-risk pattern"
+        },
+        {
+          "letter": "C",
+          "text": "Validate redirect URIs strictly against registered values"
+        },
+        {
+          "letter": "D",
+          "text": "Skip the consent screen for returning users to reduce friction"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "The attack works precisely because a cached consent cookie skips the screen while the attacker swaps in their redirect URI. D is the vulnerability, not the mitigation.",
+      "tags": [
+        "security",
+        "confused-deputy"
+      ]
+    },
+    {
+      "id": "ch8-m6",
+      "chapter": 8,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which statements about server-minted state handles (the 2026-07-28 replacement for sessions) are true? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A handle is NOT proof of identity — authorization must come from the verified token on each request"
+        },
+        {
+          "letter": "B",
+          "text": "Handles should be generated with secure randomness, not guessable sequences"
+        },
+        {
+          "letter": "C",
+          "text": "Servers should bind stored state to the authenticated user (e.g., key by user_id:handle) so a stolen handle is useless cross-user"
+        },
+        {
+          "letter": "D",
+          "text": "A handle may safely double as a bearer credential since it's random"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Random ≠ authorization: the doc's core rule is that handles reference state while the token authorizes. Treating the handle as a credential recreates session hijacking.",
+      "tags": [
+        "security",
+        "state-handles",
+        "statelessness"
+      ]
+    },
+    {
+      "id": "ch8-m7",
+      "chapter": 8,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which claims must a resource server verify on an inbound access token? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The signature, against the issuer's published keys"
+        },
+        {
+          "letter": "B",
+          "text": "The expiry (exp)"
+        },
+        {
+          "letter": "C",
+          "text": "The audience (aud) — the token was issued for THIS server"
+        },
+        {
+          "letter": "D",
+          "text": "The issuer (iss) — a trusted authorization server"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "Signature, expiry, audience, and issuer together are the minimum bar; audience validation is what kills token passthrough. All true, so E holds.",
+      "tags": [
+        "security",
+        "tokens",
+        "validation"
+      ]
+    },
+    {
+      "id": "ch8-m8",
+      "chapter": 8,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which URL-scheme rules apply when a client opens an OAuth authorization URL? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Only http:// and https:// URLs may be opened"
+        },
+        {
+          "letter": "B",
+          "text": "The URL must never be passed to a shell or interpreted as a command"
+        },
+        {
+          "letter": "C",
+          "text": "Custom schemes like myapp:// from an untrusted server should be rejected for the authorization step"
+        },
+        {
+          "letter": "D",
+          "text": "javascript: URLs are acceptable if the authorization server is trusted"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "javascript: (and file:, custom schemes) in an attacker-influenced URL is an execution vector — exactly what the rule exists to block.",
+      "tags": [
+        "security",
+        "oauth",
+        "url-schemes"
+      ]
+    }
+  ]
+}

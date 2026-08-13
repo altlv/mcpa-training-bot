@@ -1,0 +1,338 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 3 (Multi-Select): Server Features (Tools, Resources, Prompts)",
+    "protocolVersion": "2026-07-28",
+    "chapter": 3,
+    "chapterName": "Server Features (Tools, Resources, Prompts)",
+    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
+    "questionCount": 8
+  },
+  "questions": [
+    {
+      "id": "ch3-m1",
+      "chapter": 3,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which method/primitive pairings are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "tools/list and tools/call for tools"
+        },
+        {
+          "letter": "B",
+          "text": "resources/list, resources/templates/list, and resources/read for resources"
+        },
+        {
+          "letter": "C",
+          "text": "prompts/list and prompts/get for prompts"
+        },
+        {
+          "letter": "D",
+          "text": "prompts/call for executing prompts"
+        },
+        {
+          "letter": "E",
+          "text": "resources/write for updating resources"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Tools are discovered and executed (list/call); resources are listed, template-listed, and read (read-only); prompts are listed and retrieved with prompts/get. There is no prompts/call or resources/write.",
+      "tags": [
+        "server-features",
+        "methods"
+      ]
+    },
+    {
+      "id": "ch3-m2",
+      "chapter": 3,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which fields appear in a tool definition returned by tools/list? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "name — the unique identifier within the server's namespace"
+        },
+        {
+          "letter": "B",
+          "text": "title — a human-readable display name"
+        },
+        {
+          "letter": "C",
+          "text": "description — what the tool does and when to use it"
+        },
+        {
+          "letter": "D",
+          "text": "inputSchema — a JSON Schema for the expected parameters"
+        },
+        {
+          "letter": "E",
+          "text": "transport — the transport the tool requires"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "Tool objects carry name, title, description, and inputSchema (optionally an outputSchema). Transport is a connection-level concern, not per-tool metadata.",
+      "tags": [
+        "server-features",
+        "tools",
+        "schemas"
+      ]
+    },
+    {
+      "id": "ch3-m3",
+      "chapter": 3,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which statements about resources are true? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Each resource has a unique URI and declares a MIME type"
+        },
+        {
+          "letter": "B",
+          "text": "Direct resources use fixed URIs; resource templates use parameterized URIs like weather://forecast/{city}/{date}"
+        },
+        {
+          "letter": "C",
+          "text": "Resource templates support parameter completion"
+        },
+        {
+          "letter": "D",
+          "text": "Resources are model-controlled: the LLM decides when to fetch them"
+        },
+        {
+          "letter": "E",
+          "text": "Watching a resource for changes uses subscriptions/listen with a resourceSubscriptions filter"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ],
+      "explanation": "Resources are application-driven (the host decides retrieval and usage), not model-controlled — that's tools. Everything else is accurate, including the 2026-07-28 subscription mechanism.",
+      "tags": [
+        "server-features",
+        "resources",
+        "templates"
+      ]
+    },
+    {
+      "id": "ch3-m4",
+      "chapter": 3,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which human-oversight mechanisms do the docs suggest applications implement around tools? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Displaying available tools in the UI so users can scope what's available"
+        },
+        {
+          "letter": "B",
+          "text": "Approval dialogs for individual tool executions"
+        },
+        {
+          "letter": "C",
+          "text": "Permission settings for pre-approving certain safe operations"
+        },
+        {
+          "letter": "D",
+          "text": "Activity logs showing tool executions with their results"
+        },
+        {
+          "letter": "E",
+          "text": "A mandatory cooling-off delay before any tool runs"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "The four suggested mechanisms are UI visibility, per-execution approval, pre-approval permissions, and activity logs. No mandatory delay exists in the protocol or guidance.",
+      "tags": [
+        "server-features",
+        "tools",
+        "trust-safety"
+      ]
+    },
+    {
+      "id": "ch3-m5",
+      "chapter": 3,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Match the interaction model: which pairings are correct per the spec? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Tools are model-controlled — the LLM decides when to invoke them (with user approval)"
+        },
+        {
+          "letter": "B",
+          "text": "Resources are application-controlled — the host decides when to fetch and use them"
+        },
+        {
+          "letter": "C",
+          "text": "Prompts are user-controlled — explicitly selected, e.g., as slash commands"
+        },
+        {
+          "letter": "D",
+          "text": "Prompts are model-controlled — the LLM injects them automatically"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "The control triad is tools→model, resources→application, prompts→user. D contradicts C, so 'All of the above' is a trap.",
+      "tags": [
+        "server-features",
+        "control-model"
+      ]
+    },
+    {
+      "id": "ch3-m6",
+      "chapter": 3,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which fields can a resource returned by resources/list carry? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "uri — the unique identifier"
+        },
+        {
+          "letter": "B",
+          "text": "name and title"
+        },
+        {
+          "letter": "C",
+          "text": "mimeType"
+        },
+        {
+          "letter": "D",
+          "text": "ttlMs and cacheScope on the surrounding list result"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "Resources carry uri, name/title, description, and mimeType, and since SEP-2549 the list result itself is a CacheableResult with ttlMs and cacheScope. Everything listed is true.",
+      "tags": [
+        "server-features",
+        "resources",
+        "caching"
+      ]
+    },
+    {
+      "id": "ch3-m7",
+      "chapter": 3,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which statements about tools/call results are correct in 2026-07-28? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The result carries a required resultType field"
+        },
+        {
+          "letter": "B",
+          "text": "resultType: \"input_required\" signals an MRTR interim result whose inputRequests need answering"
+        },
+        {
+          "letter": "C",
+          "text": "A tool failure is reported with isError rather than a JSON-RPC protocol error"
+        },
+        {
+          "letter": "D",
+          "text": "resultType: \"task\" is reserved for the Tasks extension"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "All four are accurate: resultType is mandatory (SEP-2322), input_required drives MRTR, execution failures use isError inside the result, and 'task' is reserved for io.modelcontextprotocol/tasks.",
+      "tags": [
+        "server-features",
+        "tools",
+        "resulttype"
+      ]
+    },
+    {
+      "id": "ch3-m8",
+      "chapter": 3,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which statements about tool naming and schemas are true? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A tool's name must be unique within its server's namespace"
+        },
+        {
+          "letter": "B",
+          "text": "inputSchema is JSON Schema; since SEP-2106 any JSON Schema 2020-12 keywords are allowed"
+        },
+        {
+          "letter": "C",
+          "text": "On Streamable HTTP, the called tool's name is mirrored in the Mcp-Name header"
+        },
+        {
+          "letter": "D",
+          "text": "Two servers connected to one host may not expose tools with the same name"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Name uniqueness is per server — collisions across servers are the host's problem to disambiguate, so D is false and E falls with it.",
+      "tags": [
+        "server-features",
+        "tools",
+        "schemas",
+        "headers"
+      ]
+    }
+  ]
+}

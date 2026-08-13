@@ -1,0 +1,339 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 5 (Multi-Select): Building Servers & Agent Skills",
+    "protocolVersion": "2026-07-28",
+    "chapter": 5,
+    "chapterName": "Building Servers & Agent Skills",
+    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
+    "questionCount": 8
+  },
+  "questions": [
+    {
+      "id": "ch5-m1",
+      "chapter": 5,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which logging calls are UNSAFE in a STDIO-based MCP server because they write to stdout? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "print() in Python"
+        },
+        {
+          "letter": "B",
+          "text": "console.log() in TypeScript/JavaScript"
+        },
+        {
+          "letter": "C",
+          "text": "console.error() in TypeScript/JavaScript"
+        },
+        {
+          "letter": "D",
+          "text": "System.out.println() in Java"
+        },
+        {
+          "letter": "E",
+          "text": "fmt.Println() in Go"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "D",
+        "E"
+      ],
+      "explanation": "Anything writing to stdout corrupts the JSON-RPC stream: print(), console.log(), System.out.println(), fmt.Println(). console.error() writes to stderr and is safe (as are logging libraries targeting stderr/files).",
+      "tags": [
+        "build-server",
+        "logging",
+        "stdio"
+      ]
+    },
+    {
+      "id": "ch5-m2",
+      "chapter": 5,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Your server doesn't appear in Claude for Desktop after editing claude_desktop_config.json. Which checks match the official troubleshooting list? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Validate the config file's JSON syntax"
+        },
+        {
+          "letter": "B",
+          "text": "Ensure the server path is absolute, not relative"
+        },
+        {
+          "letter": "C",
+          "text": "Fully quit and reopen Claude Desktop (closing the window isn't enough)"
+        },
+        {
+          "letter": "D",
+          "text": "Check ~/Library/Logs/Claude (mcp.log, mcp-server-NAME.log) for errors"
+        },
+        {
+          "letter": "E",
+          "text": "Reinstall the operating system"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "The documented checklist: config syntax, absolute paths, a complete restart, and reading the MCP logs. OS reinstall is not on the list.",
+      "tags": [
+        "build-server",
+        "troubleshooting",
+        "claude-desktop"
+      ]
+    },
+    {
+      "id": "ch5-m3",
+      "chapter": 5,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which deployment paths does the build-mcp-server agent skill choose between? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Remote Streamable HTTP (default for wrapping cloud APIs)"
+        },
+        {
+          "letter": "B",
+          "text": "MCP Apps (interactive widgets rendered in chat)"
+        },
+        {
+          "letter": "C",
+          "text": "MCP Bundles / MCPB (local server packaged with its runtime)"
+        },
+        {
+          "letter": "D",
+          "text": "Local stdio (prototyping, with an upgrade path to MCPB)"
+        },
+        {
+          "letter": "E",
+          "text": "Browser extension"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "The skill routes to one of four paths: remote Streamable HTTP, MCP apps (via build-mcp-app), MCPB (via build-mcpb), or local stdio. Browser extensions aren't a path.",
+      "tags": [
+        "agent-skills",
+        "deployment"
+      ]
+    },
+    {
+      "id": "ch5-m4",
+      "chapter": 5,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "In the build-client tutorial, which statements about tool-call handling are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The client fetches tools/list and maps each tool's name, description, and input schema into the model API's tool format"
+        },
+        {
+          "letter": "B",
+          "text": "A failing tool answers with is_error set rather than raising in the client"
+        },
+        {
+          "letter": "C",
+          "text": "Tool results are appended to the conversation and sent back to the model for a final response"
+        },
+        {
+          "letter": "D",
+          "text": "The model executes tools directly on the server without the client's involvement"
+        },
+        {
+          "letter": "E",
+          "text": "CallToolResult.content is a list of typed blocks, so code narrows to text blocks before reading .text"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ],
+      "explanation": "The client is always in the loop: it maps tools for the model, executes the model's requested calls through the MCP session, checks is_error, and feeds results back. The model never talks to the server directly.",
+      "tags": [
+        "build-client",
+        "tools",
+        "error-handling"
+      ]
+    },
+    {
+      "id": "ch5-m5",
+      "chapter": 5,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which entries belong in a claude_desktop_config.json server definition? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "command — the executable to launch"
+        },
+        {
+          "letter": "B",
+          "text": "args — arguments such as the absolute path to your server script"
+        },
+        {
+          "letter": "C",
+          "text": "env — environment variables like API keys"
+        },
+        {
+          "letter": "D",
+          "text": "port — the TCP port Claude should connect to"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "STDIO servers are subprocesses: command/args/env under the mcpServers key. There is no port — stdio doesn't use TCP, which sinks D and E.",
+      "tags": [
+        "build-server",
+        "claude-desktop",
+        "configuration"
+      ]
+    },
+    {
+      "id": "ch5-m6",
+      "chapter": 5,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which system requirements do the official quickstarts state? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Python quickstart: Python 3.10+ and MCP SDK 2.0.0+"
+        },
+        {
+          "letter": "B",
+          "text": "TypeScript quickstart: Node.js 20 or higher"
+        },
+        {
+          "letter": "C",
+          "text": "Client tutorial (Python): uv for project setup and an Anthropic API key in .env"
+        },
+        {
+          "letter": "D",
+          "text": "Inspector: Node 22.19.0 or newer"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "All four requirements come straight from the docs — a legitimate 'All of the above'.",
+      "tags": [
+        "build-server",
+        "build-client",
+        "requirements"
+      ]
+    },
+    {
+      "id": "ch5-m7",
+      "chapter": 5,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Your freshly-configured stdio server crashes Claude Desktop's connection immediately. Which are plausible documented causes? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A print()/console.log() call writing to stdout and corrupting the JSON-RPC stream"
+        },
+        {
+          "letter": "B",
+          "text": "A relative path in args that resolves differently for the Claude Desktop process"
+        },
+        {
+          "letter": "C",
+          "text": "Invalid JSON syntax in claude_desktop_config.json"
+        },
+        {
+          "letter": "D",
+          "text": "Only closing the Claude window instead of fully quitting after the config change"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "Every one of these is on the official troubleshooting list, making E correct too.",
+      "tags": [
+        "build-server",
+        "troubleshooting",
+        "stdio"
+      ]
+    },
+    {
+      "id": "ch5-m8",
+      "chapter": 5,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which statements about the MCP server-development agent skills are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The mcp-server-dev plugin bundles build-mcp-server, build-mcp-app, and build-mcpb"
+        },
+        {
+          "letter": "B",
+          "text": "Remote Streamable HTTP is the default path for wrapping cloud APIs"
+        },
+        {
+          "letter": "C",
+          "text": "MCPB packages a local server together with its runtime for one-click install"
+        },
+        {
+          "letter": "D",
+          "text": "The skills only support Python servers"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "The skills cover multiple languages and deployment shapes; the Python-only claim is false, so 'All of the above' fails.",
+      "tags": [
+        "agent-skills",
+        "deployment",
+        "mcpb"
+      ]
+    }
+  ]
+}

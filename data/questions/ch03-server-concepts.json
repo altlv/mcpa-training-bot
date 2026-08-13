@@ -1,0 +1,490 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 3: Server Concepts (Tools, Resources, Prompts)",
+    "protocolVersion": "2026-07-28",
+    "chapter": 3,
+    "chapterName": "Server Concepts (Tools, Resources, Prompts)",
+    "questionCount": 15
+  },
+  "questions": [
+    {
+      "id": "ch3-q1",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What are the three core primitives that MCP servers can expose?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Tools, Resources, and Prompts"
+        },
+        {
+          "letter": "B",
+          "text": "Functions, Files, and Formats"
+        },
+        {
+          "letter": "C",
+          "text": "Actions, Events, and Streams"
+        },
+        {
+          "letter": "D",
+          "text": "Tools, Agents, and Memories"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Servers expose Tools (executable functions), Resources (read-only data sources providing context), and Prompts (reusable interaction templates).",
+      "tags": [
+        "server-concepts",
+        "primitives"
+      ]
+    },
+    {
+      "id": "ch3-q2",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Who 'controls' each server primitive according to the interaction model in the docs?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Tools: user, Resources: model, Prompts: application"
+        },
+        {
+          "letter": "B",
+          "text": "Tools: model, Resources: application, Prompts: user"
+        },
+        {
+          "letter": "C",
+          "text": "Tools: application, Resources: user, Prompts: model"
+        },
+        {
+          "letter": "D",
+          "text": "All three are controlled by the model"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Tools are model-controlled (the LLM decides when to invoke them), resources are application-driven (the host decides how to retrieve and use them), and prompts are user-controlled (requiring explicit invocation, e.g., via slash commands).",
+      "tags": [
+        "server-concepts",
+        "control-model"
+      ]
+    },
+    {
+      "id": "ch3-q3",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Which pair of protocol methods is used to discover and execute tools?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "tools/find and tools/run"
+        },
+        {
+          "letter": "B",
+          "text": "tools/list and tools/call"
+        },
+        {
+          "letter": "C",
+          "text": "tools/get and tools/invoke"
+        },
+        {
+          "letter": "D",
+          "text": "list/tools and call/tools"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Clients discover tools with tools/list (returning definitions with JSON Schemas) and execute a specific tool with tools/call.",
+      "tags": [
+        "server-concepts",
+        "tools",
+        "methods"
+      ]
+    },
+    {
+      "id": "ch3-q4",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What schema language does MCP use to define and validate tool inputs?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Protocol Buffers"
+        },
+        {
+          "letter": "B",
+          "text": "XML Schema (XSD)"
+        },
+        {
+          "letter": "C",
+          "text": "JSON Schema"
+        },
+        {
+          "letter": "D",
+          "text": "GraphQL SDL"
+        }
+      ],
+      "answer": "C",
+      "explanation": "Each tool declares an inputSchema in JSON Schema, which enables type validation and documents required and optional parameters. Tools may also declare an optional outputSchema.",
+      "tags": [
+        "server-concepts",
+        "tools",
+        "schemas"
+      ]
+    },
+    {
+      "id": "ch3-q5",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "How is a Resource uniquely identified in MCP?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "By a sequential integer ID assigned by the client"
+        },
+        {
+          "letter": "B",
+          "text": "By a unique URI, e.g., file:///path/to/document.md"
+        },
+        {
+          "letter": "C",
+          "text": "By its SHA-256 content hash"
+        },
+        {
+          "letter": "D",
+          "text": "By a (server name, index) tuple"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Each resource has a unique URI (such as file:///path/to/document.md) and declares its MIME type for appropriate content handling.",
+      "tags": [
+        "server-concepts",
+        "resources"
+      ]
+    },
+    {
+      "id": "ch3-q6",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What distinguishes a Resource Template from a Direct Resource?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Templates are write-enabled while direct resources are read-only"
+        },
+        {
+          "letter": "B",
+          "text": "Templates use dynamic URIs with parameters (e.g., travel://activities/{city}/{category}) while direct resources have fixed URIs"
+        },
+        {
+          "letter": "C",
+          "text": "Templates can only return JSON"
+        },
+        {
+          "letter": "D",
+          "text": "Templates are discovered via tools/list"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Direct resources are fixed URIs pointing to specific data; resource templates are dynamic URIs with parameters that enable flexible queries, discovered via resources/templates/list, and they support parameter completion.",
+      "tags": [
+        "server-concepts",
+        "resources",
+        "templates"
+      ]
+    },
+    {
+      "id": "ch3-q7",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which protocol method retrieves the full definition of a specific prompt, including its arguments?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "prompts/get"
+        },
+        {
+          "letter": "B",
+          "text": "prompts/read"
+        },
+        {
+          "letter": "C",
+          "text": "prompts/call"
+        },
+        {
+          "letter": "D",
+          "text": "prompts/fetch"
+        }
+      ],
+      "answer": "A",
+      "explanation": "prompts/list discovers available prompts, and prompts/get retrieves a full prompt definition with its arguments.",
+      "tags": [
+        "server-concepts",
+        "prompts",
+        "methods"
+      ]
+    },
+    {
+      "id": "ch3-q8",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "A client wants to be notified when a specific resource changes. How does it accomplish this in the 2026-07-28 protocol?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "By calling resources/subscribe with the URI"
+        },
+        {
+          "letter": "B",
+          "text": "By sending a subscriptions/listen request with the resource URIs listed in the resourceSubscriptions filter"
+        },
+        {
+          "letter": "C",
+          "text": "By re-reading the resource on a timer; there is no notification mechanism"
+        },
+        {
+          "letter": "D",
+          "text": "By setting watch: true in resources/read"
+        }
+      ],
+      "answer": "B",
+      "explanation": "To watch resources, the client sends subscriptions/listen with the URIs in the resourceSubscriptions filter; the server delivers notifications/resources/updated on the resulting stream whenever a watched resource changes.",
+      "tags": [
+        "server-concepts",
+        "resources",
+        "subscriptions"
+      ]
+    },
+    {
+      "id": "ch3-q9",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "In the tools/call response, tool output is returned in which structure?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A single plain string field named output"
+        },
+        {
+          "letter": "B",
+          "text": "A content array of typed content objects (e.g., type: \"text\")"
+        },
+        {
+          "letter": "C",
+          "text": "A base64-encoded blob"
+        },
+        {
+          "letter": "D",
+          "text": "An HTML document"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Tool responses return a content array of content objects, each with a type field (text, images, resources, etc.), enabling rich multi-format responses.",
+      "tags": [
+        "server-concepts",
+        "tools",
+        "responses"
+      ]
+    },
+    {
+      "id": "ch3-q10",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which UI patterns do applications typically use to expose user-controlled prompts?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Slash commands, command palettes, dedicated buttons, and context menus"
+        },
+        {
+          "letter": "B",
+          "text": "Only automatic invocation by the model"
+        },
+        {
+          "letter": "C",
+          "text": "Hidden system prompts the user never sees"
+        },
+        {
+          "letter": "D",
+          "text": "Email digests"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Prompts require explicit invocation, and applications commonly expose them via slash commands (e.g., /plan-vacation), command palettes, dedicated UI buttons, and context menus.",
+      "tags": [
+        "server-concepts",
+        "prompts",
+        "ux"
+      ]
+    },
+    {
+      "id": "ch3-q11",
+      "chapter": 3,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: You're building an MCP server for a database. You want to expose (a) a way to run queries, (b) the database schema for context, and (c) few-shot examples showing how to query well. Which primitives map to (a), (b), and (c)?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "(a) Tool, (b) Resource, (c) Prompt"
+        },
+        {
+          "letter": "B",
+          "text": "(a) Resource, (b) Prompt, (c) Tool"
+        },
+        {
+          "letter": "C",
+          "text": "(a) Prompt, (b) Tool, (c) Resource"
+        },
+        {
+          "letter": "D",
+          "text": "All three should be tools"
+        }
+      ],
+      "answer": "A",
+      "explanation": "This is the exact example from the architecture docs: a database server exposes tools for querying, a resource containing the schema, and a prompt with few-shot examples for interacting with the tools.",
+      "tags": [
+        "server-concepts",
+        "scenario",
+        "primitives"
+      ]
+    },
+    {
+      "id": "ch3-q12",
+      "chapter": 3,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: A tool is registered as 'calculate' on a server that may later add currency conversion and unit conversion tools. Following the naming guidance from the tool discovery docs, what should you do?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Keep 'calculate'; shorter names save tokens"
+        },
+        {
+          "letter": "B",
+          "text": "Use a clearer, namespaced-style name such as 'calculator_arithmetic' so the name uniquely and descriptively identifies the operation within the server's namespace"
+        },
+        {
+          "letter": "C",
+          "text": "Use a random UUID as the name"
+        },
+        {
+          "letter": "D",
+          "text": "Names don't matter because the title field is what the model sees"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The docs recommend names follow a clear naming pattern (e.g., calculator_arithmetic rather than just calculate). The name is the unique identifier and primary key for execution within the server's namespace, so descriptive, unambiguous names improve tool selection.",
+      "tags": [
+        "server-concepts",
+        "scenario",
+        "tools",
+        "naming"
+      ]
+    },
+    {
+      "id": "ch3-q13",
+      "chapter": 3,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "SCENARIO: A user is filling in the {city} parameter of the resource template weather://forecast/{city}/{date} and types 'Par'. What MCP feature lets the application suggest 'Paris' or 'Park City'?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Sampling"
+        },
+        {
+          "letter": "B",
+          "text": "Parameter completion on resource templates (also supported by prompts)"
+        },
+        {
+          "letter": "C",
+          "text": "Tool annotations"
+        },
+        {
+          "letter": "D",
+          "text": "Progress notifications"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Dynamic resources support parameter completion: typing 'Par' can suggest 'Paris' or 'Park City', helping users discover valid values without knowing exact formats. Prompts support argument completion similarly.",
+      "tags": [
+        "server-concepts",
+        "scenario",
+        "completion",
+        "resources"
+      ]
+    },
+    {
+      "id": "ch3-q14",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which method discovers Resource Templates specifically (as opposed to direct resources)?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "resources/list"
+        },
+        {
+          "letter": "B",
+          "text": "resources/templates/list"
+        },
+        {
+          "letter": "C",
+          "text": "templates/get"
+        },
+        {
+          "letter": "D",
+          "text": "resources/discover"
+        }
+      ],
+      "answer": "B",
+      "explanation": "resources/list returns direct resource descriptors, while resources/templates/list returns resource template definitions (uriTemplate, name, title, description, mimeType). resources/read retrieves contents.",
+      "tags": [
+        "server-concepts",
+        "resources",
+        "methods"
+      ]
+    },
+    {
+      "id": "ch3-q15",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What human-oversight mechanisms do the docs suggest applications implement around model-controlled tools?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "None; tools should run silently"
+        },
+        {
+          "letter": "B",
+          "text": "Approval dialogs for executions, permission settings for pre-approving safe operations, UI display of available tools, and activity logs of executions"
+        },
+        {
+          "letter": "C",
+          "text": "A mandatory 24-hour delay before any tool runs"
+        },
+        {
+          "letter": "D",
+          "text": "Only server-side logging"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Because tools are model-controlled, MCP emphasizes human oversight: showing available tools in the UI, approval dialogs for individual executions, permission settings for pre-approved safe operations, and activity logs showing executions with results.",
+      "tags": [
+        "server-concepts",
+        "tools",
+        "trust-safety"
+      ]
+    }
+  ]
+}

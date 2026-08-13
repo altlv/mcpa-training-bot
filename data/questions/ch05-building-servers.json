@@ -1,0 +1,650 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 5: Building Servers (and Agent Skills)",
+    "protocolVersion": "2026-07-28",
+    "chapter": 5,
+    "chapterName": "Building Servers (and Agent Skills)",
+    "questionCount": 20
+  },
+  "questions": [
+    {
+      "id": "ch5-q1",
+      "chapter": 5,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "When building a STDIO-based MCP server, why must you never write log messages to stdout (e.g., with print() or console.log())?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "stdout is reserved for the operating system"
+        },
+        {
+          "letter": "B",
+          "text": "Writing to stdout corrupts the JSON-RPC messages and breaks the server"
+        },
+        {
+          "letter": "C",
+          "text": "stdout output is too slow for logging"
+        },
+        {
+          "letter": "D",
+          "text": "It exposes secrets to the user"
+        }
+      ],
+      "answer": "B",
+      "explanation": "On the STDIO transport, stdout carries the JSON-RPC protocol messages, so any extra output corrupts them. Log to stderr instead (e.g., Python's logging module, console.error(), eprintln!()). For HTTP-based servers, stdout logging is fine.",
+      "tags": [
+        "build-server",
+        "logging",
+        "stdio"
+      ]
+    },
+    {
+      "id": "ch5-q2",
+      "chapter": 5,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "In which file do you register MCP servers for Claude for Desktop?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "~/.mcp/servers.yaml"
+        },
+        {
+          "letter": "B",
+          "text": "claude_desktop_config.json, under the mcpServers key"
+        },
+        {
+          "letter": "C",
+          "text": "package.json, under the mcp key"
+        },
+        {
+          "letter": "D",
+          "text": "settings.ini in the install directory"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Servers are added to claude_desktop_config.json (on macOS at ~/Library/Application Support/Claude/) under the mcpServers key, each entry specifying the command and args used to launch the server.",
+      "tags": [
+        "build-server",
+        "configuration",
+        "claude-desktop"
+      ]
+    },
+    {
+      "id": "ch5-q3",
+      "chapter": 5,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Why do the docs insist on absolute paths (not relative paths) in claude_desktop_config.json server entries?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Relative paths are rejected by the JSON parser"
+        },
+        {
+          "letter": "B",
+          "text": "The working directory of a server launched by the client may be undefined (e.g., / on macOS), so relative paths resolve unpredictably"
+        },
+        {
+          "letter": "C",
+          "text": "Absolute paths load faster"
+        },
+        {
+          "letter": "D",
+          "text": "Relative paths only work on Windows"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Because the client could be started from anywhere, the spawned server's working directory may be undefined. Absolute paths in configuration and .env files ensure reliable operation.",
+      "tags": [
+        "build-server",
+        "configuration",
+        "debugging"
+      ]
+    },
+    {
+      "id": "ch5-q4",
+      "chapter": 5,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "After editing claude_desktop_config.json, what must you do for the changes to take effect?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Nothing; the file is hot-reloaded"
+        },
+        {
+          "letter": "B",
+          "text": "Fully quit and restart Claude for Desktop — simply closing the window is not enough"
+        },
+        {
+          "letter": "C",
+          "text": "Run claude --reload from the terminal"
+        },
+        {
+          "letter": "D",
+          "text": "Reboot the operating system"
+        }
+      ],
+      "answer": "B",
+      "explanation": "You must fully quit the application (Cmd+Q on macOS, or Quit/Exit from the system tray on Windows) and reopen it. Closing the window does not fully quit the app, so the configuration changes will not be picked up.",
+      "tags": [
+        "build-server",
+        "claude-desktop",
+        "troubleshooting"
+      ]
+    },
+    {
+      "id": "ch5-q5",
+      "chapter": 5,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "In the Python quickstart weather server, what does the MCPServer class use to automatically generate tool definitions?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A separate tools.yaml manifest"
+        },
+        {
+          "letter": "B",
+          "text": "Python type hints and docstrings on the decorated functions"
+        },
+        {
+          "letter": "C",
+          "text": "Reflection on function bytecode"
+        },
+        {
+          "letter": "D",
+          "text": "A GUI-based schema editor"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The MCPServer class uses Python type hints and docstrings to automatically generate tool definitions, so a function decorated with @mcp.tool() gets its schema and description from its signature and docstring.",
+      "tags": [
+        "build-server",
+        "python-sdk",
+        "tools"
+      ]
+    },
+    {
+      "id": "ch5-q6",
+      "chapter": 5,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "When a user asks a question in an MCP host like Claude for Desktop, what is the correct order of events?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The server picks a tool, executes it, and sends the answer directly to the user"
+        },
+        {
+          "letter": "B",
+          "text": "The client sends the question to the model; the model decides which tool(s) to use; the client executes them through the MCP server; results return to the model, which formulates the response shown to the user"
+        },
+        {
+          "letter": "C",
+          "text": "The model connects directly to the MCP server over TCP and streams the answer"
+        },
+        {
+          "letter": "D",
+          "text": "The user must manually invoke each tool before asking the question"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Under the hood: the client sends the question to the model, the model analyzes available tools and picks one or more, the client executes them via the MCP server, results go back to the model, and the model formulates the natural-language response.",
+      "tags": [
+        "build-server",
+        "flow",
+        "hosts"
+      ]
+    },
+    {
+      "id": "ch5-q7",
+      "chapter": 5,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "In the 'Build with Agent Skills' guide, which deployment path is the default recommendation for a server wrapping a cloud API?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Local stdio"
+        },
+        {
+          "letter": "B",
+          "text": "Remote Streamable HTTP"
+        },
+        {
+          "letter": "C",
+          "text": "An MCP Bundle (MCPB)"
+        },
+        {
+          "letter": "D",
+          "text": "A browser extension"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Remote Streamable HTTP is the default for anything wrapping a cloud API: zero install friction, one deployment serves all users, and OAuth flows work properly since the server can handle redirects and token storage.",
+      "tags": [
+        "agent-skills",
+        "deployment"
+      ]
+    },
+    {
+      "id": "ch5-q8",
+      "chapter": 5,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What problem do MCP Bundles (MCPB) solve?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "They compress protocol messages for slow networks"
+        },
+        {
+          "letter": "B",
+          "text": "They package a local stdio server together with its runtime as a single .mcpb archive, so users can install it without setting up Node or Python"
+        },
+        {
+          "letter": "C",
+          "text": "They bundle multiple remote servers behind one URL"
+        },
+        {
+          "letter": "D",
+          "text": "They convert servers into browser apps"
+        }
+      ],
+      "answer": "B",
+      "explanation": "MCPB packages a local server with its runtime as one .mcpb archive — the right path when the server must touch the user's machine (local files, desktop apps, localhost services) but users shouldn't need a dev environment.",
+      "tags": [
+        "agent-skills",
+        "mcpb",
+        "distribution"
+      ]
+    },
+    {
+      "id": "ch5-q9",
+      "chapter": 5,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "The reference mcp-server-dev plugin provides three composing skills. Which option lists them correctly?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "build-mcp-server, build-mcp-app, build-mcpb"
+        },
+        {
+          "letter": "B",
+          "text": "scaffold-server, test-server, deploy-server"
+        },
+        {
+          "letter": "C",
+          "text": "mcp-init, mcp-auth, mcp-deploy"
+        },
+        {
+          "letter": "D",
+          "text": "server-skill, client-skill, registry-skill"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The plugin ships build-mcp-server (the entry point that interrogates the use case), build-mcp-app (interactive UI widgets rendered in chat), and build-mcpb (packaging a local stdio server with its runtime).",
+      "tags": [
+        "agent-skills",
+        "tooling"
+      ]
+    },
+    {
+      "id": "ch5-q10",
+      "chapter": 5,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What are the system requirements for the Python weather-server quickstart?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Python 3.10 or higher and Python MCP SDK 2.0.0 or higher"
+        },
+        {
+          "letter": "B",
+          "text": "Python 2.7 and any SDK version"
+        },
+        {
+          "letter": "C",
+          "text": "Python 3.6 with pip only"
+        },
+        {
+          "letter": "D",
+          "text": "Anaconda is mandatory"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The quickstart requires Python 3.10+ and the Python MCP SDK 2.0.0+, using uv to set up the project and install mcp[cli].",
+      "tags": [
+        "build-server",
+        "python-sdk",
+        "requirements"
+      ]
+    },
+    {
+      "id": "ch5-q11",
+      "chapter": 5,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "In the TypeScript quickstart, which function is safe to use for logging in a STDIO server?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "console.log()"
+        },
+        {
+          "letter": "B",
+          "text": "console.error(), because it writes to stderr"
+        },
+        {
+          "letter": "C",
+          "text": "process.stdout.write()"
+        },
+        {
+          "letter": "D",
+          "text": "alert()"
+        }
+      ],
+      "answer": "B",
+      "explanation": "console.log() writes to stdout and would corrupt the JSON-RPC stream; console.error() writes to stderr, which is safe (and is captured by hosts like Claude Desktop into the server's log file).",
+      "tags": [
+        "build-server",
+        "typescript-sdk",
+        "logging"
+      ]
+    },
+    {
+      "id": "ch5-q12",
+      "chapter": 5,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "SCENARIO: You added your new server to claude_desktop_config.json, restarted the window, but the server doesn't appear under Connectors. Which troubleshooting sequence matches the docs?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Reinstall the operating system"
+        },
+        {
+          "letter": "B",
+          "text": "Check the config file's JSON syntax, make sure the server path is absolute (not relative), and fully quit Claude Desktop (Cmd+Q / tray Quit) before reopening — closing the window isn't a real restart"
+        },
+        {
+          "letter": "C",
+          "text": "Switch the server to HTTP transport; stdio is unsupported in Claude Desktop"
+        },
+        {
+          "letter": "D",
+          "text": "Rename the server to 'default'"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The troubleshooting guide lists exactly this: verify claude_desktop_config.json syntax, use absolute paths, and restart Claude Desktop completely. Logs in ~/Library/Logs/Claude (mcp.log, mcp-server-NAME.log) help diagnose further.",
+      "tags": [
+        "build-server",
+        "scenario",
+        "troubleshooting"
+      ]
+    },
+    {
+      "id": "ch5-q13",
+      "chapter": 5,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: Your weather quickstart server returns 'Failed to retrieve grid point data' when asked about London. What is the most likely cause?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The JSON-RPC id was a string instead of a number"
+        },
+        {
+          "letter": "B",
+          "text": "The coordinates are outside the US — the server uses the US National Weather Service API, which only supports US locations"
+        },
+        {
+          "letter": "C",
+          "text": "stdout logging corrupted the transport"
+        },
+        {
+          "letter": "D",
+          "text": "The tool name contains an underscore"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The quickstart uses api.weather.gov (NWS), so only US locations work. The docs list non-US coordinates, NWS API outages, and rate limiting as the usual causes of this error.",
+      "tags": [
+        "build-server",
+        "scenario",
+        "troubleshooting",
+        "apis"
+      ]
+    },
+    {
+      "id": "ch5-q14",
+      "chapter": 5,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "In the C# quickstart, why must you use Host.CreateEmptyApplicationBuilder instead of CreateDefaultBuilder for a STDIO server?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "CreateDefaultBuilder is deprecated in .NET"
+        },
+        {
+          "letter": "B",
+          "text": "CreateEmptyApplicationBuilder ensures the server writes no additional messages to the console, which would otherwise corrupt the STDIO protocol stream"
+        },
+        {
+          "letter": "C",
+          "text": "It enables HTTPS by default"
+        },
+        {
+          "letter": "D",
+          "text": "It is required for dependency injection"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The default builder writes startup messages to the console (stdout). For STDIO transport that would corrupt JSON-RPC messages, so the quickstart uses CreateEmptyApplicationBuilder. The same principle appears in Java (banner off) and other SDKs.",
+      "tags": [
+        "build-server",
+        "csharp-sdk",
+        "stdio"
+      ]
+    },
+    {
+      "id": "ch5-q15",
+      "chapter": 5,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "SCENARIO: You ask an agent with the build-mcp-server skill installed to 'help me build an MCP server for our CRM'. What does the skill do before writing any code?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Immediately generates a random scaffold"
+        },
+        {
+          "letter": "B",
+          "text": "Runs a short discovery phase asking what it connects to, who will use it, action surface size, user interaction needs, and upstream auth — then recommends a deployment path"
+        },
+        {
+          "letter": "C",
+          "text": "Asks only for your API key"
+        },
+        {
+          "letter": "D",
+          "text": "Downloads all reference servers"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The entry skill interrogates the use case first (connection target, audience, action surface, interaction needs, auth) and then recommends one of four deployment paths — remote Streamable HTTP, MCP apps, MCPB, or local stdio — skipping ahead if your opening message already covers the answers.",
+      "tags": [
+        "agent-skills",
+        "scenario",
+        "workflow"
+      ]
+    },
+    {
+      "id": "ch5-q16",
+      "chapter": 5,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "In the build-client Python tutorial, what does the 'async with Client(...)' block represent?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Only a timeout wrapper"
+        },
+        {
+          "letter": "B",
+          "text": "The entire connection lifecycle: entering it launches the server subprocess and agrees a protocol version; leaving it disconnects and shuts the subprocess down"
+        },
+        {
+          "letter": "C",
+          "text": "A database transaction"
+        },
+        {
+          "letter": "D",
+          "text": "A retry loop for failed queries"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The tutorial stresses there is no connect/close pair to call: the async with block owns the whole lifecycle — launch, version agreement, and clean shutdown — with nothing to close by hand.",
+      "tags": [
+        "build-client",
+        "python-sdk",
+        "lifecycle"
+      ]
+    },
+    {
+      "id": "ch5-q17",
+      "chapter": 5,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "In the client tutorial, how should your code detect that a tool call failed?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Wrap call_tool in try/except; failing tools always raise"
+        },
+        {
+          "letter": "B",
+          "text": "Check result.is_error — a tool that raises on the server does not raise in the client; it answers with is_error set, and passing that flag to the model lets it read the message and try something else"
+        },
+        {
+          "letter": "C",
+          "text": "Check for an HTTP 500 status"
+        },
+        {
+          "letter": "D",
+          "text": "Compare the output against an empty string"
+        }
+      ],
+      "answer": "B",
+      "explanation": "CallToolResult carries content blocks plus an is_error flag. The best-practices section says explicitly: check result.is_error rather than expecting a failing tool to raise.",
+      "tags": [
+        "build-client",
+        "error-handling",
+        "tools"
+      ]
+    },
+    {
+      "id": "ch5-q18",
+      "chapter": 5,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "SCENARIO: A user submits a query to your MCP-powered chatbot client. Which sequence of steps does the tutorial describe?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The server answers the user directly, bypassing the model"
+        },
+        {
+          "letter": "B",
+          "text": "Client fetches the tool list from the server → sends the query plus tool descriptions to Claude → Claude decides which tools to use → client executes them through the server → results go back to Claude → Claude produces the natural-language response shown to the user"
+        },
+        {
+          "letter": "C",
+          "text": "Claude connects to the MCP server directly over stdio"
+        },
+        {
+          "letter": "D",
+          "text": "The user must pick a tool manually before typing the query"
+        }
+      ],
+      "answer": "B",
+      "explanation": "This seven-step flow (list tools, send with query, model decides, client executes via server, results back, model responds, display) is the core loop every quickstart client implements.",
+      "tags": [
+        "build-client",
+        "scenario",
+        "flow"
+      ]
+    },
+    {
+      "id": "ch5-q19",
+      "chapter": 5,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: Your new client connects to the weather server but the very first response takes ~25 seconds, and a teammate suggests killing the process. Per the troubleshooting guidance, what's correct?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Anything over 5 seconds indicates a broken transport"
+        },
+        {
+          "letter": "B",
+          "text": "The first response can take up to 30 seconds while the server initializes, Claude processes the query, and tools execute; subsequent responses are faster — don't interrupt the initial waiting period"
+        },
+        {
+          "letter": "C",
+          "text": "Restart the OS networking stack"
+        },
+        {
+          "letter": "D",
+          "text": "Switch the model to a smaller one to fix startup time"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The troubleshooting section notes the first response may take up to 30 seconds (server init + model processing + tool execution) and that this is normal; later responses are typically faster.",
+      "tags": [
+        "build-client",
+        "scenario",
+        "troubleshooting"
+      ]
+    },
+    {
+      "id": "ch5-q20",
+      "chapter": 5,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Why does the Python client tutorial run input() via asyncio.to_thread in the chat loop?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "input() is deprecated in Python 3.10"
+        },
+        {
+          "letter": "B",
+          "text": "input() blocks, so running it on a worker thread keeps the event loop free to service the MCP connection while the user types"
+        },
+        {
+          "letter": "C",
+          "text": "To capture keystrokes for autocomplete"
+        },
+        {
+          "letter": "D",
+          "text": "Threads are required for stdout logging"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Because input() is blocking, calling it directly would stall the asyncio event loop and the connection with it; asyncio.to_thread moves it to a worker thread.",
+      "tags": [
+        "build-client",
+        "python-sdk",
+        "async"
+      ]
+    }
+  ]
+}

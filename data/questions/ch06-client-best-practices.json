@@ -1,0 +1,487 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 6: Client Best Practices (Progressive Discovery & Code Mode)",
+    "protocolVersion": "2026-07-28",
+    "chapter": 6,
+    "chapterName": "Client Best Practices (Progressive Discovery & Code Mode)",
+    "questionCount": 15
+  },
+  "questions": [
+    {
+      "id": "ch6-q1",
+      "chapter": 6,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What problem does progressive tool discovery solve for MCP hosts connected to many servers?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Slow network transports"
+        },
+        {
+          "letter": "B",
+          "text": "Loading every tool definition into the model's context upfront wastes tokens, adds latency, and degrades model performance"
+        },
+        {
+          "letter": "C",
+          "text": "Servers refusing to list their tools"
+        },
+        {
+          "letter": "D",
+          "text": "OAuth token expiry"
+        }
+      ],
+      "answer": "B",
+      "explanation": "With hundreds of tools, upfront definitions can consume most of the context window. Progressive discovery defers injecting definitions, exposing a lightweight search_tools meta-tool and loading full definitions only as needed.",
+      "tags": [
+        "client-best-practices",
+        "progressive-discovery",
+        "context"
+      ]
+    },
+    {
+      "id": "ch6-q2",
+      "chapter": 6,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "In the three-layer progressive discovery pattern, what are the layers?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Catalog, Inspect, Execute"
+        },
+        {
+          "letter": "B",
+          "text": "Search, Sort, Send"
+        },
+        {
+          "letter": "C",
+          "text": "List, Cache, Call"
+        },
+        {
+          "letter": "D",
+          "text": "Discover, Authorize, Invoke"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Layer 1 (Catalog): a search_tools meta-tool returns matching names with brief descriptions. Layer 2 (Inspect): the model fetches the full definition of only the tool it needs. Layer 3 (Execute): the model calls the tool with full knowledge of its interface.",
+      "tags": [
+        "client-best-practices",
+        "progressive-discovery"
+      ]
+    },
+    {
+      "id": "ch6-q3",
+      "chapter": 6,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What threshold do the docs recommend for switching from loading all tools to progressive discovery?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "When more than 100 servers are connected"
+        },
+        {
+          "letter": "B",
+          "text": "When tool definitions consume roughly 1%–5% of the context window"
+        },
+        {
+          "letter": "C",
+          "text": "When any single tool schema exceeds 1 MB"
+        },
+        {
+          "letter": "D",
+          "text": "Progressive discovery should always be used, regardless of size"
+        }
+      ],
+      "answer": "B",
+      "explanation": "For a small tool set, loading everything is fine. Clients should implement a threshold as a percentage of the context window — for example 1%–5% — and switch to progressive discovery once tool definitions cross it.",
+      "tags": [
+        "client-best-practices",
+        "progressive-discovery",
+        "thresholds"
+      ]
+    },
+    {
+      "id": "ch6-q4",
+      "chapter": 6,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What is 'programmatic tool calling' (code mode)?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The model writes code that calls tools; the code runs in a sandbox and only the final result returns to the model"
+        },
+        {
+          "letter": "B",
+          "text": "Tools written exclusively in Python"
+        },
+        {
+          "letter": "C",
+          "text": "A mode where the server executes tools without client approval"
+        },
+        {
+          "letter": "D",
+          "text": "Pre-compiling tool schemas to WebAssembly"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Instead of round-tripping every intermediate result through the model's context, the model writes a script against typed APIs generated from MCP tool schemas. The sandbox executes it, intermediate data flows between servers via the host broker, and only e.g. a console.log summary returns to the model.",
+      "tags": [
+        "client-best-practices",
+        "code-mode"
+      ]
+    },
+    {
+      "id": "ch6-q5",
+      "chapter": 6,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "In a code-mode architecture, which statement about credentials and network access is correct?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The sandbox holds API keys so tool calls are faster"
+        },
+        {
+          "letter": "B",
+          "text": "The sandbox should have no direct network access; credentials are held by the host broker, which adds authentication when forwarding calls to servers"
+        },
+        {
+          "letter": "C",
+          "text": "The model receives all tokens so it can decide which to use"
+        },
+        {
+          "letter": "D",
+          "text": "Each MCP server pushes its credentials into the sandbox at startup"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The sandbox is isolated: its only interface is the generated function stubs that route back to the host. The host acts as broker, holds authorization tokens, enforces per-call authorization, and never exposes credentials to model-generated code.",
+      "tags": [
+        "client-best-practices",
+        "code-mode",
+        "security"
+      ]
+    },
+    {
+      "id": "ch6-q6",
+      "chapter": 6,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "How should generated code-mode wrappers handle an MCP tool response with isError: true?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Ignore it, since the transport succeeded"
+        },
+        {
+          "letter": "B",
+          "text": "Convert it into a thrown exception so model-authored code can use try/catch"
+        },
+        {
+          "letter": "C",
+          "text": "Retry the call automatically up to 10 times"
+        },
+        {
+          "letter": "D",
+          "text": "Terminate the sandbox immediately without reporting"
+        }
+      ],
+      "answer": "B",
+      "explanation": "MCP tool errors arrive as successful responses with isError: true, not transport failures. Wrappers should convert this into a thrown exception; if an uncaught error ends the script, surface it as the script's result so the model can self-correct.",
+      "tags": [
+        "client-best-practices",
+        "code-mode",
+        "error-handling"
+      ]
+    },
+    {
+      "id": "ch6-q7",
+      "chapter": 6,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which of these is a recommended implementation guideline for progressive discovery?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Re-fetch tools/list from the server every time a definition is needed"
+        },
+        {
+          "letter": "B",
+          "text": "Cache tool definitions host-side once fetched, and re-index the search catalog when a notifications/tools/list_changed arrives"
+        },
+        {
+          "letter": "C",
+          "text": "Hide the source server of each tool from the model"
+        },
+        {
+          "letter": "D",
+          "text": "Only ever expose one tool at a time"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Guidelines include offering multiple detail levels, caching definitions host-side, refreshing the catalog on list_changed notifications, and grouping tools by server so the model can reason about related capabilities.",
+      "tags": [
+        "client-best-practices",
+        "progressive-discovery",
+        "caching"
+      ]
+    },
+    {
+      "id": "ch6-q8",
+      "chapter": 6,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Why can adding or removing tool definitions mid-conversation be costly even when it saves definition tokens?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Servers charge per tools/list call"
+        },
+        {
+          "letter": "B",
+          "text": "It invalidates the provider's prompt cache (which includes the tools array), and the resulting cache miss can cost more tokens than the definitions removed"
+        },
+        {
+          "letter": "C",
+          "text": "It forces the client to reconnect to every server"
+        },
+        {
+          "letter": "D",
+          "text": "JSON-RPC requires renumbering all message IDs"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Most providers cache the prompt prefix including the tools array. To preserve caching, append newly discovered definitions after the cache breakpoint or route calls through a single stable call_tool meta-tool, and treat server disconnection as a conversation-boundary operation.",
+      "tags": [
+        "client-best-practices",
+        "prompt-caching"
+      ]
+    },
+    {
+      "id": "ch6-q9",
+      "chapter": 6,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "In progressive discovery, what does the lightweight search_tools meta-tool return?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Full JSON Schemas for every tool on every server"
+        },
+        {
+          "letter": "B",
+          "text": "Concise matches: tool names and one-line descriptions only"
+        },
+        {
+          "letter": "C",
+          "text": "Executable code for each tool"
+        },
+        {
+          "letter": "D",
+          "text": "A ranked list of servers to disconnect"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The catalog layer returns only names and brief descriptions (e.g., salesforce_updateRecord — 'Update fields on a Salesforce object'); the model then inspects the full definition of just the tool it needs.",
+      "tags": [
+        "client-best-practices",
+        "progressive-discovery"
+      ]
+    },
+    {
+      "id": "ch6-q10",
+      "chapter": 6,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What is the main drawback of direct tool calling when chaining multiple tools together?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Tools cannot be chained at all"
+        },
+        {
+          "letter": "B",
+          "text": "Every intermediate result flows through the model's context, consuming tokens and adding latency even when the model doesn't need it"
+        },
+        {
+          "letter": "C",
+          "text": "It requires OAuth for every call"
+        },
+        {
+          "letter": "D",
+          "text": "It only works over stdio"
+        }
+      ],
+      "answer": "B",
+      "explanation": "With direct calling, each invocation is a round trip through the model. Programmatic tool calling (code mode) fixes this by letting data flow between servers inside a sandbox, with only the final summary returning to the model.",
+      "tags": [
+        "client-best-practices",
+        "code-mode"
+      ]
+    },
+    {
+      "id": "ch6-q11",
+      "chapter": 6,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Under dynamic server management, what can a host do instead of connecting to every configured server at startup?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Nothing; all servers must connect at startup"
+        },
+        {
+          "letter": "B",
+          "text": "Keep a registry of available servers, connect to a server only when the model needs its capabilities, and disconnect servers no longer relevant to free context"
+        },
+        {
+          "letter": "C",
+          "text": "Merge all servers into one process"
+        },
+        {
+          "letter": "D",
+          "text": "Randomly sample three servers per conversation"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Progressive discovery extends to whole servers: maintain a registry with high-level descriptions, connect on demand (e.g., enable_server('salesforce')), and disconnect when done. This suits general-purpose agents where intent isn't known upfront.",
+      "tags": [
+        "client-best-practices",
+        "progressive-discovery",
+        "servers"
+      ]
+    },
+    {
+      "id": "ch6-q12",
+      "chapter": 6,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which discovery strategies do the docs list for implementing search_tools?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Keyword-based, embedding-based, subagent-based, and hybrid approaches"
+        },
+        {
+          "letter": "B",
+          "text": "Alphabetical sorting only"
+        },
+        {
+          "letter": "C",
+          "text": "Random selection with retries"
+        },
+        {
+          "letter": "D",
+          "text": "Manual user selection for every call"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Options include keyword matching (BM25/regex), vector-similarity embeddings, a small fast subagent model (e.g., Claude Haiku) selecting tools, or hybrids. Some providers (OpenAI, Anthropic) offer built-in tool search you may prefer.",
+      "tags": [
+        "client-best-practices",
+        "progressive-discovery",
+        "strategies"
+      ]
+    },
+    {
+      "id": "ch6-q13",
+      "chapter": 6,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "SCENARIO: A task requires reading thousands of error log entries, deduplicating them, and filing one ticket per unique error. Which approach keeps the log data out of the model's context?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Direct tool calling with the full log dump returned to the model each time"
+        },
+        {
+          "letter": "B",
+          "text": "Code mode: the model writes a script that calls logging_getLogs, filters and deduplicates inside the sandbox, calls ticketing_createIssue per unique error, and returns only a one-line console.log summary"
+        },
+        {
+          "letter": "C",
+          "text": "Asking the user to paste the logs manually"
+        },
+        {
+          "letter": "D",
+          "text": "Increasing the model's max tokens"
+        }
+      ],
+      "answer": "B",
+      "explanation": "This is the canonical code-mode example: log data and ticket creation flow between servers through the host broker without entering the model's context; only the summary line (e.g., 'Filed 7 tickets from 3,214 error logs') returns.",
+      "tags": [
+        "client-best-practices",
+        "code-mode",
+        "scenario"
+      ]
+    },
+    {
+      "id": "ch6-q14",
+      "chapter": 6,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: A user approves a code-mode script that will call ticketing_createIssue in a loop. Mid-run, the script tries to call payments_transferFunds, which the user never discussed. What does the security guidance say the host broker should do?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Allow it — approving the script grants blanket approval for all runtime calls"
+        },
+        {
+          "letter": "B",
+          "text": "Evaluate each sandbox-originated call against the granted approval: script approval is not blanket approval, so a call outside the grant (like payments_transferFunds) requires its own authorization"
+        },
+        {
+          "letter": "C",
+          "text": "Kill the sandbox and delete all tickets already created"
+        },
+        {
+          "letter": "D",
+          "text": "Log it silently and continue"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Per-call authorization: the broker is still the MCP host for spec purposes. Hosts may grant categorical approval (e.g., 'allow ticketing_createIssue for this run') rather than prompting per iteration, but every call must still be evaluated against that grant — approving the script does not approve everything it might do.",
+      "tags": [
+        "client-best-practices",
+        "code-mode",
+        "security",
+        "scenario"
+      ]
+    },
+    {
+      "id": "ch6-q15",
+      "chapter": 6,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "When a tool provides no outputSchema, what does the guidance recommend for typing its results in code mode?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Refuse to call the tool"
+        },
+        {
+          "letter": "B",
+          "text": "Prefer a generic type (any/string) and handle unstructured output downstream; optionally use a host-brokered extract(value, ExpectedType) helper backed by a fast model for single-shot calls, validating the result before use"
+        },
+        {
+          "letter": "C",
+          "text": "Guess the schema from the tool's name"
+        },
+        {
+          "letter": "D",
+          "text": "Always regenerate the whole API from scratch"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The simple path is a generic type — the real fix is server authors providing outputSchema. An extract() helper routed through the host (never giving the sandbox network access) can coerce values via a small model, but it adds latency and can hallucinate, so validate against the expected type.",
+      "tags": [
+        "client-best-practices",
+        "code-mode",
+        "schemas"
+      ]
+    }
+  ]
+}

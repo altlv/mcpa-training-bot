@@ -1,0 +1,484 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 11: JSON-RPC 2.0 Fundamentals",
+    "protocolVersion": "2026-07-28",
+    "chapter": 11,
+    "chapterName": "JSON-RPC 2.0 Fundamentals",
+    "source": "https://www.jsonrpc.org/specification",
+    "questionCount": 15
+  },
+  "questions": [
+    {
+      "id": "ch11-q1",
+      "chapter": 11,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "How is JSON-RPC described in the opening of its specification?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A stateless, light-weight remote procedure call (RPC) protocol that is transport agnostic"
+        },
+        {
+          "letter": "B",
+          "text": "A stateful streaming protocol tied to HTTP/2"
+        },
+        {
+          "letter": "C",
+          "text": "A binary serialization format"
+        },
+        {
+          "letter": "D",
+          "text": "A database query language"
+        }
+      ],
+      "answer": "A",
+      "explanation": "JSON-RPC is a stateless, light-weight RPC protocol using JSON as its data format. It is transport agnostic — usable in-process, over sockets, over HTTP, or in other message-passing environments — which is why MCP can run it over both stdio and Streamable HTTP.",
+      "tags": [
+        "json-rpc",
+        "basics"
+      ]
+    },
+    {
+      "id": "ch11-q2",
+      "chapter": 11,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What value must the jsonrpc member of every request and response contain?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Exactly the String \"2.0\""
+        },
+        {
+          "letter": "B",
+          "text": "The number 2"
+        },
+        {
+          "letter": "C",
+          "text": "Any version string the server prefers"
+        },
+        {
+          "letter": "D",
+          "text": "It is optional"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The jsonrpc member MUST be exactly \"2.0\". This is also how 2.0 messages are distinguished from JSON-RPC 1.0, which lacks the member.",
+      "tags": [
+        "json-rpc",
+        "format"
+      ]
+    },
+    {
+      "id": "ch11-q3",
+      "chapter": 11,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Which members can a JSON-RPC 2.0 Request object contain?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "jsonrpc, method, params (optional), and id"
+        },
+        {
+          "letter": "B",
+          "text": "url, headers, and body"
+        },
+        {
+          "letter": "C",
+          "text": "type, payload, and checksum"
+        },
+        {
+          "letter": "D",
+          "text": "jsonrpc, function, and args"
+        }
+      ],
+      "answer": "A",
+      "explanation": "A request carries jsonrpc (\"2.0\"), method (a String naming the method), optional params (a Structured value), and id (String, Number, or Null) — omit the id and the request becomes a notification.",
+      "tags": [
+        "json-rpc",
+        "request"
+      ]
+    },
+    {
+      "id": "ch11-q4",
+      "chapter": 11,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What is a JSON-RPC Notification?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A response the server sends without being asked"
+        },
+        {
+          "letter": "B",
+          "text": "A Request object without an id member — the client isn't interested in a response, and the server MUST NOT reply"
+        },
+        {
+          "letter": "C",
+          "text": "Any message with id: 0"
+        },
+        {
+          "letter": "D",
+          "text": "A batch of exactly one request"
+        }
+      ],
+      "answer": "B",
+      "explanation": "A notification is a request with no id. No response is returned — even for errors — so notifications are not confirmable. MCP uses this for messages like notifications/tools/list_changed.",
+      "tags": [
+        "json-rpc",
+        "notifications"
+      ]
+    },
+    {
+      "id": "ch11-q5",
+      "chapter": 11,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What are the two allowed parameter structures for params?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "By-position (an Array in the server's expected order) or by-name (an Object with exactly-matching, case-sensitive member names)"
+        },
+        {
+          "letter": "B",
+          "text": "Comma-separated strings or XML"
+        },
+        {
+          "letter": "C",
+          "text": "Only flat key=value pairs"
+        },
+        {
+          "letter": "D",
+          "text": "Positional integers only"
+        }
+      ],
+      "answer": "A",
+      "explanation": "If present, params MUST be Structured: an Array for by-position calls, or an Object for by-name calls whose names must match the method's expected parameters exactly, including case. MCP uses by-name params.",
+      "tags": [
+        "json-rpc",
+        "params"
+      ]
+    },
+    {
+      "id": "ch11-q6",
+      "chapter": 11,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which rule governs the result and error members of a Response object?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Both must always be present"
+        },
+        {
+          "letter": "B",
+          "text": "Exactly one must be included: result is required on success, error on failure, and both MUST NOT appear together"
+        },
+        {
+          "letter": "C",
+          "text": "result may contain an error object"
+        },
+        {
+          "letter": "D",
+          "text": "error is optional even on failure"
+        }
+      ],
+      "answer": "B",
+      "explanation": "A response contains either result (success) or error (failure), never both. The response also echoes the request's id so the client can correlate them.",
+      "tags": [
+        "json-rpc",
+        "response"
+      ]
+    },
+    {
+      "id": "ch11-q7",
+      "chapter": 11,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What are the members of a JSON-RPC Error object?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "code (an integer), message (a concise String), and optional data with additional information"
+        },
+        {
+          "letter": "B",
+          "text": "status, reason, and stacktrace"
+        },
+        {
+          "letter": "C",
+          "text": "errno and strerror"
+        },
+        {
+          "letter": "D",
+          "text": "level, source, and detail"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The error object has code (MUST be an integer), message (a short single-sentence description), and optional data (Primitive or Structured, server-defined). MCP uses data e.g. to list supported versions in an UnsupportedProtocolVersionError.",
+      "tags": [
+        "json-rpc",
+        "errors"
+      ]
+    },
+    {
+      "id": "ch11-q8",
+      "chapter": 11,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Match the reserved error code to its meaning: -32700, -32600, -32601, -32602, -32603.",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Parse error, Invalid Request, Method not found, Invalid params, Internal error"
+        },
+        {
+          "letter": "B",
+          "text": "Internal error, Parse error, Invalid params, Method not found, Invalid Request"
+        },
+        {
+          "letter": "C",
+          "text": "Timeout, Overload, Not found, Bad gateway, Unavailable"
+        },
+        {
+          "letter": "D",
+          "text": "They are all synonyms for 'server error'"
+        }
+      ],
+      "answer": "A",
+      "explanation": "-32700 Parse error (invalid JSON), -32600 Invalid Request, -32601 Method not found, -32602 Invalid params, -32603 Internal error. -32000 to -32099 are reserved for implementation-defined server errors, and the whole -32768..-32000 range is reserved.",
+      "tags": [
+        "json-rpc",
+        "error-codes"
+      ]
+    },
+    {
+      "id": "ch11-q9",
+      "chapter": 11,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which range of error codes is reserved for implementation-defined server errors?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "-32000 to -32099"
+        },
+        {
+          "letter": "B",
+          "text": "400 to 599"
+        },
+        {
+          "letter": "C",
+          "text": "-1 to -99"
+        },
+        {
+          "letter": "D",
+          "text": "1000 to 1999"
+        }
+      ],
+      "answer": "A",
+      "explanation": "-32000 to -32099 is reserved for implementation-defined server errors within the larger reserved range -32768 to -32000. MCP defines codes such as -32021 and -32022 for protocol-specific failures. The remainder of the space is available for application-defined errors.",
+      "tags": [
+        "json-rpc",
+        "error-codes"
+      ]
+    },
+    {
+      "id": "ch11-q10",
+      "chapter": 11,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "What restrictions and recommendations apply to the id member of a Request?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "It must be a UUID"
+        },
+        {
+          "letter": "B",
+          "text": "It MUST be a String, Number, or Null if included; Null is discouraged (it's used for responses with unknown id), and Numbers SHOULD NOT contain fractional parts"
+        },
+        {
+          "letter": "C",
+          "text": "It must increase monotonically"
+        },
+        {
+          "letter": "D",
+          "text": "Booleans are allowed"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The id is client-established and echoed back by the server. Null is discouraged because error responses to unparseable requests use id: null, and fractional numbers are discouraged since many decimal fractions can't be represented exactly in binary.",
+      "tags": [
+        "json-rpc",
+        "id",
+        "correlation"
+      ]
+    },
+    {
+      "id": "ch11-q11",
+      "chapter": 11,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "SCENARIO: A server receives {\"jsonrpc\": \"2.0\", \"method\": \"foobar\", \"id\": \"1\"} but has no method named foobar. What does it return?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "{\"jsonrpc\": \"2.0\", \"error\": {\"code\": -32601, \"message\": \"Method not found\"}, \"id\": \"1\"}"
+        },
+        {
+          "letter": "B",
+          "text": "An empty 200 response"
+        },
+        {
+          "letter": "C",
+          "text": "{\"result\": null, \"id\": \"1\"}"
+        },
+        {
+          "letter": "D",
+          "text": "Nothing; unknown methods are ignored"
+        }
+      ],
+      "answer": "A",
+      "explanation": "A call to a non-existent method returns error -32601 Method not found, echoing the request's id — this example appears verbatim in the specification.",
+      "tags": [
+        "json-rpc",
+        "scenario",
+        "errors"
+      ]
+    },
+    {
+      "id": "ch11-q12",
+      "chapter": 11,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: A server receives text that is not valid JSON at all. What id does the error response carry, and why?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The id from the broken request, recovered heuristically"
+        },
+        {
+          "letter": "B",
+          "text": "id: null — because the id could not be detected in the malformed request, the spec mandates Null (with error -32700 Parse error)"
+        },
+        {
+          "letter": "C",
+          "text": "A freshly generated id"
+        },
+        {
+          "letter": "D",
+          "text": "No response is ever sent for parse errors"
+        }
+      ],
+      "answer": "B",
+      "explanation": "When there is an error detecting the id (Parse error / Invalid Request), the response id MUST be Null. This is also why using Null as a request id is discouraged — it's reserved for 'unknown id' responses.",
+      "tags": [
+        "json-rpc",
+        "scenario",
+        "errors",
+        "id"
+      ]
+    },
+    {
+      "id": "ch11-q13",
+      "chapter": 11,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which statements about batch calls are correct?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Responses must be returned in the same order as the requests"
+        },
+        {
+          "letter": "B",
+          "text": "The server may process batch requests concurrently and return responses in any order; clients match them by id. Notifications in a batch get no response, and a batch of all notifications returns nothing at all"
+        },
+        {
+          "letter": "C",
+          "text": "Batches may contain at most 10 requests"
+        },
+        {
+          "letter": "D",
+          "text": "An empty array [] is a valid no-op batch"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Batch responses MAY come back in any order (match by id), notifications get no response objects, and if no responses remain the server returns nothing rather than an empty array. An empty array is invalid and yields a single -32600 error.",
+      "tags": [
+        "json-rpc",
+        "batch"
+      ]
+    },
+    {
+      "id": "ch11-q14",
+      "chapter": 11,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which method names are reserved in JSON-RPC 2.0?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Names beginning with 'rpc.' (rpc followed by a period) — reserved for rpc-internal methods and extensions"
+        },
+        {
+          "letter": "B",
+          "text": "Names containing underscores"
+        },
+        {
+          "letter": "C",
+          "text": "Names longer than 32 characters"
+        },
+        {
+          "letter": "D",
+          "text": "Names beginning with capital letters"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Method names beginning with rpc. are reserved for system extensions and MUST NOT be used for anything else. MCP's method names (tools/list, server/discover, etc.) use slash-separated namespaces, avoiding the reserved prefix.",
+      "tags": [
+        "json-rpc",
+        "methods",
+        "reserved"
+      ]
+    },
+    {
+      "id": "ch11-q15",
+      "chapter": 11,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: In an MCP session you observe the message {\"jsonrpc\": \"2.0\", \"method\": \"notifications/tools/list_changed\", \"params\": {...}} with no id field, and the client sends nothing back. Is this correct JSON-RPC behavior?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "No; every message requires a response"
+        },
+        {
+          "letter": "B",
+          "text": "Yes: a request without an id is a notification, and per JSON-RPC 2.0 the receiver MUST NOT reply — exactly how MCP delivers change notifications"
+        },
+        {
+          "letter": "C",
+          "text": "No; the server should have used id: null"
+        },
+        {
+          "letter": "D",
+          "text": "Only if the transport is HTTP"
+        }
+      ],
+      "answer": "B",
+      "explanation": "This ties MCP back to its JSON-RPC foundation: notifications omit the id, expect no response, and receivers must not reply. MCP's notifications/* messages follow these semantics precisely.",
+      "tags": [
+        "json-rpc",
+        "scenario",
+        "notifications",
+        "mcp"
+      ]
+    }
+  ]
+}

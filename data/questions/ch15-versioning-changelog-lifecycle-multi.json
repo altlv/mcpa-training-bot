@@ -1,0 +1,335 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 15 (Multi-Select): Versioning, 2026-07-28 Changelog & Feature Lifecycle",
+    "protocolVersion": "2026-07-28",
+    "chapter": 15,
+    "chapterName": "Versioning, 2026-07-28 Changelog & Feature Lifecycle",
+    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
+    "questionCount": 8
+  },
+  "questions": [
+    {
+      "id": "ch15-m1",
+      "chapter": 15,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which features are DEPRECATED (not removed) as of 2026-07-28? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Roots"
+        },
+        {
+          "letter": "B",
+          "text": "Sampling"
+        },
+        {
+          "letter": "C",
+          "text": "Logging (notifications/message)"
+        },
+        {
+          "letter": "D",
+          "text": "The legacy HTTP+SSE transport"
+        },
+        {
+          "letter": "E",
+          "text": "The ping method"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "Roots, Sampling, Logging (SEP-2577) and HTTP+SSE (SEP-2596) are Deprecated with at least a twelve-month window. ping was removed outright, not deprecated.",
+      "tags": [
+        "lifecycle",
+        "deprecations",
+        "changelog"
+      ]
+    },
+    {
+      "id": "ch15-m2",
+      "chapter": 15,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which are MAJOR changes in the 2026-07-28 changelog? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Removal of protocol-level sessions and the Mcp-Session-Id header"
+        },
+        {
+          "letter": "B",
+          "text": "Removal of the initialize handshake in favor of per-request _meta"
+        },
+        {
+          "letter": "C",
+          "text": "Addition of the mandatory server/discover RPC"
+        },
+        {
+          "letter": "D",
+          "text": "Replacement of the HTTP GET endpoint and resources/subscribe with subscriptions/listen"
+        },
+        {
+          "letter": "E",
+          "text": "A switch of the wire format from JSON to CBOR"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "A–D are all listed major changes (SEP-2567/2575), alongside MRTR, resultType, the Tasks extension move, and SSE resumability removal. The wire format remains JSON-RPC 2.0.",
+      "tags": [
+        "changelog",
+        "major-changes"
+      ]
+    },
+    {
+      "id": "ch15-m3",
+      "chapter": 15,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which authorization changes landed in 2026-07-28? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Authorization servers SHOULD include iss in authorization responses, and clients MUST validate a present iss before redeeming the code"
+        },
+        {
+          "letter": "B",
+          "text": "Clients MUST specify an appropriate application_type during Dynamic Client Registration"
+        },
+        {
+          "letter": "C",
+          "text": "Credentials are bound to their issuing authorization server — persisted per issuer, never reused across servers"
+        },
+        {
+          "letter": "D",
+          "text": "Dynamic Client Registration was deprecated in favor of Client ID Metadata Documents"
+        },
+        {
+          "letter": "E",
+          "text": "PKCE was removed as unnecessary"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "All four hardening changes are in the changelog (SEP-2468, SEP-837, SEP-2352, and the DCR→CIMD deprecation). PKCE remains a core requirement of the OAuth 2.1 flow.",
+      "tags": [
+        "changelog",
+        "authorization"
+      ]
+    },
+    {
+      "id": "ch15-m4",
+      "chapter": 15,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which statements about the feature lifecycle and deprecation policy are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Features move through Active, Deprecated, and Removed states"
+        },
+        {
+          "letter": "B",
+          "text": "The minimum deprecation window is twelve months"
+        },
+        {
+          "letter": "C",
+          "text": "Deprecated features keep working in this version and every version published within a year of it"
+        },
+        {
+          "letter": "D",
+          "text": "Actual removal requires a separate, explicit proposal"
+        },
+        {
+          "letter": "E",
+          "text": "Deprecated features stop working on the release date"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "SEP-2596's policy: three states, a 12-month minimum window, continued function during it, and removal only via a separate proposal — so nothing broke on July 28.",
+      "tags": [
+        "lifecycle",
+        "deprecation-policy"
+      ]
+    },
+    {
+      "id": "ch15-m5",
+      "chapter": 15,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which things did 2026-07-28 REMOVE outright (rather than deprecate)? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The ping method"
+        },
+        {
+          "letter": "B",
+          "text": "logging/setLevel (log level moved to per-request _meta)"
+        },
+        {
+          "letter": "C",
+          "text": "notifications/roots/list_changed"
+        },
+        {
+          "letter": "D",
+          "text": "SSE stream resumability (Last-Event-ID)"
+        },
+        {
+          "letter": "E",
+          "text": "The Sampling feature"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "Sampling is deprecated (12-month window), not removed. The other four are gone from the modern era.",
+      "tags": [
+        "changelog",
+        "removals",
+        "deprecations"
+      ]
+    },
+    {
+      "id": "ch15-m6",
+      "chapter": 15,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which error-code moves happened in the 2026-07-28 renumbering? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "HeaderMismatch: -32001 → -32020"
+        },
+        {
+          "letter": "B",
+          "text": "MissingRequiredClientCapability: -32003 → -32021"
+        },
+        {
+          "letter": "C",
+          "text": "UnsupportedProtocolVersion: -32004 → -32022"
+        },
+        {
+          "letter": "D",
+          "text": "Resource not found: -32002 → -32602 (aligning with JSON-RPC Invalid params)"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "All four renumberings are in the changelog, following the new allocation policy reserving -32020..-32099 for the spec.",
+      "tags": [
+        "changelog",
+        "error-codes"
+      ]
+    },
+    {
+      "id": "ch15-m7",
+      "chapter": 15,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which statements about protocol eras are accurate? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Legacy = initialize handshake, protocol versions 2025-11-25 and earlier"
+        },
+        {
+          "letter": "B",
+          "text": "Modern = per-request protocol metadata, 2026-07-28 and later"
+        },
+        {
+          "letter": "C",
+          "text": "Dual-era implementations deliberately support both styles"
+        },
+        {
+          "letter": "D",
+          "text": "A modern-only client can interoperate with a legacy-only server because negotiation bridges the gap"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Negotiation only DETECTS the mismatch; bridging requires an actual dual-era implementation. D is the classic misconception.",
+      "tags": [
+        "versioning",
+        "eras",
+        "compatibility"
+      ]
+    },
+    {
+      "id": "ch15-m8",
+      "chapter": 15,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which governance changes shipped with 2026-07-28? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A feature lifecycle policy with Active, Deprecated, and Removed states (SEP-2596)"
+        },
+        {
+          "letter": "B",
+          "text": "A minimum twelve-month deprecation window plus a deprecated-features registry"
+        },
+        {
+          "letter": "C",
+          "text": "A formalized PR-based SEP workflow with markdown files, sponsors, and label-driven status (SEP-1850)"
+        },
+        {
+          "letter": "D",
+          "text": "A rule that deprecated features silently stop working after six months"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Six-month silent breakage is the opposite of the policy: features work for at least twelve months and removal needs its own proposal.",
+      "tags": [
+        "changelog",
+        "governance",
+        "lifecycle"
+      ]
+    }
+  ]
+}

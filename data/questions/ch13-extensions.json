@@ -1,0 +1,489 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 13: Extensions (MCP Apps, Tasks, Auth Extensions)",
+    "protocolVersion": "2026-07-28",
+    "chapter": 13,
+    "chapterName": "Extensions (MCP Apps, Tasks, Auth Extensions)",
+    "questionCount": 15
+  },
+  "questions": [
+    {
+      "id": "ch13-q1",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What are MCP extensions?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Mandatory add-ons every implementation must support"
+        },
+        {
+          "letter": "B",
+          "text": "Optional, versioned additions to the core protocol that require explicit support from both client and server, negotiated via the extension capabilities mechanism"
+        },
+        {
+          "letter": "C",
+          "text": "Browser plugins for the Inspector"
+        },
+        {
+          "letter": "D",
+          "text": "Paid features licensed by Anthropic"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Extensions add modular, specialized, or experimental functionality beyond the core protocol. They are always opt-in and negotiated: clients declare them in the extensions field of clientCapabilities, and servers advertise theirs via server/discover.",
+      "tags": [
+        "extensions",
+        "basics"
+      ]
+    },
+    {
+      "id": "ch13-q2",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What format do extension identifiers follow?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "{vendor-prefix}/{extension-name}, e.g., io.modelcontextprotocol/tasks; official extensions use the io.modelcontextprotocol prefix"
+        },
+        {
+          "letter": "B",
+          "text": "Sequential integers assigned by the registry"
+        },
+        {
+          "letter": "C",
+          "text": "UUIDs"
+        },
+        {
+          "letter": "D",
+          "text": "ext-<name>-v<number> only"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Extensions are identified as {vendor-prefix}/{extension-name}. Official extensions use the io.modelcontextprotocol vendor prefix and live in MCP GitHub org repositories with an ext- prefix (ext-apps, ext-tasks, ext-auth).",
+      "tags": [
+        "extensions",
+        "identifiers"
+      ]
+    },
+    {
+      "id": "ch13-q3",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "How is extension support negotiated in the 2026-07-28 protocol?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Via a dedicated extensions/negotiate RPC"
+        },
+        {
+          "letter": "B",
+          "text": "Clients declare supported extensions in the extensions field of the io.modelcontextprotocol/clientCapabilities sent in each request's _meta; servers advertise theirs in the capabilities returned by server/discover"
+        },
+        {
+          "letter": "C",
+          "text": "By exchanging config files out of band"
+        },
+        {
+          "letter": "D",
+          "text": "Extensions are enabled by default unless disabled"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The changelog added an extensions field to both ClientCapabilities and ServerCapabilities. Both sides must declare support — extensions are never active by default.",
+      "tags": [
+        "extensions",
+        "negotiation",
+        "capabilities"
+      ]
+    },
+    {
+      "id": "ch13-q4",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What do MCP Apps enable?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Running MCP servers inside mobile apps"
+        },
+        {
+          "letter": "B",
+          "text": "Servers delivering interactive UI elements (charts, forms, dashboards, video players) that render inline within conversations in MCP hosts"
+        },
+        {
+          "letter": "C",
+          "text": "Compiling servers to native binaries"
+        },
+        {
+          "letter": "D",
+          "text": "App-store distribution of servers"
+        }
+      ],
+      "answer": "B",
+      "explanation": "MCP Apps let tools return interactive HTML interfaces rendered directly in the chat — data visualizations, forms, dashboards — instead of only text and structured data.",
+      "tags": [
+        "extensions",
+        "mcp-apps"
+      ]
+    },
+    {
+      "id": "ch13-q5",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "How does an MCP App link a tool to its user interface?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The tool declares a UI resource using the ui:// URI scheme, and references it via metadata (_meta.ui.resourceUri) so the host can fetch and render it"
+        },
+        {
+          "letter": "B",
+          "text": "The tool returns raw HTML in its text content"
+        },
+        {
+          "letter": "C",
+          "text": "The host guesses the UI from the tool name"
+        },
+        {
+          "letter": "D",
+          "text": "UIs are uploaded to the registry separately"
+        }
+      ],
+      "answer": "A",
+      "explanation": "MCP Apps introduces predeclared UI resources on the ui:// scheme (MIME type text/html;profile=mcp-app), tool-UI linkage via _meta.ui.resourceUri, and bidirectional communication — the extension identifier is io.modelcontextprotocol/ui.",
+      "tags": [
+        "extensions",
+        "mcp-apps",
+        "ui-resources"
+      ]
+    },
+    {
+      "id": "ch13-q6",
+      "chapter": 13,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: A user clicks a button inside an MCP App's rendered widget, which triggers another tool call. From a security standpoint, how does this action flow?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The iframe calls the server's API directly over the network"
+        },
+        {
+          "letter": "B",
+          "text": "The UI runs in a mandatory sandboxed iframe and communicates with the host via JSON-RPC over postMessage; the tool call is proxied through the host and goes through the host's ordinary audit and consent path"
+        },
+        {
+          "letter": "C",
+          "text": "The click is converted to a shell command"
+        },
+        {
+          "letter": "D",
+          "text": "UI actions bypass consent because the user already approved rendering"
+        }
+      ],
+      "answer": "B",
+      "explanation": "MCP Apps' security model: mandatory iframe sandboxing, host-constructed CSP from server-declared domains (default deny-all network), and auditable JSON-RPC/postMessage communication. A UI-triggered tool call gets the same consent treatment as a direct one.",
+      "tags": [
+        "extensions",
+        "mcp-apps",
+        "security",
+        "scenario"
+      ]
+    },
+    {
+      "id": "ch13-q7",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What problem does the Tasks extension solve?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Slow JSON parsing"
+        },
+        {
+          "letter": "B",
+          "text": "Long-running operations: instead of blocking, the server returns a durable task handle so clients can poll for progress, provide mid-flight input, and retrieve the result even after reconnecting"
+        },
+        {
+          "letter": "C",
+          "text": "Scheduling cron jobs on the client"
+        },
+        {
+          "letter": "D",
+          "text": "Compressing large tool results"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Tasks (io.modelcontextprotocol/tasks) address CI pipelines, batch processing, human approvals, and similar work: no long-lived connections, crash resilience via durable task IDs, progress visibility, and mid-flight interaction.",
+      "tags": [
+        "extensions",
+        "tasks"
+      ]
+    },
+    {
+      "id": "ch13-q8",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "How is a task returned to the client, and how does the client get the result?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Via a webhook the client registers"
+        },
+        {
+          "letter": "B",
+          "text": "The server returns a CreateTaskResult (resultType: \"task\") with a taskId, initial status, TTL, and suggested poll interval; the client polls tasks/get (respecting pollIntervalMs) until a terminal status, where result or error appears"
+        },
+        {
+          "letter": "C",
+          "text": "The server emails the result"
+        },
+        {
+          "letter": "D",
+          "text": "The client blocks on tasks/result"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The 2026-07-28 redesign replaced the blocking tasks/result with polling via tasks/get (plus tasks/update for input and tasks/cancel). The task must be durably created before the CreateTaskResult is sent.",
+      "tags": [
+        "extensions",
+        "tasks",
+        "polling"
+      ]
+    },
+    {
+      "id": "ch13-q9",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which task statuses exist, and which are terminal?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "working, input_required, completed, failed, cancelled — with completed, failed, and cancelled terminal"
+        },
+        {
+          "letter": "B",
+          "text": "queued, running, done"
+        },
+        {
+          "letter": "C",
+          "text": "open and closed"
+        },
+        {
+          "letter": "D",
+          "text": "pending, active, archived, purged"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Tasks carry status metadata: working, input_required (server needs client input via inputRequests/tasks/update), and the terminal states completed (result field), failed (error field), and cancelled. Terminal state never changes.",
+      "tags": [
+        "extensions",
+        "tasks",
+        "lifecycle"
+      ]
+    },
+    {
+      "id": "ch13-q10",
+      "chapter": 13,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: A server wants to return a task handle for a slow tools/call, but the incoming request's clientCapabilities did not include the tasks extension. What must the server do?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Return the task anyway; clients must handle it"
+        },
+        {
+          "letter": "B",
+          "text": "Never return a task to a client that didn't declare support — verify the extension in the per-request capabilities first, and otherwise process the request synchronously"
+        },
+        {
+          "letter": "C",
+          "text": "Return an empty result"
+        },
+        {
+          "letter": "D",
+          "text": "Convert the task to an elicitation"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Task creation is server-directed but capability-gated: before returning a CreateTaskResult, the server must verify the client included io.modelcontextprotocol/tasks in its per-request capabilities.",
+      "tags": [
+        "extensions",
+        "tasks",
+        "scenario",
+        "capabilities"
+      ]
+    },
+    {
+      "id": "ch13-q11",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Is task cancellation guaranteed to stop the work?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Yes; tasks/cancel kills the worker immediately"
+        },
+        {
+          "letter": "B",
+          "text": "No — cancellation is cooperative: the server acknowledges the intent, but the task may still reach a non-cancelled terminal status"
+        },
+        {
+          "letter": "C",
+          "text": "Only if the task is younger than its TTL"
+        },
+        {
+          "letter": "D",
+          "text": "Cancellation is not part of the extension"
+        }
+      ],
+      "answer": "B",
+      "explanation": "tasks/cancel signals intent; the server acks with an empty result and honors it when possible, but is not obligated to stop the work.",
+      "tags": [
+        "extensions",
+        "tasks",
+        "cancellation"
+      ]
+    },
+    {
+      "id": "ch13-q12",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What does the OAuth Client Credentials auth extension add to MCP?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Passwordless logins for humans"
+        },
+        {
+          "letter": "B",
+          "text": "Machine-to-machine authentication via the OAuth 2.1 client credentials flow — no user interaction, using pre-registered client credentials established out of band"
+        },
+        {
+          "letter": "C",
+          "text": "Biometric authentication"
+        },
+        {
+          "letter": "D",
+          "text": "Anonymous access mode"
+        }
+      ],
+      "answer": "B",
+      "explanation": "io.modelcontextprotocol/oauth-client-credentials enables M2M auth for HTTP-based transports where no user is in the loop (e.g., service-to-service agents), building on the baseline authorization requirements.",
+      "tags": [
+        "extensions",
+        "auth",
+        "client-credentials"
+      ]
+    },
+    {
+      "id": "ch13-q13",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What is the purpose of the Enterprise-Managed Authorization (EMA) extension?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Charging enterprises per token"
+        },
+        {
+          "letter": "B",
+          "text": "Centralized access control through the organization's identity provider: employees get connected MCP servers on first login with a single sign-on, no per-app OAuth, and the IdP can enforce which users/groups may use which clients with which servers and scopes"
+        },
+        {
+          "letter": "C",
+          "text": "Replacing OAuth with API keys"
+        },
+        {
+          "letter": "D",
+          "text": "Encrypting all traffic with enterprise certificates"
+        }
+      ],
+      "answer": "B",
+      "explanation": "EMA (now stable) addresses repeated consent prompts in enterprises: the trusted IdP centrally provisions MCP server access — e.g., engineering gets read-only source-control access from a code editor while marketing gets docs read/write — for zero-touch setup.",
+      "tags": [
+        "extensions",
+        "auth",
+        "enterprise"
+      ]
+    },
+    {
+      "id": "ch13-q14",
+      "chapter": 13,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: A monitoring agent (no human user) must call a protected MCP server nightly, while your employees access the same server through the company IdP with zero-touch setup. Which extensions map to each need?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "MCP Apps for the agent; Tasks for the employees"
+        },
+        {
+          "letter": "B",
+          "text": "OAuth Client Credentials for the machine-to-machine agent; Enterprise-Managed Authorization for centralized, IdP-driven employee access"
+        },
+        {
+          "letter": "C",
+          "text": "Both need Dynamic Client Registration only"
+        },
+        {
+          "letter": "D",
+          "text": "Neither; core MCP forbids unattended access"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The two auth extensions cover exactly these cases: client credentials for M2M auth without a user, and EMA for centrally managed employee access through the enterprise IdP. Both require explicit client support and are never active by default.",
+      "tags": [
+        "extensions",
+        "auth",
+        "scenario"
+      ]
+    },
+    {
+      "id": "ch13-q15",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Where do official MCP extensions live, and how can you check which clients support them?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "In npm only; support is universal"
+        },
+        {
+          "letter": "B",
+          "text": "In MCP GitHub org repositories prefixed ext- (ext-apps, ext-tasks, ext-auth); the docs publish an extension support matrix showing which MCP clients implement which official extensions"
+        },
+        {
+          "letter": "C",
+          "text": "In a private Anthropic repository"
+        },
+        {
+          "letter": "D",
+          "text": "Inside the core schema.ts"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Official extensions are developed in ext-* repos under github.com/modelcontextprotocol, and the Extension Support Matrix page (extensions/client-matrix) tracks per-client support — important because support varies and requires explicit opt-in.",
+      "tags": [
+        "extensions",
+        "ecosystem",
+        "client-matrix"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,339 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 12 (Multi-Select): Transports & Protocol Utilities",
+    "protocolVersion": "2026-07-28",
+    "chapter": 12,
+    "chapterName": "Transports & Protocol Utilities",
+    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
+    "questionCount": 8
+  },
+  "questions": [
+    {
+      "id": "ch12-m1",
+      "chapter": 12,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which header requirements apply to 2026-07-28 Streamable HTTP POST requests? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Mcp-Method is required on every request"
+        },
+        {
+          "letter": "B",
+          "text": "Mcp-Name is required for tools/call, resources/read, and prompts/get"
+        },
+        {
+          "letter": "C",
+          "text": "Servers reject requests where headers and body disagree (400 + HeaderMismatch, -32020)"
+        },
+        {
+          "letter": "D",
+          "text": "Mcp-Session-Id is required for session affinity"
+        },
+        {
+          "letter": "E",
+          "text": "x-mcp-header annotations can surface tool parameters as Mcp-Param-* headers"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ],
+      "explanation": "Mcp-Session-Id was removed with protocol sessions. The rest is SEP-2243's header model, enabling gateways to route without parsing bodies.",
+      "tags": [
+        "transports",
+        "headers",
+        "sep-2243"
+      ]
+    },
+    {
+      "id": "ch12-m2",
+      "chapter": 12,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which things were REMOVED from the Streamable HTTP transport in 2026-07-28? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Protocol-level sessions and the Mcp-Session-Id header"
+        },
+        {
+          "letter": "B",
+          "text": "SSE stream resumability and message redelivery (Last-Event-ID, SSE event IDs)"
+        },
+        {
+          "letter": "C",
+          "text": "The standalone HTTP GET endpoint for server-to-client notifications"
+        },
+        {
+          "letter": "D",
+          "text": "The POST method for client messages"
+        },
+        {
+          "letter": "E",
+          "text": "The initialize/notifications/initialized handshake"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ],
+      "explanation": "Sessions, resumability, the GET notification endpoint (replaced by subscriptions/listen), and the handshake are gone. POST remains the way client messages travel.",
+      "tags": [
+        "transports",
+        "removals",
+        "statelessness"
+      ]
+    },
+    {
+      "id": "ch12-m3",
+      "chapter": 12,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which results must carry ttlMs and cacheScope under the CacheableResult requirement? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "tools/list"
+        },
+        {
+          "letter": "B",
+          "text": "prompts/list"
+        },
+        {
+          "letter": "C",
+          "text": "resources/list and resources/templates/list"
+        },
+        {
+          "letter": "D",
+          "text": "resources/read"
+        },
+        {
+          "letter": "E",
+          "text": "tools/call"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "SEP-2549 requires the caching fields on the list endpoints and resources/read. Tool execution results are not cacheable list results.",
+      "tags": [
+        "utilities",
+        "caching",
+        "sep-2549"
+      ]
+    },
+    {
+      "id": "ch12-m4",
+      "chapter": 12,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which statements about progress and cancellation are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Progress requires the client to include a progressToken in the request's _meta"
+        },
+        {
+          "letter": "B",
+          "text": "notifications/progress flows on the response stream of the request it relates to"
+        },
+        {
+          "letter": "C",
+          "text": "Cancellation is a notification (notifications/cancelled) referencing the requestId, expecting no reply"
+        },
+        {
+          "letter": "D",
+          "text": "A cancelled request still receives a normal final response"
+        },
+        {
+          "letter": "E",
+          "text": "The subscriptions/listen stream carries progress notifications"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Progress rides the originating request's response stream (not subscriptions/listen), and a cancelled request produces no response — the server stops work and frees resources.",
+      "tags": [
+        "utilities",
+        "progress",
+        "cancellation"
+      ]
+    },
+    {
+      "id": "ch12-m5",
+      "chapter": 12,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which _meta observability keys did SEP-414 standardize, and with what effect? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "traceparent"
+        },
+        {
+          "letter": "B",
+          "text": "tracestate"
+        },
+        {
+          "letter": "C",
+          "text": "baggage"
+        },
+        {
+          "letter": "D",
+          "text": "A trace can follow one tool call from host through SDK, server, and downstream systems as a single span tree"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "The three W3C Trace Context keys plus the resulting end-to-end correlation — everything listed is right.",
+      "tags": [
+        "transports",
+        "observability",
+        "opentelemetry"
+      ]
+    },
+    {
+      "id": "ch12-m6",
+      "chapter": 12,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which requests require the Mcp-Name header on Streamable HTTP? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "tools/call"
+        },
+        {
+          "letter": "B",
+          "text": "resources/read"
+        },
+        {
+          "letter": "C",
+          "text": "prompts/get"
+        },
+        {
+          "letter": "D",
+          "text": "tools/list"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Only the three that name a target carry Mcp-Name; list calls carry just Mcp-Method. 'All of the above' fails on D.",
+      "tags": [
+        "transports",
+        "headers",
+        "sep-2243"
+      ]
+    },
+    {
+      "id": "ch12-m7",
+      "chapter": 12,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "How does subscriptions/listen behave? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "It is a single long-lived POST whose response stream carries the opted-in notifications"
+        },
+        {
+          "letter": "B",
+          "text": "The client names the notification types it wants; the server acknowledges via notifications/subscriptions/acknowledged"
+        },
+        {
+          "letter": "C",
+          "text": "The subscriptionId equals the listen request's JSON-RPC id and tags every notification"
+        },
+        {
+          "letter": "D",
+          "text": "Delivery is guaranteed and replayed after reconnect"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Delivery is best-effort — resumability was removed, so clients should still poll or refresh after a dropped stream. D poisons E.",
+      "tags": [
+        "transports",
+        "subscriptions",
+        "notifications"
+      ]
+    },
+    {
+      "id": "ch12-m8",
+      "chapter": 12,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which caching statements from SEP-2549 are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "ttlMs is a freshness hint in milliseconds"
+        },
+        {
+          "letter": "B",
+          "text": "cacheScope: \"public\" permits shared intermediaries to cache; \"private\" restricts caching to the client"
+        },
+        {
+          "letter": "C",
+          "text": "A list_changed notification supersedes an unexpired TTL"
+        },
+        {
+          "letter": "D",
+          "text": "The fields appear on tools/list, prompts/list, resources/list, resources/templates/list, and resources/read results"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "All four describe the CacheableResult contract accurately.",
+      "tags": [
+        "transports",
+        "caching",
+        "sep-2549"
+      ]
+    }
+  ]
+}

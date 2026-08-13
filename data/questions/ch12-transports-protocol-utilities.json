@@ -1,0 +1,490 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 12: Transports & Protocol Utilities",
+    "protocolVersion": "2026-07-28",
+    "chapter": 12,
+    "chapterName": "Transports & Protocol Utilities",
+    "questionCount": 15
+  },
+  "questions": [
+    {
+      "id": "ch12-q1",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "How are JSON-RPC messages exchanged over the stdio transport?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The client launches the server as a subprocess; messages flow over the server's standard input and output, and stderr is reserved for logging"
+        },
+        {
+          "letter": "B",
+          "text": "Over a Unix socket created by the server"
+        },
+        {
+          "letter": "C",
+          "text": "Via shared memory segments"
+        },
+        {
+          "letter": "D",
+          "text": "Through temporary files polled every second"
+        }
+      ],
+      "answer": "A",
+      "explanation": "With stdio, the host launches the server process and speaks JSON-RPC over stdin/stdout — which is why any stray stdout output (print, console.log) corrupts the protocol, and logging must go to stderr.",
+      "tags": [
+        "transports",
+        "stdio"
+      ]
+    },
+    {
+      "id": "ch12-q2",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "How does the Streamable HTTP transport exchange messages?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "WebSocket frames only"
+        },
+        {
+          "letter": "B",
+          "text": "HTTP POST for client-to-server messages, with optional Server-Sent Events for streaming server output"
+        },
+        {
+          "letter": "C",
+          "text": "gRPC bidirectional streams"
+        },
+        {
+          "letter": "D",
+          "text": "FTP file transfers"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Streamable HTTP uses HTTP POST for client-to-server messages with optional SSE for streaming. It enables remote servers and supports standard HTTP authentication (bearer tokens, API keys, custom headers), with OAuth recommended for obtaining tokens.",
+      "tags": [
+        "transports",
+        "streamable-http"
+      ]
+    },
+    {
+      "id": "ch12-q3",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which HTTP header is now required on EVERY Streamable HTTP POST request in 2026-07-28?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Mcp-Session-Id"
+        },
+        {
+          "letter": "B",
+          "text": "Mcp-Method (with Mcp-Name additionally required for tools/call, resources/read, and prompts/get)"
+        },
+        {
+          "letter": "C",
+          "text": "X-Requested-With"
+        },
+        {
+          "letter": "D",
+          "text": "Mcp-Token"
+        }
+      ],
+      "answer": "B",
+      "explanation": "SEP-2243 requires the Mcp-Method header on every request; Mcp-Name is required for the request types that name a target (tools/call, resources/read, prompts/get). Gateways, rate limiters, and WAFs can then route and meter on headers without parsing the JSON body.",
+      "tags": [
+        "transports",
+        "headers",
+        "sep-2243"
+      ]
+    },
+    {
+      "id": "ch12-q4",
+      "chapter": 12,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: A Streamable HTTP request arrives with the header Mcp-Name: search but the JSON body actually calls the tool 'delete_records'. What must a server that processes the body do?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Trust the body silently"
+        },
+        {
+          "letter": "B",
+          "text": "Reject the request — headers and body that disagree yield 400 Bad Request with the HeaderMismatch JSON-RPC error (-32020)"
+        },
+        {
+          "letter": "C",
+          "text": "Execute both tools"
+        },
+        {
+          "letter": "D",
+          "text": "Trust the header and call 'search'"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Because intermediaries may authorize on headers, the spec anticipates spoofing: servers reject requests where the headers and body disagree, returning 400 with the HeaderMismatchError (-32020, renumbered from -32001).",
+      "tags": [
+        "transports",
+        "headers",
+        "scenario",
+        "error-codes"
+      ]
+    },
+    {
+      "id": "ch12-q5",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What happened to the Mcp-Session-Id header in the 2026-07-28 revision?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "It was made mandatory"
+        },
+        {
+          "letter": "B",
+          "text": "It was removed along with protocol-level sessions — list endpoints no longer vary per connection, and cross-call state uses explicit server-minted handles passed as tool arguments"
+        },
+        {
+          "letter": "C",
+          "text": "It was renamed to Mcp-Connection-Id"
+        },
+        {
+          "letter": "D",
+          "text": "It now carries the OAuth token"
+        }
+      ],
+      "answer": "B",
+      "explanation": "SEP-2567 removed sessions and Mcp-Session-Id. This eliminates sticky routing and shared session stores, letting servers run behind ordinary round-robin load balancers and on serverless platforms.",
+      "tags": [
+        "transports",
+        "statelessness",
+        "sessions"
+      ]
+    },
+    {
+      "id": "ch12-q6",
+      "chapter": 12,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: An SSE response stream breaks mid-request under 2026-07-28. Your legacy code tries to resume with the Last-Event-ID header. What actually happens?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The server replays missed events from the event ID"
+        },
+        {
+          "letter": "B",
+          "text": "Resumability and message redelivery were removed: a broken response stream loses the in-flight request, and the client MUST re-issue it as a new request with a new request ID"
+        },
+        {
+          "letter": "C",
+          "text": "The server pauses the request until reconnection"
+        },
+        {
+          "letter": "D",
+          "text": "The stream automatically migrates to WebSocket"
+        }
+      ],
+      "answer": "B",
+      "explanation": "SEP-2575 removed SSE stream resumability (Last-Event-ID and SSE event IDs). Losing the stream loses the in-flight request; the client re-issues it fresh with a new request ID.",
+      "tags": [
+        "transports",
+        "sse",
+        "scenario",
+        "resumability"
+      ]
+    },
+    {
+      "id": "ch12-q7",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What is the x-mcp-header annotation used for?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Marking a header as deprecated"
+        },
+        {
+          "letter": "B",
+          "text": "Letting a tool parameter be mirrored into a custom HTTP header (e.g., a 'city' argument annotated x-mcp-header: \"City\" appears as Mcp-Param-City), so infrastructure can route on parameter values"
+        },
+        {
+          "letter": "C",
+          "text": "Encrypting individual headers"
+        },
+        {
+          "letter": "D",
+          "text": "Declaring the server's version"
+        }
+      ],
+      "answer": "B",
+      "explanation": "SEP-2243 adds support for custom headers derived from tool parameters via x-mcp-header schema annotations, surfacing selected argument values as Mcp-Param-* headers for gateways.",
+      "tags": [
+        "transports",
+        "headers",
+        "sep-2243"
+      ]
+    },
+    {
+      "id": "ch12-q8",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "How does progress reporting work for a long-running MCP request?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The client polls a /progress REST endpoint"
+        },
+        {
+          "letter": "B",
+          "text": "The client includes a progressToken in the request's _meta; the server emits notifications/progress carrying that token, and the client matches notifications back to the originating call"
+        },
+        {
+          "letter": "C",
+          "text": "Progress is emailed to the user"
+        },
+        {
+          "letter": "D",
+          "text": "Progress is only available via the Tasks extension"
+        }
+      ],
+      "answer": "B",
+      "explanation": "progressToken is a reserved _meta key (part of RequestMetaObject in the 2026-07-28 schema). Servers send notifications/progress tagged with the token; these request-scoped notifications flow on the response stream of the request they relate to, not the subscriptions/listen stream.",
+      "tags": [
+        "utilities",
+        "progress",
+        "meta"
+      ]
+    },
+    {
+      "id": "ch12-q9",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "On which stream do request-scoped notifications such as notifications/progress travel in 2026-07-28?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The subscriptions/listen stream, like all notifications"
+        },
+        {
+          "letter": "B",
+          "text": "The response stream of the request they relate to"
+        },
+        {
+          "letter": "C",
+          "text": "A dedicated WebSocket"
+        },
+        {
+          "letter": "D",
+          "text": "They are batched into the final result"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The changelog is explicit: request-scoped notifications like notifications/progress and notifications/message continue to flow on the response stream of their originating request; subscriptions/listen carries only the opted-in change notifications.",
+      "tags": [
+        "utilities",
+        "progress",
+        "notifications"
+      ]
+    },
+    {
+      "id": "ch12-q10",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "How does pagination work for list operations like tools/list?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Clients pass page and pageSize integers"
+        },
+        {
+          "letter": "B",
+          "text": "Cursor-based: the client passes an opaque cursor token representing the current position, and the server returns results starting after it (with a next cursor when more remain)"
+        },
+        {
+          "letter": "C",
+          "text": "Servers always return everything in one response"
+        },
+        {
+          "letter": "D",
+          "text": "Pagination uses HTTP Range headers"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The schema defines Cursor as 'an opaque token representing the current pagination position'; list requests accept an optional cursor parameter, and clients treat it as opaque rather than parsing or constructing it.",
+      "tags": [
+        "utilities",
+        "pagination",
+        "cursor"
+      ]
+    },
+    {
+      "id": "ch12-q11",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Which server utility helps users fill in valid values for prompt arguments and resource template parameters?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Completion (argument autocompletion, e.g., suggesting 'Paris' for a partial 'Par')"
+        },
+        {
+          "letter": "B",
+          "text": "Sampling"
+        },
+        {
+          "letter": "C",
+          "text": "Caching"
+        },
+        {
+          "letter": "D",
+          "text": "Progress"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The completion utility provides autocompletion for prompt arguments and resource template parameters, letting users discover valid values without knowing exact formats.",
+      "tags": [
+        "utilities",
+        "completion"
+      ]
+    },
+    {
+      "id": "ch12-q12",
+      "chapter": 12,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "SCENARIO: A tools/list response arrives with ttlMs: 300000 and cacheScope: \"public\". Then a notifications/tools/list_changed arrives after two minutes. Can the client keep using its cached list for the remaining three minutes?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Yes; the TTL always wins"
+        },
+        {
+          "letter": "B",
+          "text": "No — a cached list must be treated as stale once a list_changed notification arrives, even before its TTL expires"
+        },
+        {
+          "letter": "C",
+          "text": "Only if cacheScope is private"
+        },
+        {
+          "letter": "D",
+          "text": "Yes, but only for read operations"
+        }
+      ],
+      "answer": "B",
+      "explanation": "ttlMs is a freshness hint and cacheScope (public/private) governs shared-intermediary caching, but the caching rules say a list_changed notification supersedes the TTL: treat the cached list as stale immediately.",
+      "tags": [
+        "utilities",
+        "caching",
+        "scenario"
+      ]
+    },
+    {
+      "id": "ch12-q13",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Why does the 2026-07-28 spec recommend servers return tools from tools/list in a deterministic order?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Alphabetical order is easier to read"
+        },
+        {
+          "letter": "B",
+          "text": "A stable order enables client-side caching and improves LLM prompt cache hit rates, since the tools array often sits in the cached prompt prefix"
+        },
+        {
+          "letter": "C",
+          "text": "JSON requires sorted arrays"
+        },
+        {
+          "letter": "D",
+          "text": "It prevents pagination"
+        }
+      ],
+      "answer": "B",
+      "explanation": "This minor change recognizes that tool definitions live in the model's prompt: if their order shifts between calls, prompt caches are invalidated. Deterministic ordering keeps both client caches and provider prompt caches effective.",
+      "tags": [
+        "utilities",
+        "caching",
+        "prompt-caching"
+      ]
+    },
+    {
+      "id": "ch12-q14",
+      "chapter": 12,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: Your ops team wants per-tool rate limiting at the API gateway without decrypting and parsing JSON-RPC bodies. Which 2026-07-28 feature makes this practical?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Sticky sessions keyed on Mcp-Session-Id"
+        },
+        {
+          "letter": "B",
+          "text": "The required Mcp-Method and Mcp-Name headers: the invoked method and target tool are visible in HTTP headers, so gateways, WAFs, and rate limiters can route, meter, and authorize at the edge"
+        },
+        {
+          "letter": "C",
+          "text": "Base64-encoding the request body"
+        },
+        {
+          "letter": "D",
+          "text": "Switching to the stdio transport"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Header-based routing (SEP-2243) is designed exactly for this: a tools/call to 'search' arrives as Mcp-Method: tools/call and Mcp-Name: search, making per-tool policy at the edge practical without body inspection.",
+      "tags": [
+        "transports",
+        "headers",
+        "scenario",
+        "gateways"
+      ]
+    },
+    {
+      "id": "ch12-q15",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "How does a client cancel an in-flight request?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "By closing the TCP connection, which servers interpret as cancellation"
+        },
+        {
+          "letter": "B",
+          "text": "By sending a notifications/cancelled notification referencing the requestId; the server should stop work and free resources, sending no response for the cancelled request"
+        },
+        {
+          "letter": "C",
+          "text": "By calling DELETE /requests/{id}"
+        },
+        {
+          "letter": "D",
+          "text": "Requests cannot be cancelled in MCP"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Cancellation is one of MCP's cross-cutting patterns: a JSON-RPC notification (notifications/cancelled) carries the requestId of the in-flight request; being a notification, it expects no reply, and the cancelled request produces no response.",
+      "tags": [
+        "utilities",
+        "cancellation"
+      ]
+    }
+  ]
+}

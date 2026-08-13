@@ -1,0 +1,673 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 1: MCP Fundamentals",
+    "protocolVersion": "2026-07-28",
+    "chapter": 1,
+    "chapterName": "MCP Fundamentals",
+    "questionCount": 21
+  },
+  "questions": [
+    {
+      "id": "ch1-q1",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What does MCP stand for?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Model Context Protocol"
+        },
+        {
+          "letter": "B",
+          "text": "Machine Communication Protocol"
+        },
+        {
+          "letter": "C",
+          "text": "Model Control Process"
+        },
+        {
+          "letter": "D",
+          "text": "Multi-Channel Platform"
+        }
+      ],
+      "answer": "A",
+      "explanation": "MCP stands for Model Context Protocol, an open-source standard for connecting AI applications to external systems such as data sources, tools, and workflows.",
+      "tags": [
+        "mcp-basics",
+        "definitions"
+      ]
+    },
+    {
+      "id": "ch1-q2",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "The official documentation compares MCP to which everyday technology?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A Wi-Fi router for AI models"
+        },
+        {
+          "letter": "B",
+          "text": "A USB-C port for AI applications"
+        },
+        {
+          "letter": "C",
+          "text": "A power adapter for LLMs"
+        },
+        {
+          "letter": "D",
+          "text": "An HDMI cable for data sources"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The docs describe MCP as being like a USB-C port for AI applications: just as USB-C standardizes how devices connect, MCP standardizes how AI applications connect to external systems.",
+      "tags": [
+        "mcp-basics",
+        "analogies"
+      ]
+    },
+    {
+      "id": "ch1-q3",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Which of the following is NOT one of the categories of external systems MCP is designed to connect AI applications to?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Data sources (e.g., local files, databases)"
+        },
+        {
+          "letter": "B",
+          "text": "Tools (e.g., search engines, calculators)"
+        },
+        {
+          "letter": "C",
+          "text": "Workflows (e.g., specialized prompts)"
+        },
+        {
+          "letter": "D",
+          "text": "GPU compute clusters for model training"
+        }
+      ],
+      "answer": "D",
+      "explanation": "MCP connects AI applications to data sources, tools, and workflows. It does not concern itself with model training infrastructure.",
+      "tags": [
+        "mcp-basics",
+        "scope"
+      ]
+    },
+    {
+      "id": "ch1-q4",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which of the following projects is NOT part of the Model Context Protocol's official scope?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The MCP Specification"
+        },
+        {
+          "letter": "B",
+          "text": "Language-specific MCP SDKs"
+        },
+        {
+          "letter": "C",
+          "text": "A hosted LLM inference API"
+        },
+        {
+          "letter": "D",
+          "text": "MCP reference server implementations"
+        }
+      ],
+      "answer": "C",
+      "explanation": "MCP's scope includes the specification, SDKs, development tools (like the Inspector), and reference server implementations. MCP focuses solely on context exchange and does not dictate how AI applications use LLMs, nor does it provide model inference.",
+      "tags": [
+        "mcp-basics",
+        "scope"
+      ]
+    },
+    {
+      "id": "ch1-q5",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "According to the intro docs, what is the main benefit MCP delivers to developers?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Free hosting for AI applications"
+        },
+        {
+          "letter": "B",
+          "text": "Reduced development time and complexity when building or integrating with AI applications and agents"
+        },
+        {
+          "letter": "C",
+          "text": "Guaranteed model accuracy improvements"
+        },
+        {
+          "letter": "D",
+          "text": "Automatic security auditing of servers"
+        }
+      ],
+      "answer": "B",
+      "explanation": "For developers, MCP reduces development time and complexity: you build an integration once against a standard protocol instead of writing custom glue for every AI application.",
+      "tags": [
+        "mcp-basics",
+        "ecosystem"
+      ]
+    },
+    {
+      "id": "ch1-q6",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Which of the following applications is listed in the docs as supporting MCP?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Claude, ChatGPT, Visual Studio Code, and Cursor"
+        },
+        {
+          "letter": "B",
+          "text": "Only Anthropic products"
+        },
+        {
+          "letter": "C",
+          "text": "Only open-source terminal tools"
+        },
+        {
+          "letter": "D",
+          "text": "MCP has no client support yet"
+        }
+      ],
+      "answer": "A",
+      "explanation": "MCP is an open protocol with broad ecosystem support: AI assistants like Claude and ChatGPT, and development tools like Visual Studio Code, Cursor, and MCPJam all support it — making it possible to build once and integrate everywhere.",
+      "tags": [
+        "mcp-basics",
+        "ecosystem"
+      ]
+    },
+    {
+      "id": "ch1-q7",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Which of these is an example the docs give of what MCP can enable?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Claude Code generating an entire web app from a Figma design"
+        },
+        {
+          "letter": "B",
+          "text": "Training a new foundation model from scratch"
+        },
+        {
+          "letter": "C",
+          "text": "Replacing the operating system kernel"
+        },
+        {
+          "letter": "D",
+          "text": "Compressing model weights for mobile devices"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Examples in the intro include agents accessing Google Calendar and Notion, Claude Code generating a web app from a Figma design, enterprise chatbots connecting to multiple databases, and AI models creating 3D designs in Blender.",
+      "tags": [
+        "mcp-basics",
+        "use-cases"
+      ]
+    },
+    {
+      "id": "ch1-q8",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What benefit does MCP deliver to end users, according to the intro?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Cheaper API pricing"
+        },
+        {
+          "letter": "B",
+          "text": "More capable AI applications that can access their data and take actions on their behalf when necessary"
+        },
+        {
+          "letter": "C",
+          "text": "Faster model inference"
+        },
+        {
+          "letter": "D",
+          "text": "Guaranteed privacy from all servers"
+        }
+      ],
+      "answer": "B",
+      "explanation": "For end users, MCP results in more capable AI applications and agents which can access their data and take actions on their behalf when necessary.",
+      "tags": [
+        "mcp-basics",
+        "ecosystem"
+      ]
+    },
+    {
+      "id": "ch1-q9",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Besides servers and clients, what third kind of thing does the getting-started guide invite you to build?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "MCP Apps — interactive apps that run inside AI clients"
+        },
+        {
+          "letter": "B",
+          "text": "MCP Kernels"
+        },
+        {
+          "letter": "C",
+          "text": "MCP Databases"
+        },
+        {
+          "letter": "D",
+          "text": "MCP Browsers"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The Start Building section lists three paths: build servers (expose data and tools), build clients (applications that connect to servers), and build MCP Apps (interactive apps that run inside AI clients).",
+      "tags": [
+        "mcp-basics",
+        "mcp-apps"
+      ]
+    },
+    {
+      "id": "ch1-q10",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which languages have official MCP SDKs referenced across the documentation?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Python, TypeScript, Java, Kotlin, C#, Ruby, Rust, and Go"
+        },
+        {
+          "letter": "B",
+          "text": "Python and JavaScript only"
+        },
+        {
+          "letter": "C",
+          "text": "C and C++ only"
+        },
+        {
+          "letter": "D",
+          "text": "PHP, Perl, and Bash"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The build-server quickstart provides parallel tutorials in Python, TypeScript, Java (Spring AI), Kotlin, C#, Ruby, Rust (rmcp), and Go — all backed by official SDKs under the modelcontextprotocol GitHub organization.",
+      "tags": [
+        "mcp-basics",
+        "sdks"
+      ]
+    },
+    {
+      "id": "ch1-q11",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which of the following does MCP deliberately NOT specify?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "How tools are discovered by clients"
+        },
+        {
+          "letter": "B",
+          "text": "How AI applications use LLMs or manage the provided context"
+        },
+        {
+          "letter": "C",
+          "text": "The message format between clients and servers"
+        },
+        {
+          "letter": "D",
+          "text": "How servers describe their capabilities"
+        }
+      ],
+      "answer": "B",
+      "explanation": "MCP focuses solely on the protocol for context exchange — it does not dictate how AI applications use LLMs or manage the context they receive. Discovery, message format, and capability description are all in scope.",
+      "tags": [
+        "mcp-basics",
+        "scope",
+        "design"
+      ]
+    },
+    {
+      "id": "ch1-q12",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which repositories live under the modelcontextprotocol GitHub organization?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Only the specification"
+        },
+        {
+          "letter": "B",
+          "text": "The specification (with the schema), language SDKs, the MCP Inspector, and reference server implementations (servers)"
+        },
+        {
+          "letter": "C",
+          "text": "Forks of popular LLM frameworks"
+        },
+        {
+          "letter": "D",
+          "text": "Only closed-source binaries"
+        }
+      ],
+      "answer": "B",
+      "explanation": "github.com/modelcontextprotocol hosts the specification (whose TypeScript schema is authoritative), the SDKs (python-sdk, typescript-sdk, kotlin-sdk, csharp-sdk, go-sdk, etc.), the inspector developer tool, and the servers repository of reference implementations like the filesystem server.",
+      "tags": [
+        "mcp-basics",
+        "github",
+        "open-source"
+      ]
+    },
+    {
+      "id": "ch1-q13",
+      "chapter": 1,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: Your company builds an AI assistant that must integrate with 12 internal systems (databases, ticketing, wikis). Each new AI application you adopt currently requires re-writing all 12 integrations. How does adopting MCP change this?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "It doesn't; every AI application still needs custom integrations"
+        },
+        {
+          "letter": "B",
+          "text": "You build each integration once as an MCP server; any MCP-capable host (Claude, VS Code, ChatGPT, etc.) can then connect to all of them through the standard protocol"
+        },
+        {
+          "letter": "C",
+          "text": "MCP merges all 12 systems into a single database"
+        },
+        {
+          "letter": "D",
+          "text": "MCP only works with cloud systems, so internal systems are excluded"
+        }
+      ],
+      "answer": "B",
+      "explanation": "This is MCP's core value proposition — like USB-C, it standardizes the connection. Build each integration once as an MCP server, and the growing ecosystem of MCP hosts can use them without additional glue code, reducing development time and complexity.",
+      "tags": [
+        "mcp-basics",
+        "scenario",
+        "ecosystem"
+      ]
+    },
+    {
+      "id": "ch1-q14",
+      "chapter": 1,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "SCENARIO: An enterprise wants employees to analyze data across several internal databases through a chat interface. Which MCP-enabled pattern from the intro docs matches this need?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "An enterprise chatbot connecting to multiple databases across the organization via MCP servers, empowering users to analyze data using chat"
+        },
+        {
+          "letter": "B",
+          "text": "Exporting all databases to CSV weekly"
+        },
+        {
+          "letter": "C",
+          "text": "Fine-tuning a model on the databases"
+        },
+        {
+          "letter": "D",
+          "text": "Giving every employee direct SQL access"
+        }
+      ],
+      "answer": "A",
+      "explanation": "This is one of the intro's flagship examples: enterprise chatbots can connect to multiple databases across an organization through MCP, letting users analyze data conversationally.",
+      "tags": [
+        "mcp-basics",
+        "scenario",
+        "use-cases"
+      ]
+    },
+    {
+      "id": "ch1-q15",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "For whom does MCP 'reduce development time and complexity', and why is the protocol described as 'build once, integrate everywhere'?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "For model trainers, because MCP compresses training data"
+        },
+        {
+          "letter": "B",
+          "text": "For developers, because a server or client written against the open standard works across the whole ecosystem of MCP-supporting applications"
+        },
+        {
+          "letter": "C",
+          "text": "For GPU vendors, because MCP reduces memory usage"
+        },
+        {
+          "letter": "D",
+          "text": "For end users, because MCP removes the need for consent dialogs"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Because MCP is an open protocol supported across many clients and servers, developers build an integration once and it works everywhere MCP is supported — that's the 'build once and integrate everywhere' promise.",
+      "tags": [
+        "mcp-basics",
+        "ecosystem",
+        "developers"
+      ]
+    },
+    {
+      "id": "ch1-q16",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What is the 'M×N integration problem' that MCP solves?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "M models cannot share N GPUs"
+        },
+        {
+          "letter": "B",
+          "text": "Without a standard, M AI applications each need custom integrations with N external systems (M×N connectors); MCP reduces this to M+N — each app implements the protocol once, each system exposes one MCP server"
+        },
+        {
+          "letter": "C",
+          "text": "M users competing for N licenses"
+        },
+        {
+          "letter": "D",
+          "text": "Matrix multiplication overhead in transformers"
+        }
+      ],
+      "answer": "B",
+      "explanation": "This is the core economic argument for MCP: instead of every AI application writing bespoke connectors for every tool and data source (M×N pairings), each side implements the open standard once, collapsing the integration work to M+N.",
+      "tags": [
+        "fundamentals",
+        "mxn-problem",
+        "standardization"
+      ]
+    },
+    {
+      "id": "ch1-q17",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "MCP explicitly takes inspiration from which earlier protocol, and what is the parallel?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "HTTP/2 — both use binary framing"
+        },
+        {
+          "letter": "B",
+          "text": "The Language Server Protocol (LSP) — just as LSP standardized adding programming-language support across an ecosystem of development tools, MCP standardizes integrating context and tools into the ecosystem of AI applications"
+        },
+        {
+          "letter": "C",
+          "text": "SMTP — both route messages between servers"
+        },
+        {
+          "letter": "D",
+          "text": "OAuth — both delegate authorization"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The specification states this directly: LSP solved the same shape of problem for editors and languages that MCP solves for AI applications and external systems — one protocol replacing per-pair integrations.",
+      "tags": [
+        "fundamentals",
+        "lsp",
+        "history"
+      ]
+    },
+    {
+      "id": "ch1-q18",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "According to the specification overview, MCP provides a standardized way for applications to do which three things?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Share contextual information with language models, expose tools and capabilities to AI systems, and build composable integrations and workflows"
+        },
+        {
+          "letter": "B",
+          "text": "Train models, deploy models, and monitor models"
+        },
+        {
+          "letter": "C",
+          "text": "Encrypt data, compress data, and cache data"
+        },
+        {
+          "letter": "D",
+          "text": "Render UIs, store files, and send emails"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The spec's Overview names exactly these three: sharing contextual information with LLMs, exposing tools and capabilities to AI systems, and building composable integrations and workflows.",
+      "tags": [
+        "fundamentals",
+        "standardization",
+        "spec"
+      ]
+    },
+    {
+      "id": "ch1-q19",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which top-level areas make up the MCP project and its documentation site?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Only the specification"
+        },
+        {
+          "letter": "B",
+          "text": "Documentation, the Specification, Extensions, the Registry, SEPs (Specification Enhancement Proposals), and Community/governance"
+        },
+        {
+          "letter": "C",
+          "text": "A model zoo and a benchmark suite"
+        },
+        {
+          "letter": "D",
+          "text": "Frontend, backend, and database sections"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The project spans the docs/guides, the versioned specification, the optional Extensions framework, the MCP Registry for server discovery, the SEP process for proposing changes, and community governance (working groups, contributor ladder, policies).",
+      "tags": [
+        "fundamentals",
+        "project-structure",
+        "seps"
+      ]
+    },
+    {
+      "id": "ch1-q20",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "What is a Specification Enhancement Proposal (SEP)?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A paid support ticket"
+        },
+        {
+          "letter": "B",
+          "text": "The formal mechanism for proposing changes to the MCP specification — markdown documents with PR-derived numbering, sponsors, and status labels (e.g., SEP-2575 made MCP stateless, SEP-1865 defined MCP Apps)"
+        },
+        {
+          "letter": "C",
+          "text": "A server performance benchmark"
+        },
+        {
+          "letter": "D",
+          "text": "A security exploit report"
+        }
+      ],
+      "answer": "B",
+      "explanation": "SEPs drive protocol evolution: 2026-07-28 formalized a PR-based SEP workflow (SEP-1850) with markdown files in the seps/ directory, sponsor responsibilities, and status via PR labels. Major changes like statelessness (SEP-2575), MRTR (SEP-2322), and deprecations (SEP-2577) all arrived as SEPs.",
+      "tags": [
+        "fundamentals",
+        "seps",
+        "governance"
+      ]
+    },
+    {
+      "id": "ch1-q21",
+      "chapter": 1,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: A team of 5 AI products needs to integrate with 8 internal systems. Roughly how many integrations are needed without MCP versus with MCP?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "40 custom integrations without MCP; 13 protocol implementations (5 clients + 8 servers) with MCP"
+        },
+        {
+          "letter": "B",
+          "text": "13 without; 40 with"
+        },
+        {
+          "letter": "C",
+          "text": "8 either way"
+        },
+        {
+          "letter": "D",
+          "text": "5 either way"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The M×N problem concretely: 5×8 = 40 bespoke connectors without a standard. With MCP, each product implements the client side once and each system exposes one server — 5+8 = 13 — and every future addition costs one implementation, not a row or column of connectors.",
+      "tags": [
+        "fundamentals",
+        "mxn-problem",
+        "scenario"
+      ]
+    }
+  ]
+}

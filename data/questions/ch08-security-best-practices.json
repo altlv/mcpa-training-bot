@@ -1,0 +1,553 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 8: Security & Trust",
+    "protocolVersion": "2026-07-28",
+    "chapter": 8,
+    "chapterName": "Security & Trust",
+    "questionCount": 17
+  },
+  "questions": [
+    {
+      "id": "ch8-q1",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What is the 'token passthrough' anti-pattern?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Forwarding refresh tokens over plain HTTP"
+        },
+        {
+          "letter": "B",
+          "text": "An MCP server accepting tokens from a client without validating they were issued to the MCP server, and forwarding them to a downstream API"
+        },
+        {
+          "letter": "C",
+          "text": "Storing tokens in a database"
+        },
+        {
+          "letter": "D",
+          "text": "Re-using one PKCE verifier across flows"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Token passthrough is explicitly forbidden: MCP servers MUST NOT accept tokens that were not explicitly issued for them. Accepting and forwarding foreign-audience tokens circumvents security controls, breaks audit trails, and creates confused deputy risks.",
+      "tags": [
+        "security",
+        "token-passthrough"
+      ]
+    },
+    {
+      "id": "ch8-q2",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which combination of conditions enables the confused deputy attack against an MCP proxy server?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "HTTPS everywhere, short-lived tokens, and PKCE"
+        },
+        {
+          "letter": "B",
+          "text": "A static client ID with the third-party auth server, dynamic client registration for MCP clients, a consent cookie set after first authorization, and no per-client consent at the proxy"
+        },
+        {
+          "letter": "C",
+          "text": "Rate limiting combined with token rotation"
+        },
+        {
+          "letter": "D",
+          "text": "Using JWTs instead of opaque tokens"
+        }
+      ],
+      "answer": "B",
+      "explanation": "When the proxy uses one static client ID upstream, allows clients to register dynamically, and the third-party server skips consent because of a cookie, an attacker can register a malicious redirect URI and steal authorization codes. The mitigation is mandatory per-client consent before forwarding to third-party authorization.",
+      "tags": [
+        "security",
+        "confused-deputy",
+        "oauth"
+      ]
+    },
+    {
+      "id": "ch8-q3",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "During OAuth metadata discovery, why should server-deployed MCP clients block requests to addresses like http://169.254.169.254/?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "That range is reserved for IPv6 tunneling"
+        },
+        {
+          "letter": "B",
+          "text": "It is the cloud metadata endpoint; a malicious server could use SSRF via crafted metadata URLs to exfiltrate cloud credentials"
+        },
+        {
+          "letter": "C",
+          "text": "Requests to it are always rate-limited"
+        },
+        {
+          "letter": "D",
+          "text": "It only serves IPv4 traffic"
+        }
+      ],
+      "answer": "B",
+      "explanation": "A malicious MCP server can point resource_metadata or authorization endpoints at internal resources. 169.254.169.254 is the AWS/GCP/Azure metadata service, which can leak IAM credentials — one reason clients should enforce HTTPS, block private/link-local IP ranges, validate redirects, and consider egress proxies.",
+      "tags": [
+        "security",
+        "ssrf"
+      ]
+    },
+    {
+      "id": "ch8-q4",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Since MCP 2026-07-28 is stateless, servers that need multi-request state mint explicit state handles (e.g., a cart ID). What is the core mitigation against state handle hijacking?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Encrypting the handle with the client's public key"
+        },
+        {
+          "letter": "B",
+          "text": "Never treating possession of a handle as authentication: verify every request, use secure random handles, and bind handles server-side to the authenticated user"
+        },
+        {
+          "letter": "C",
+          "text": "Making handles sequential so they are easy to audit"
+        },
+        {
+          "letter": "D",
+          "text": "Embedding the handle in the URL path"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Servers MUST verify all inbound requests and MUST NOT treat handle possession as authentication. Handles should be non-deterministic, ideally expiring, and bound server-side (e.g., keyed as user_id:handle from the verified token) so a guessed handle can't be used by another principal.",
+      "tags": [
+        "security",
+        "state-handles",
+        "statelessness"
+      ]
+    },
+    {
+      "id": "ch8-q5",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which URL schemes may an MCP client accept for OAuth authorization URLs?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Any scheme, as long as the URL is well-formed"
+        },
+        {
+          "letter": "B",
+          "text": "Only http:// and https:// — with http restricted to loopback addresses during development; javascript:, data:, file:, and vbscript: must be rejected"
+        },
+        {
+          "letter": "C",
+          "text": "https:// and ftp://"
+        },
+        {
+          "letter": "D",
+          "text": "Custom app schemes like myapp:// only"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Malicious servers can supply javascript: URLs (XSS) or shell-injection payloads. Clients MUST allowlist http/https only (http only for loopback in development), MUST NOT open URLs via shell commands, and should sanitize all URLs received from servers.",
+      "tags": [
+        "security",
+        "oauth-url-validation",
+        "xss"
+      ]
+    },
+    {
+      "id": "ch8-q6",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What must an MCP client do before executing a one-click local MCP server configuration?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Nothing, if the server comes from the official registry"
+        },
+        {
+          "letter": "B",
+          "text": "Show the exact, untruncated command to be executed, identify it as potentially dangerous, and require explicit user approval"
+        },
+        {
+          "letter": "C",
+          "text": "Run the command once in dry-run mode"
+        },
+        {
+          "letter": "D",
+          "text": "Upload the command to a virus scanner"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Because local servers can execute arbitrary code with the client's privileges, one-click configuration MUST show the exact command (with arguments), clearly flag the risk, require explicit approval, and allow cancellation. Sandboxing and dangerous-pattern warnings are additionally recommended.",
+      "tags": [
+        "security",
+        "local-servers",
+        "consent"
+      ]
+    },
+    {
+      "id": "ch8-q7",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "What scope design does the security guidance recommend for MCP servers?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "One omnibus scope like full-access to minimize consent dialogs"
+        },
+        {
+          "letter": "B",
+          "text": "A progressive, least-privilege model: minimal initial scopes, with incremental elevation via targeted WWW-Authenticate scope challenges when privileged operations are attempted"
+        },
+        {
+          "letter": "C",
+          "text": "Wildcard scopes per department"
+        },
+        {
+          "letter": "D",
+          "text": "No scopes at all; rely on network isolation"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Broad up-front scopes expand blast radius and obscure audit trails. The recommendation is minimal initial scopes (e.g., mcp:tools-basic), step-up authorization via precise scope challenges, and client-side accumulation of the union of granted and newly challenged scopes.",
+      "tags": [
+        "security",
+        "scopes",
+        "least-privilege"
+      ]
+    },
+    {
+      "id": "ch8-q8",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "According to the spec's Security and Trust & Safety principles, what must happen before a host invokes any tool?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The tool must be signed by Anthropic"
+        },
+        {
+          "letter": "B",
+          "text": "The host must obtain explicit user consent, and users should understand what the tool does"
+        },
+        {
+          "letter": "C",
+          "text": "The server must pass a benchmark suite"
+        },
+        {
+          "letter": "D",
+          "text": "The tool must run once in a simulator"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Tools represent arbitrary code execution. Hosts must obtain explicit user consent before invoking any tool, tool descriptions/annotations should be treated as untrusted unless from a trusted server, and users must retain control over data sharing and actions.",
+      "tags": [
+        "security",
+        "consent",
+        "tools"
+      ]
+    },
+    {
+      "id": "ch8-q9",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Should you write your own token validation and authorization logic from scratch for an MCP server?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Yes, custom code is always more secure"
+        },
+        {
+          "letter": "B",
+          "text": "No — use off-the-shelf, well-tested libraries; implementing it yourself makes mistakes far more likely unless you're a security expert"
+        },
+        {
+          "letter": "C",
+          "text": "Only if the server is written in Rust"
+        },
+        {
+          "letter": "D",
+          "text": "Token validation is optional"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The guidance is explicit: do not implement token validation or authorization logic yourself. Use well-tested, secure libraries for token validation and authorization decisions.",
+      "tags": [
+        "security",
+        "tokens",
+        "best-practices"
+      ]
+    },
+    {
+      "id": "ch8-q10",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "When is plain http:// acceptable for OAuth-related MCP URLs?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Whenever the server is behind a firewall"
+        },
+        {
+          "letter": "B",
+          "text": "Only for loopback addresses (localhost, 127.0.0.1, ::1) during development; production must use HTTPS"
+        },
+        {
+          "letter": "C",
+          "text": "Always, since tokens are already encrypted"
+        },
+        {
+          "letter": "D",
+          "text": "Never, not even for localhost"
+        }
+      ],
+      "answer": "B",
+      "explanation": "HTTPS must be enforced in production. The only exception is loopback addresses during local development — aligning with OAuth 2.1's requirement of HTTPS for all protocol URLs except loopback redirects.",
+      "tags": [
+        "security",
+        "https",
+        "development"
+      ]
+    },
+    {
+      "id": "ch8-q11",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Why does the security guidance recommend short-lived access tokens?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "They are smaller and faster to parse"
+        },
+        {
+          "letter": "B",
+          "text": "If a malicious actor steals a token, a short lifetime limits how long they can maintain access"
+        },
+        {
+          "letter": "C",
+          "text": "Authorization servers charge per token-hour"
+        },
+        {
+          "letter": "D",
+          "text": "Long-lived tokens are not valid JSON"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Short-lived tokens shrink the window of usefulness for stolen credentials. Combined with secure encrypted storage and cache eviction of expired tokens, this limits the blast radius of a leak.",
+      "tags": [
+        "security",
+        "tokens",
+        "lifetimes"
+      ]
+    },
+    {
+      "id": "ch8-q12",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Which of these should NEVER appear in your MCP server's logs?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Request timing and correlation IDs"
+        },
+        {
+          "letter": "B",
+          "text": "Authorization headers, tokens, authorization codes, and secrets"
+        },
+        {
+          "letter": "C",
+          "text": "Tool names being invoked"
+        },
+        {
+          "letter": "D",
+          "text": "Error patterns"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Never log credentials: no Authorization headers, tokens, codes, or secrets. Scrub query strings and headers, and redact sensitive fields in structured logs. Timing, correlation IDs, tool executions, and error patterns are exactly what you should log.",
+      "tags": [
+        "security",
+        "logging"
+      ]
+    },
+    {
+      "id": "ch8-q13",
+      "chapter": 8,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "SCENARIO: A client sends your MCP server a syntactically valid, unexpired JWT originally issued for a company's calendar API. Your server forwards it to its downstream API, which accepts it. What have you just implemented?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Federated single sign-on, which is encouraged"
+        },
+        {
+          "letter": "B",
+          "text": "The forbidden token passthrough anti-pattern — the server accepted a token not issued for it and forwarded it, circumventing security controls and breaking audit trails"
+        },
+        {
+          "letter": "C",
+          "text": "Correct OAuth 2.1 behavior"
+        },
+        {
+          "letter": "D",
+          "text": "Resource indicator negotiation"
+        }
+      ],
+      "answer": "B",
+      "explanation": "MCP servers MUST NOT accept tokens not explicitly issued for them. Passing them through bypasses rate limiting and validation, makes logs attribute requests to the wrong identity, and can turn the server into a data-exfiltration proxy.",
+      "tags": [
+        "security",
+        "token-passthrough",
+        "scenario"
+      ]
+    },
+    {
+      "id": "ch8-q14",
+      "chapter": 8,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: A user previously authorized your MCP proxy against a third-party API. Weeks later, they click a link from an attacker; the third-party auth server sees its old consent cookie for your static client ID, skips the consent screen, and the authorization code lands on the attacker's redirect URI (registered via DCR). Which mitigation would have stopped this?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Longer-lived consent cookies"
+        },
+        {
+          "letter": "B",
+          "text": "The proxy implementing per-client consent — maintaining a registry of approved client_ids per user and showing its own consent page BEFORE forwarding to third-party authorization, plus strict exact-match redirect URI validation"
+        },
+        {
+          "letter": "C",
+          "text": "Switching from OAuth to API keys"
+        },
+        {
+          "letter": "D",
+          "text": "Using GET instead of POST for the token exchange"
+        }
+      ],
+      "answer": "B",
+      "explanation": "This is the confused deputy attack. The mitigation: per-client consent storage checked before initiating third-party authorization, an MCP-level consent page identifying the client and redirect_uri, CSRF-protected state handling, and exact-string redirect URI matching.",
+      "tags": [
+        "security",
+        "confused-deputy",
+        "scenario"
+      ]
+    },
+    {
+      "id": "ch8-q15",
+      "chapter": 8,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: Your stateless MCP shopping server mints cart handles as sequential integers (cart-1041, cart-1042, ...) and any request presenting a handle can modify that cart. An attacker increments the number and edits another user's cart. Which two fixes does the guidance require/recommend?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Rate limiting alone"
+        },
+        {
+          "letter": "B",
+          "text": "Verify authorization on every inbound request (never treat handle possession as authentication), and use secure non-deterministic handles bound server-side to the authenticated user (e.g., keyed as user_id:handle from the verified token)"
+        },
+        {
+          "letter": "C",
+          "text": "Encode the handle in base64"
+        },
+        {
+          "letter": "D",
+          "text": "Move the handle to a custom HTTP header"
+        }
+      ],
+      "answer": "B",
+      "explanation": "State handle hijacking mitigations: servers MUST verify all requests and MUST NOT treat handle possession as authentication; handles SHOULD be securely random (ideally expiring) and bound server-side to the verified user so even a guessed handle is rejected for other principals.",
+      "tags": [
+        "security",
+        "state-handles",
+        "scenario"
+      ]
+    },
+    {
+      "id": "ch8-q16",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Which key principles does the specification's 'Security and Trust & Safety' section define?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "User Consent and Control, Data Privacy, and Tool Safety (earlier revisions also listed LLM Sampling Controls as a fourth, before sampling's deprecation)"
+        },
+        {
+          "letter": "B",
+          "text": "Speed, Scale, and Simplicity"
+        },
+        {
+          "letter": "C",
+          "text": "Encryption, Compression, and Caching"
+        },
+        {
+          "letter": "D",
+          "text": "Availability, Latency, and Throughput"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The 2026-07-28 spec lists User Consent and Control (explicit consent for all data access and operations), Data Privacy (hosts must not transmit resource data without consent), and Tool Safety (tools are arbitrary code; descriptions are untrusted unless from a trusted server). Pre-2026 revisions included LLM Sampling Controls as a fourth principle.",
+      "tags": [
+        "security",
+        "principles",
+        "trust-safety"
+      ]
+    },
+    {
+      "id": "ch8-q17",
+      "chapter": 8,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "SCENARIO: Your MCP server's JWT validator checks signature, expiry, and issuer — but not the aud claim. A partner service's leaked token (valid, same issuer, audience 'https://billing.internal') is replayed against your server. What happens, and what's the fix?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Nothing happens; the issuer check is sufficient"
+        },
+        {
+          "letter": "B",
+          "text": "The token is accepted despite being minted for another service — an audience validation failure. Fix: verify the aud claim matches your server's resource identifier and reject all others, per the token passthrough prohibition"
+        },
+        {
+          "letter": "C",
+          "text": "The token is rejected because JWTs are single-use"
+        },
+        {
+          "letter": "D",
+          "text": "TLS prevents this attack entirely"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Audience validation failure is one of token passthrough's two critical dimensions: same-issuer tokens for other resources must be rejected. Servers MUST NOT accept tokens not explicitly issued for them — signature/expiry/issuer checks alone don't establish the token was meant for you.",
+      "tags": [
+        "security",
+        "audience",
+        "tokens",
+        "scenario"
+      ]
+    }
+  ]
+}

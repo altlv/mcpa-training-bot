@@ -169,6 +169,26 @@ Learn more: [modelcontextprotocol.io](https://modelcontextprotocol.io)
 
 ---
 
+## Question Sources
+
+Questions in this training bot are based on official MCP documentation:
+
+| Source | URL | Used For |
+|--------|-----|----------|
+| **MCP Specification (2026-07-28)** | https://modelcontextprotocol.io/docs/2026-07-28/getting-started/intro | Architecture, server/client features, transports |
+| **JSON-RPC 2.0 Specification** | https://www.jsonrpc.org/specification | Protocol fundamentals, message formats, error codes |
+| **MCP Documentation** | https://modelcontextprotocol.io/docs/getting-started/intro | Getting started, tutorials, best practices |
+| **MCPA Certification** | https://training.linuxfoundation.org/certification/model-context-protocol-associate-mcpa/ | Exam domains, weighting, format |
+
+**Exam Domain Weighting:**
+- Interactions & Execution: 26%
+- Security & Governance: 24%
+- Use Cases & Ecosystem: 20%
+- MCP Fundamentals: 16%
+- Architecture & Components: 14%
+
+---
+
 ## Acknowledgments
 
 - **Anthropic** - For creating MCP and Goose

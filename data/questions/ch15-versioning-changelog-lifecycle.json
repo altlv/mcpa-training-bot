@@ -1,0 +1,490 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 15: Versioning, 2026-07-28 Changelog & Feature Lifecycle",
+    "protocolVersion": "2026-07-28",
+    "chapter": 15,
+    "chapterName": "Versioning, 2026-07-28 Changelog & Feature Lifecycle",
+    "questionCount": 15
+  },
+  "questions": [
+    {
+      "id": "ch15-q1",
+      "chapter": 15,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What does an MCP version identifier like 2026-07-28 actually denote?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The date the documentation website was updated"
+        },
+        {
+          "letter": "B",
+          "text": "A YYYY-MM-DD version label marking the last date backwards-incompatible changes were made to the specification"
+        },
+        {
+          "letter": "C",
+          "text": "The server's build date"
+        },
+        {
+          "letter": "D",
+          "text": "A semantic version in disguise"
+        }
+      ],
+      "answer": "B",
+      "explanation": "MCP uses date-stamped string version identifiers (YYYY-MM-DD) indicating the last date of backwards-incompatible changes. 2026-07-28 replaced 2025-11-25.",
+      "tags": [
+        "versioning",
+        "scheme"
+      ]
+    },
+    {
+      "id": "ch15-q2",
+      "chapter": 15,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What is the single headline change of the 2026-07-28 revision?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A switch from JSON to Protocol Buffers"
+        },
+        {
+          "letter": "B",
+          "text": "MCP became stateless at the protocol layer: no initialize handshake, no protocol-level sessions, so servers run behind ordinary load balancers and on serverless platforms"
+        },
+        {
+          "letter": "C",
+          "text": "Mandatory paid licensing"
+        },
+        {
+          "letter": "D",
+          "text": "Removal of the tools primitive"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Six SEPs together made MCP a request/response stateless protocol — the most requested change for reliability and scalability of remote servers.",
+      "tags": [
+        "changelog",
+        "statelessness"
+      ]
+    },
+    {
+      "id": "ch15-q3",
+      "chapter": 15,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which handshake did 2026-07-28 remove, and what replaced it?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The TLS handshake, replaced by QUIC"
+        },
+        {
+          "letter": "B",
+          "text": "The initialize/notifications/initialized handshake, replaced by per-request _meta fields (protocolVersion, clientCapabilities, clientInfo) plus the mandatory server/discover RPC"
+        },
+        {
+          "letter": "C",
+          "text": "OAuth consent, replaced by API keys"
+        },
+        {
+          "letter": "D",
+          "text": "tools/list, replaced by server/discover"
+        }
+      ],
+      "answer": "B",
+      "explanation": "SEP-2575: the handshake is gone; every request self-describes via _meta, servers should identify themselves via serverInfo in each result's _meta, and server/discover (which servers MUST implement) provides up-front version/capability discovery.",
+      "tags": [
+        "changelog",
+        "handshake",
+        "discovery"
+      ]
+    },
+    {
+      "id": "ch15-q4",
+      "chapter": 15,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What is the required resultType field introduced in 2026-07-28?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A MIME type for the payload"
+        },
+        {
+          "letter": "B",
+          "text": "A discriminator on every result: \"complete\" for ordinary results, \"input_required\" for MRTR interim results (and \"task\" reserved for the Tasks extension); results from earlier-protocol servers that omit it are treated as \"complete\""
+        },
+        {
+          "letter": "C",
+          "text": "A boolean success flag"
+        },
+        {
+          "letter": "D",
+          "text": "The name of the SDK that produced the result"
+        }
+      ],
+      "answer": "B",
+      "explanation": "SEP-2322 made resultType required so clients can parse results polymorphically: complete vs input_required (MRTR), with 'task' reserved by the Tasks extension. Missing field from legacy servers → treat as complete.",
+      "tags": [
+        "changelog",
+        "resulttype",
+        "mrtr"
+      ]
+    },
+    {
+      "id": "ch15-q5",
+      "chapter": 15,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which methods were removed outright in 2026-07-28?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "tools/list and prompts/get"
+        },
+        {
+          "letter": "B",
+          "text": "ping, logging/setLevel, and notifications/roots/list_changed (log level moved to per-request _meta; resources/subscribe & unsubscribe and the HTTP GET endpoint were replaced by subscriptions/listen)"
+        },
+        {
+          "letter": "C",
+          "text": "elicitation/create"
+        },
+        {
+          "letter": "D",
+          "text": "server/discover"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The changelog lists ping, logging/setLevel, and notifications/roots/list_changed as removed; logging is now per-request via io.modelcontextprotocol/logLevel, and change notifications consolidated onto subscriptions/listen.",
+      "tags": [
+        "changelog",
+        "removals"
+      ]
+    },
+    {
+      "id": "ch15-q6",
+      "chapter": 15,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Under the feature lifecycle policy adopted in 2026-07-28, what states can a specification feature be in, and what's the minimum deprecation window?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Alpha, Beta, GA — 30 days"
+        },
+        {
+          "letter": "B",
+          "text": "Active, Deprecated, Removed — with a minimum twelve-month deprecation window and a registry of deprecated features"
+        },
+        {
+          "letter": "C",
+          "text": "Draft, Final — no window"
+        },
+        {
+          "letter": "D",
+          "text": "Experimental, Stable, Legacy — 6 months"
+        }
+      ],
+      "answer": "B",
+      "explanation": "SEP-2596 defines Active/Deprecated/Removed, a minimum 12-month window (deprecated features keep working in this version and every version published within a year), and a deprecated-features registry. Actual removal needs a separate explicit proposal.",
+      "tags": [
+        "lifecycle",
+        "deprecation-policy"
+      ]
+    },
+    {
+      "id": "ch15-q7",
+      "chapter": 15,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "SCENARIO: Your production server heavily uses Sampling. It's deprecated in 2026-07-28. Do you need an emergency migration before July 28?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Yes; deprecated features stop working on release day"
+        },
+        {
+          "letter": "B",
+          "text": "No — deprecated features remain fully functional for at least the twelve-month window; nothing breaks on release day, but new implementations shouldn't adopt them and you should plan migration to direct LLM provider APIs"
+        },
+        {
+          "letter": "C",
+          "text": "Only if you also use Roots"
+        },
+        {
+          "letter": "D",
+          "text": "Sampling was removed, not deprecated"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Per the maintainers, 'nothing breaks on July 28': Roots, Sampling, and Logging (SEP-2577) keep working for at least twelve months. Migration paths: tool params/config for roots, direct LLM APIs for sampling, stderr/OpenTelemetry for logging.",
+      "tags": [
+        "lifecycle",
+        "deprecations",
+        "scenario"
+      ]
+    },
+    {
+      "id": "ch15-q8",
+      "chapter": 15,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "What changed about client registration in the 2026-07-28 authorization stack?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Registration is no longer required"
+        },
+        {
+          "letter": "B",
+          "text": "Dynamic Client Registration (RFC 7591) was deprecated in favor of Client ID Metadata Documents (CIMD); DCR remains available for backwards compatibility with authorization servers that don't support CIMD"
+        },
+        {
+          "letter": "C",
+          "text": "Only static pre-registration is allowed now"
+        },
+        {
+          "letter": "D",
+          "text": "CIMD was deprecated in favor of DCR"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The changelog deprecates DCR as the registration mechanism: CIMD (URL-based client IDs proving domain control) is the way forward, with DCR kept for compatibility until a future removal.",
+      "tags": [
+        "changelog",
+        "authorization",
+        "cimd",
+        "dcr"
+      ]
+    },
+    {
+      "id": "ch15-q9",
+      "chapter": 15,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which OAuth hardening did 2026-07-28 add regarding the iss parameter?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "iss was removed from responses"
+        },
+        {
+          "letter": "B",
+          "text": "Authorization servers SHOULD include iss in authorization responses (RFC 9207), and clients MUST validate a present iss against the recorded issuer before redeeming the authorization code — mitigating mix-up attacks"
+        },
+        {
+          "letter": "C",
+          "text": "iss now carries the access token"
+        },
+        {
+          "letter": "D",
+          "text": "Clients must ignore iss"
+        }
+      ],
+      "answer": "B",
+      "explanation": "SEP-2468: issuer identification in authorization responses binds the response to the expected authorization server, preventing mix-up attacks where a code would be redeemed at an attacker's token endpoint.",
+      "tags": [
+        "changelog",
+        "authorization",
+        "iss",
+        "security"
+      ]
+    },
+    {
+      "id": "ch15-q10",
+      "chapter": 15,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "How did 2026-07-28 repartition the JSON-RPC server-error code range for MCP?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "MCP now uses positive error codes"
+        },
+        {
+          "letter": "B",
+          "text": "-32000 to -32019 stays implementation-defined (existing SDK usage grandfathered) and -32020 to -32099 is reserved for the MCP spec; draft codes were renumbered (HeaderMismatch → -32020, MissingRequiredClientCapability → -32021, UnsupportedProtocolVersion → -32022)"
+        },
+        {
+          "letter": "C",
+          "text": "All errors collapsed into -32603"
+        },
+        {
+          "letter": "D",
+          "text": "Error codes are now strings"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The error code allocation policy splits the JSON-RPC server-error range and renumbered the new errors accordingly; resource-not-found also moved from -32002 to -32602 to align with JSON-RPC Invalid Params.",
+      "tags": [
+        "changelog",
+        "error-codes"
+      ]
+    },
+    {
+      "id": "ch15-q11",
+      "chapter": 15,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "In the versioning docs and Inspector terminology, what defines the 'legacy' vs 'modern' protocol eras?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Legacy = stdio; modern = HTTP"
+        },
+        {
+          "letter": "B",
+          "text": "Legacy uses the initialize handshake (2025-11-25 and earlier); modern uses per-request protocol metadata (2026-07-28 and later); dual-era implementations deliberately support both"
+        },
+        {
+          "letter": "C",
+          "text": "Legacy = open source; modern = commercial"
+        },
+        {
+          "letter": "D",
+          "text": "The eras differ only in default port numbers"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The era split: a modern-only client can't talk to a legacy-only server and vice versa — version negotiation detects the mismatch but doesn't bridge it. Dual-era servers answer the legacy initialize alongside server/discover, which is how nothing broke on release day.",
+      "tags": [
+        "versioning",
+        "eras",
+        "compatibility"
+      ]
+    },
+    {
+      "id": "ch15-q12",
+      "chapter": 15,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: Your remote MCP server must serve both a 2025-11-25 IDE plugin and a 2026-07-28 agent. What's the recommended approach?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Run two separate domains forever"
+        },
+        {
+          "letter": "B",
+          "text": "Serve dual-era: answer the legacy initialize handshake alongside server/discover; SDKs route per request (e.g., by the MCP-Protocol-Version header or its absence) so one deployment handles both eras"
+        },
+        {
+          "letter": "C",
+          "text": "Reject legacy clients with 426 Upgrade Required"
+        },
+        {
+          "letter": "D",
+          "text": "Downgrade the server to legacy-only"
+        }
+      ],
+      "answer": "B",
+      "explanation": "New-spec servers can be dual-era: SDKs route requests by the protocol version they name (legacy clients' initialize carries no modern header), so 2025-11-25 clients keep connecting while 2026-07-28 clients get the stateless path.",
+      "tags": [
+        "versioning",
+        "eras",
+        "scenario",
+        "migration"
+      ]
+    },
+    {
+      "id": "ch15-q13",
+      "chapter": 15,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What happened to the old HTTP+SSE transport in 2026-07-28?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "It became the default transport"
+        },
+        {
+          "letter": "B",
+          "text": "Already superseded since 2025-03-26, it was formally reclassified as Deprecated under the lifecycle policy with a year-long offramp; migrate to Streamable HTTP"
+        },
+        {
+          "letter": "C",
+          "text": "It was renamed Streamable HTTP"
+        },
+        {
+          "letter": "D",
+          "text": "It was extended with HTTP/3 support"
+        }
+      ],
+      "answer": "B",
+      "explanation": "SEP-2596 reclassified the legacy HTTP+SSE transport as Deprecated. The includeContext values 'thisServer'/'allServers' were also reclassified as Deprecated in the same sweep.",
+      "tags": [
+        "changelog",
+        "transports",
+        "deprecations"
+      ]
+    },
+    {
+      "id": "ch15-q14",
+      "chapter": 15,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "What observability convention did 2026-07-28 document for _meta?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A new binary tracing format"
+        },
+        {
+          "letter": "B",
+          "text": "OpenTelemetry / W3C Trace Context propagation via the traceparent, tracestate, and baggage keys (SEP-414), so distributed traces correlate across host, SDK, server, and downstream calls"
+        },
+        {
+          "letter": "C",
+          "text": "Mandatory Prometheus metrics"
+        },
+        {
+          "letter": "D",
+          "text": "Logging every payload to stdout"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Locking down these _meta key names means a trace starting in a host application can follow a tool call through the client SDK, the MCP server, and downstream systems as a single span tree.",
+      "tags": [
+        "changelog",
+        "observability",
+        "opentelemetry"
+      ]
+    },
+    {
+      "id": "ch15-q15",
+      "chapter": 15,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "SCENARIO: Under the SDK tiering system, what were Tier 1 SDKs expected to do during the ten-week release-candidate window (locked May 21, final July 28, 2026)?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Nothing; SDKs update whenever convenient"
+        },
+        {
+          "letter": "B",
+          "text": "Ship support for the new specification within the validation window, so implementers could validate the changes against real workloads before the final release"
+        },
+        {
+          "letter": "C",
+          "text": "Freeze all releases entirely"
+        },
+        {
+          "letter": "D",
+          "text": "Rewrite themselves in Rust"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The RC window existed for SDK maintainers and client implementers to validate against real workloads; under the SDK tier system Tier 1 SDKs (TypeScript, Python, and peers) were expected to ship support within it — and all four spoke 2026-07-28 on release day.",
+      "tags": [
+        "lifecycle",
+        "sdk-tiers",
+        "scenario",
+        "release"
+      ]
+    }
+  ]
+}

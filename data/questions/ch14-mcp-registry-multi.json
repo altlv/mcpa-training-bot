@@ -1,0 +1,338 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 14 (Multi-Select): The MCP Registry",
+    "protocolVersion": "2026-07-28",
+    "chapter": 14,
+    "chapterName": "The MCP Registry",
+    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
+    "questionCount": 8
+  },
+  "questions": [
+    {
+      "id": "ch14-m1",
+      "chapter": 14,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which package registry types does the official MCP Registry support? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "npm (registry.npmjs.org)"
+        },
+        {
+          "letter": "B",
+          "text": "PyPI (pypi.org)"
+        },
+        {
+          "letter": "C",
+          "text": "NuGet (api.nuget.org)"
+        },
+        {
+          "letter": "D",
+          "text": "Docker/OCI images (Docker Hub, ghcr.io, *.pkg.dev, *.azurecr.io, mcr.microsoft.com)"
+        },
+        {
+          "letter": "E",
+          "text": "Private Artifactory instances"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "npm, PyPI, NuGet, OCI, and MCPB (GitHub/GitLab releases) are supported. Private package registries are explicitly out — private servers belong in a self-hosted registry.",
+      "tags": [
+        "registry",
+        "package-types"
+      ]
+    },
+    {
+      "id": "ch14-m2",
+      "chapter": 14,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Match the ownership-verification markers to their package types — which pairings are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "npm: mcpName property in package.json matching the server.json name"
+        },
+        {
+          "letter": "B",
+          "text": "PyPI: 'mcp-name: <server-name>' string in the package README (may be in an HTML comment)"
+        },
+        {
+          "letter": "C",
+          "text": "NuGet: 'mcp-name: <server-name>' string in the package README"
+        },
+        {
+          "letter": "D",
+          "text": "Docker/OCI: io.modelcontextprotocol.server.name annotation/LABEL on the image"
+        },
+        {
+          "letter": "E",
+          "text": "MCPB: a GPG signature over the archive"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "A–D are the documented markers. MCPB verification requires the identifier URL to contain 'mcp' plus a fileSha256 hash (validated by clients, not GPG).",
+      "tags": [
+        "registry",
+        "verification",
+        "package-types"
+      ]
+    },
+    {
+      "id": "ch14-m3",
+      "chapter": 14,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "What does the MCP Registry provide? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A single place for server creators to publish metadata"
+        },
+        {
+          "letter": "B",
+          "text": "Namespace management through DNS/GitHub verification"
+        },
+        {
+          "letter": "C",
+          "text": "A REST API for clients and aggregators to discover servers"
+        },
+        {
+          "letter": "D",
+          "text": "Standardized installation and configuration information"
+        },
+        {
+          "letter": "E",
+          "text": "Hosting of the server code and binaries themselves"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "The registry hosts metadata that points to packages; the code lives on npm, PyPI, Docker Hub, etc.",
+      "tags": [
+        "registry",
+        "basics"
+      ]
+    },
+    {
+      "id": "ch14-m4",
+      "chapter": 14,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which spam-prevention and trust mechanisms does the official registry use today? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Namespace authentication (GitHub, DNS, or HTTP challenges) before publishing"
+        },
+        {
+          "letter": "B",
+          "text": "Character limits and regex validation on free-form fields"
+        },
+        {
+          "letter": "C",
+          "text": "Manual takedown of spam or malicious servers per the moderation policy"
+        },
+        {
+          "letter": "D",
+          "text": "Delegating code security scanning to package registries and downstream aggregators"
+        },
+        {
+          "letter": "E",
+          "text": "Mandatory human security audit of every published server"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "A–D describe the current model. The registry explicitly does not audit server code itself — scanning is delegated to package registries and aggregators.",
+      "tags": [
+        "registry",
+        "trust",
+        "moderation"
+      ]
+    },
+    {
+      "id": "ch14-m5",
+      "chapter": 14,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which mcp-publisher commands and behaviors are real? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "mcp-publisher init — scaffold a server.json with auto-detected values"
+        },
+        {
+          "letter": "B",
+          "text": "mcp-publisher login github — authenticate for io.github.* namespaces"
+        },
+        {
+          "letter": "C",
+          "text": "mcp-publisher publish --dry-run — validate without publishing"
+        },
+        {
+          "letter": "D",
+          "text": "mcp-publisher logout — removes the local token file (without server-side revocation)"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "All four commands behave as described — E is genuinely correct.",
+      "tags": [
+        "registry",
+        "cli",
+        "publishing"
+      ]
+    },
+    {
+      "id": "ch14-m6",
+      "chapter": 14,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which namespace/authentication pairings are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "io.github.alice/* — GitHub OAuth login as alice (or her org)"
+        },
+        {
+          "letter": "B",
+          "text": "com.acme/* — DNS or HTTP challenge proving control of acme.com"
+        },
+        {
+          "letter": "C",
+          "text": "Remote URLs under com.acme/* must live on acme.com or its subdomains"
+        },
+        {
+          "letter": "D",
+          "text": "io.github.* remotes have no URL restriction"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "GitHub namespaces bind to accounts, domain namespaces bind to DNS/HTTP proof, and the remote-URL restriction applies only to domain namespaces. All true.",
+      "tags": [
+        "registry",
+        "namespaces",
+        "verification"
+      ]
+    },
+    {
+      "id": "ch14-m7",
+      "chapter": 14,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which server types can be published to the OFFICIAL registry? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "An open-source npm package anyone can install"
+        },
+        {
+          "letter": "B",
+          "text": "A closed-source but publicly downloadable Docker image"
+        },
+        {
+          "letter": "C",
+          "text": "A publicly reachable remote server with no installable package"
+        },
+        {
+          "letter": "D",
+          "text": "A server on a private package registry reachable only inside the corporate network"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Open or closed source is fine as long as installation or access is public; private-network servers belong in a self-hosted registry.",
+      "tags": [
+        "registry",
+        "publishing",
+        "private-servers"
+      ]
+    },
+    {
+      "id": "ch14-m8",
+      "chapter": 14,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which statements describe the intended consumption model of the registry? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Downstream aggregators pull metadata on a regular but infrequent basis (e.g., hourly)"
+        },
+        {
+          "letter": "B",
+          "text": "Aggregators add curation, ratings, or extra metadata the official registry deliberately omits"
+        },
+        {
+          "letter": "C",
+          "text": "Host applications should consume aggregators (via the shared OpenAPI spec), not the official registry directly"
+        },
+        {
+          "letter": "D",
+          "text": "The official codebase is designed and supported for self-hosting private forks"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "The maintainers explicitly do NOT support self-hosting the official codebase — forkers are on their own; private registries should implement the OpenAPI spec instead.",
+      "tags": [
+        "registry",
+        "aggregators",
+        "architecture"
+      ]
+    }
+  ]
+}

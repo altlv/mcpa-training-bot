@@ -1,0 +1,341 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 9 (Multi-Select): MCP Inspector",
+    "protocolVersion": "2026-07-28",
+    "chapter": 9,
+    "chapterName": "MCP Inspector",
+    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
+    "questionCount": 8
+  },
+  "questions": [
+    {
+      "id": "ch9-m1",
+      "chapter": 9,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which properties are shared across the Inspector's web, CLI, and TUI clients? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The same transports"
+        },
+        {
+          "letter": "B",
+          "text": "The same catalog/config file handling"
+        },
+        {
+          "letter": "C",
+          "text": "The same OAuth state on disk"
+        },
+        {
+          "letter": "D",
+          "text": "The same protocol-era negotiation (legacy vs modern)"
+        },
+        {
+          "letter": "E",
+          "text": "The same flag set — every flag works in all three"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "All three are built on one shared core, so transports, config resolution, OAuth state, and era negotiation behave identically. Flags differ per client (e.g., --method is CLI-only, --dev is web-only).",
+      "tags": [
+        "inspector",
+        "overview"
+      ]
+    },
+    {
+      "id": "ch9-m2",
+      "chapter": 9,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which CLI exit-code interpretations are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "0 — success"
+        },
+        {
+          "letter": "B",
+          "text": "2 — no MCP App found on the tool during an --app-info probe"
+        },
+        {
+          "letter": "C",
+          "text": "3 — server requires authentication"
+        },
+        {
+          "letter": "D",
+          "text": "4 — server unreachable (DNS, refused, timeout)"
+        },
+        {
+          "letter": "E",
+          "text": "5 — usage error (the catch-all)"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "0/2/3/4 are right. Exit 5 means a tool error (isError: true or tool not found); the usage/unexpected catch-all is exit 1.",
+      "tags": [
+        "inspector",
+        "cli",
+        "exit-codes"
+      ]
+    },
+    {
+      "id": "ch9-m3",
+      "chapter": 9,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which statements about --catalog vs --config are true? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "--catalog is writable and is created and seeded if the file doesn't exist"
+        },
+        {
+          "letter": "B",
+          "text": "--config is read-only, never written, and errors if the file is missing"
+        },
+        {
+          "letter": "C",
+          "text": "The two flags are mutually exclusive"
+        },
+        {
+          "letter": "D",
+          "text": "--config files can be edited from the web UI"
+        },
+        {
+          "letter": "E",
+          "text": "--catalog defaults to ~/.mcp-inspector/mcp.json (or MCP_CATALOG_PATH)"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ],
+      "explanation": "A --config file is served as-is and is not editable in the web UI — that's the point of using it for someone else's config. Everything else is accurate.",
+      "tags": [
+        "inspector",
+        "configuration",
+        "catalog"
+      ]
+    },
+    {
+      "id": "ch9-m4",
+      "chapter": 9,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "For non-interactive/CI OAuth handling, which CLI flags exist? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "--stored-auth-only — never start interactive OAuth; fail fast if no stored token"
+        },
+        {
+          "letter": "B",
+          "text": "--use-stored-auth — reuse (and refresh) a token the web Inspector already obtained"
+        },
+        {
+          "letter": "C",
+          "text": "--wait-for-auth <sec> — poll the state file until a token appears"
+        },
+        {
+          "letter": "D",
+          "text": "--print-handoff — print the deep link and port-forward command a human needs to complete OAuth remotely"
+        },
+        {
+          "letter": "E",
+          "text": "--skip-oauth-forever — permanently disable authorization"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "The first four are real flags covering CI and web-to-CLI handoff. There is no --skip-oauth-forever.",
+      "tags": [
+        "inspector",
+        "cli",
+        "oauth",
+        "ci"
+      ]
+    },
+    {
+      "id": "ch9-m5",
+      "chapter": 9,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which statements about launching the Inspector are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "It runs via npx @modelcontextprotocol/inspector with no installation"
+        },
+        {
+          "letter": "B",
+          "text": "It requires Node 22.19.0 or newer"
+        },
+        {
+          "letter": "C",
+          "text": "The web client prints a URL containing a one-time session token"
+        },
+        {
+          "letter": "D",
+          "text": "The web UI listens on 6274 while the CLI/TUI OAuth callback uses 6276"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "All four launch facts are documented, so the all-of-the-above option is genuinely right.",
+      "tags": [
+        "inspector",
+        "launch",
+        "ports"
+      ]
+    },
+    {
+      "id": "ch9-m6",
+      "chapter": 9,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which combinations or usages do the Inspector docs explicitly forbid or refuse? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Combining DANGEROUSLY_OMIT_AUTH with DANGEROUSLY_BIND_ALL_INTERFACES"
+        },
+        {
+          "letter": "B",
+          "text": "Passing --catalog and --config together"
+        },
+        {
+          "letter": "C",
+          "text": "Using --method (a CLI flag) on the web client"
+        },
+        {
+          "letter": "D",
+          "text": "Running two Inspector instances on one machine"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Auth-off plus all-interfaces would expose an unauthenticated proxy to the network, and catalog/config are mutually exclusive; --method is CLI-only. Multiple instances are fine.",
+      "tags": [
+        "inspector",
+        "flags",
+        "security"
+      ]
+    },
+    {
+      "id": "ch9-m7",
+      "chapter": 9,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which Inspector features help debug the 2026-07-28 protocol era specifically? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A protocol-era selector negotiating auto, modern, or legacy per connection"
+        },
+        {
+          "letter": "B",
+          "text": "A populated server/discover view when connected modern"
+        },
+        {
+          "letter": "C",
+          "text": "Network-level visibility of the mirrored Mcp-* headers"
+        },
+        {
+          "letter": "D",
+          "text": "Rendering of MCP Apps in a sandboxed Apps tab"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "Era negotiation, discover inspection, header visibility, and the Apps tab are all part of Inspector V2 — E is correct.",
+      "tags": [
+        "inspector",
+        "protocol-eras",
+        "apps"
+      ]
+    },
+    {
+      "id": "ch9-m8",
+      "chapter": 9,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which CLI exit-code interpretations are right? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "0 — success"
+        },
+        {
+          "letter": "B",
+          "text": "1 — usage or unexpected error (the catch-all)"
+        },
+        {
+          "letter": "C",
+          "text": "3 — the server requires authentication"
+        },
+        {
+          "letter": "D",
+          "text": "5 — a tool error (isError: true, or tool not found)"
+        },
+        {
+          "letter": "E",
+          "text": "2 — the server is unreachable"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "Exit 2 means no MCP App was found during an --app-info probe; unreachable servers exit 4.",
+      "tags": [
+        "inspector",
+        "cli",
+        "exit-codes"
+      ]
+    }
+  ]
+}

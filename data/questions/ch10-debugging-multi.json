@@ -1,0 +1,334 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 10 (Multi-Select): Debugging",
+    "protocolVersion": "2026-07-28",
+    "chapter": 10,
+    "chapterName": "Debugging",
+    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
+    "questionCount": 8
+  },
+  "questions": [
+    {
+      "id": "ch10-m1",
+      "chapter": 10,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which events does the debugging guide list as important to log? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Startup steps"
+        },
+        {
+          "letter": "B",
+          "text": "Resource access"
+        },
+        {
+          "letter": "C",
+          "text": "Tool execution"
+        },
+        {
+          "letter": "D",
+          "text": "Error conditions and performance metrics"
+        },
+        {
+          "letter": "E",
+          "text": "Raw Authorization headers for reproduction"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "Startup, resource access, tool execution, errors, and performance metrics are the list. Credentials must never be logged.",
+      "tags": [
+        "debugging",
+        "logging"
+      ]
+    },
+    {
+      "id": "ch10-m2",
+      "chapter": 10,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "A client fails to connect. Which steps are on the official connection-troubleshooting checklist? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Check the client's logs"
+        },
+        {
+          "letter": "B",
+          "text": "Verify the server process is running"
+        },
+        {
+          "letter": "C",
+          "text": "Test the server standalone with the MCP Inspector"
+        },
+        {
+          "letter": "D",
+          "text": "Call server/discover to verify protocol compatibility"
+        },
+        {
+          "letter": "E",
+          "text": "Flush the OS DNS cache as the first step"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "Logs, process check, Inspector, and protocol verification via server/discover (plus inspecting the per-request _meta fields) are the documented steps. DNS flushing isn't part of the checklist.",
+      "tags": [
+        "debugging",
+        "troubleshooting",
+        "checklist"
+      ]
+    },
+    {
+      "id": "ch10-m3",
+      "chapter": 10,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which error-code interpretations from the 2026-07-28 debugging guidance are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "-32022 UnsupportedProtocolVersionError — the data field lists the server's supported versions"
+        },
+        {
+          "letter": "B",
+          "text": "-32021 MissingRequiredClientCapabilityError — names client capabilities the server needs but the request didn't declare"
+        },
+        {
+          "letter": "C",
+          "text": "-32602 Invalid params — also returned when a request is missing required _meta fields"
+        },
+        {
+          "letter": "D",
+          "text": "-32020 HeaderMismatch — Streamable HTTP headers disagree with the body"
+        },
+        {
+          "letter": "E",
+          "text": "-32700 — the server ran out of memory"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "A–D are correct. -32700 is JSON-RPC's Parse error (invalid JSON), not an out-of-memory signal.",
+      "tags": [
+        "debugging",
+        "error-codes"
+      ]
+    },
+    {
+      "id": "ch10-m4",
+      "chapter": 10,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which statements about Claude Desktop's MCP logs are accurate? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "macOS location: ~/Library/Logs/Claude"
+        },
+        {
+          "letter": "B",
+          "text": "Windows location: %APPDATA%\\Claude\\logs"
+        },
+        {
+          "letter": "C",
+          "text": "mcp.log holds general connection logging"
+        },
+        {
+          "letter": "D",
+          "text": "mcp-server-SERVERNAME.log captures each server's stderr output"
+        },
+        {
+          "letter": "E",
+          "text": "Logs are only available with a paid plan"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "Locations and file roles are as documented; logging is built in, not gated.",
+      "tags": [
+        "debugging",
+        "logs",
+        "claude-desktop"
+      ]
+    },
+    {
+      "id": "ch10-m5",
+      "chapter": 10,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which are documented debugging workflows for a misbehaving local server? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Test it standalone in the Inspector before blaming the host integration"
+        },
+        {
+          "letter": "B",
+          "text": "Tail ~/Library/Logs/Claude/mcp-server-NAME.log to read the server's stderr"
+        },
+        {
+          "letter": "C",
+          "text": "Add stderr logging around startup, tool execution, and error paths"
+        },
+        {
+          "letter": "D",
+          "text": "Add print() statements to trace the message flow on stdio"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "print() writes to stdout and corrupts the protocol stream — the one thing you must not do on a stdio server.",
+      "tags": [
+        "debugging",
+        "stdio",
+        "logs"
+      ]
+    },
+    {
+      "id": "ch10-m6",
+      "chapter": 10,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Your modern client gets error -32021 from a server. Which statements apply? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The error is MissingRequiredClientCapabilityError"
+        },
+        {
+          "letter": "B",
+          "text": "The server needs a client capability (possibly an extension) the request's _meta didn't declare"
+        },
+        {
+          "letter": "C",
+          "text": "The fix is declaring the capability in io.modelcontextprotocol/clientCapabilities on each request"
+        },
+        {
+          "letter": "D",
+          "text": "The error means the JSON was unparseable"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "-32021 is the capability-gap error in the MCP-reserved range; unparseable JSON is -32700.",
+      "tags": [
+        "debugging",
+        "error-codes",
+        "capabilities"
+      ]
+    },
+    {
+      "id": "ch10-m7",
+      "chapter": 10,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which places surface MCP diagnostics in Claude Desktop? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "mcp.log for general connection events"
+        },
+        {
+          "letter": "B",
+          "text": "mcp-server-NAME.log for a specific server's stderr"
+        },
+        {
+          "letter": "C",
+          "text": "The Developer settings / tools UI showing server status"
+        },
+        {
+          "letter": "D",
+          "text": "The macOS Console app is required to decrypt the logs"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Logs are plain files under ~/Library/Logs/Claude (or %APPDATA%\\Claude\\logs) — nothing is encrypted.",
+      "tags": [
+        "debugging",
+        "claude-desktop",
+        "logs"
+      ]
+    },
+    {
+      "id": "ch10-m8",
+      "chapter": 10,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "A dual-era server serves an old IDE plugin and a new agent. Which debugging expectations are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A legacy client's traffic starts with an initialize handshake and may carry no modern protocol header"
+        },
+        {
+          "letter": "B",
+          "text": "A modern client's requests each carry protocol metadata in _meta and can hit any instance"
+        },
+        {
+          "letter": "C",
+          "text": "The server routes per request, so both clients can share one deployment"
+        },
+        {
+          "letter": "D",
+          "text": "Version negotiation automatically translates legacy requests into modern ones"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Negotiation detects era, it doesn't bridge it — the server (or SDK) must actually implement both legs; nothing translates on the wire for free.",
+      "tags": [
+        "debugging",
+        "protocol-eras",
+        "dual-era"
+      ]
+    }
+  ]
+}

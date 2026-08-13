@@ -1,0 +1,492 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 10: Debugging",
+    "protocolVersion": "2026-07-28",
+    "chapter": 10,
+    "chapterName": "Debugging",
+    "questionCount": 15
+  },
+  "questions": [
+    {
+      "id": "ch10-q1",
+      "chapter": 10,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "According to the debugging guide, what should be your first stop when an MCP integration misbehaves?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Rewriting the server in another language"
+        },
+        {
+          "letter": "B",
+          "text": "The MCP Inspector — an interactive, transport-agnostic testing UI"
+        },
+        {
+          "letter": "C",
+          "text": "Filing a GitHub issue immediately"
+        },
+        {
+          "letter": "D",
+          "text": "Packet capture with Wireshark"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The Inspector lets you connect to stdio or Streamable HTTP servers, invoke tools/prompts/resources, and watch the notification stream — it should be your first stop before deeper debugging.",
+      "tags": [
+        "debugging",
+        "inspector"
+      ]
+    },
+    {
+      "id": "ch10-q2",
+      "chapter": 10,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Where does Claude Desktop write its MCP-related log files on macOS?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "/var/log/claude/"
+        },
+        {
+          "letter": "B",
+          "text": "~/Library/Logs/Claude (e.g., mcp.log and mcp-server-SERVERNAME.log)"
+        },
+        {
+          "letter": "C",
+          "text": "~/Documents/Claude/logs"
+        },
+        {
+          "letter": "D",
+          "text": "/tmp/claude-mcp.log"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Logs live in ~/Library/Logs/Claude: mcp.log contains general connection logging, and mcp-server-SERVERNAME.log files capture each server's stderr output. On Windows they're under %APPDATA%\\Claude\\logs.",
+      "tags": [
+        "debugging",
+        "logs",
+        "claude-desktop"
+      ]
+    },
+    {
+      "id": "ch10-q3",
+      "chapter": 10,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "For a server using the Streamable HTTP transport, how should you handle logging (as opposed to a stdio server)?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "stderr is captured by the client, so keep using it"
+        },
+        {
+          "letter": "B",
+          "text": "Use server-side log aggregation or OpenTelemetry, plus standard HTTP tooling to inspect requests — the client does not capture stderr"
+        },
+        {
+          "letter": "C",
+          "text": "Send everything via notifications/message, the recommended mechanism"
+        },
+        {
+          "letter": "D",
+          "text": "HTTP servers cannot log at all"
+        }
+      ],
+      "answer": "B",
+      "explanation": "For stdio servers, stderr is captured by the host automatically. For Streamable HTTP servers the client doesn't capture stderr, so use your own aggregation or OpenTelemetry; note that protocol-level logging (notifications/message) is deprecated as of 2026-07-28.",
+      "tags": [
+        "debugging",
+        "logging",
+        "transports"
+      ]
+    },
+    {
+      "id": "ch10-q4",
+      "chapter": 10,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "A request is rejected with error code -32021 (MissingRequiredClientCapabilityError). What does this indicate?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The server does not support the requested protocol version"
+        },
+        {
+          "letter": "B",
+          "text": "The server needs a capability (such as elicitation) that the request's clientCapabilities in _meta did not declare"
+        },
+        {
+          "letter": "C",
+          "text": "The tool arguments failed schema validation"
+        },
+        {
+          "letter": "D",
+          "text": "The OAuth token expired"
+        }
+      ],
+      "answer": "B",
+      "explanation": "-32021 names client capabilities the server requires but the request didn't declare. By contrast, -32022 (UnsupportedProtocolVersionError) lists the server's supported versions, and -32602 (Invalid params) covers requests missing required _meta fields or otherwise malformed input.",
+      "tags": [
+        "debugging",
+        "error-codes",
+        "capabilities"
+      ]
+    },
+    {
+      "id": "ch10-q5",
+      "chapter": 10,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "MCP servers launched over stdio inherit only a limited set of environment variables. How do you provide additional ones in claude_desktop_config.json?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "They must be baked into the binary"
+        },
+        {
+          "letter": "B",
+          "text": "Add an env key to the server's entry, e.g., \"env\": { \"MYAPP_API_KEY\": \"some_key\" }"
+        },
+        {
+          "letter": "C",
+          "text": "Set them in the shell before launching Claude; they always propagate"
+        },
+        {
+          "letter": "D",
+          "text": "Use a .envrc file next to the config"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Stdio-launched servers inherit only a limited, platform-dependent subset of environment variables, so custom variables are specified via the env key in the server's configuration entry.",
+      "tags": [
+        "debugging",
+        "environment",
+        "configuration"
+      ]
+    },
+    {
+      "id": "ch10-q6",
+      "chapter": 10,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "How do clients opt in to receiving log messages from a server under the 2026-07-28 per-request logging model?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "By calling logging/setLevel once per session"
+        },
+        {
+          "letter": "B",
+          "text": "By setting the io.modelcontextprotocol/logLevel field in the request's _meta; servers must not send notifications/message for requests that omit it"
+        },
+        {
+          "letter": "C",
+          "text": "Logging is always on at debug level"
+        },
+        {
+          "letter": "D",
+          "text": "By subscribing to a logs:// resource"
+        }
+      ],
+      "answer": "B",
+      "explanation": "MCP defines eight RFC 5424 severity levels, and clients opt in per request via the io.modelcontextprotocol/logLevel _meta field. This replaces the legacy session-wide logging/setLevel model (and the mechanism as a whole is deprecated in favor of stderr/OpenTelemetry).",
+      "tags": [
+        "debugging",
+        "logging",
+        "meta"
+      ]
+    },
+    {
+      "id": "ch10-q7",
+      "chapter": 10,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "How do you enable Chrome DevTools inside Claude Desktop for client-side debugging?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "It is enabled by default with F12"
+        },
+        {
+          "letter": "B",
+          "text": "Create a developer_settings.json containing {\"allowDevTools\": true}, then open DevTools with Command-Option-I (macOS) or Ctrl+Alt+I (Windows)"
+        },
+        {
+          "letter": "C",
+          "text": "Launch Claude with the --devtools flag"
+        },
+        {
+          "letter": "D",
+          "text": "Install a separate debug build of Claude"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Writing {\"allowDevTools\": true} to developer_settings.json in Claude's application support directory enables DevTools; you'll see two windows (main content and title bar) and can use the Console and Network panels to inspect errors, payloads, and timing.",
+      "tags": [
+        "debugging",
+        "devtools",
+        "claude-desktop"
+      ]
+    },
+    {
+      "id": "ch10-q8",
+      "chapter": 10,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "For a local stdio server, what happens to messages the server writes to stderr?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "They are discarded"
+        },
+        {
+          "letter": "B",
+          "text": "They are captured automatically by the host application (e.g., into Claude Desktop's mcp-server-NAME.log)"
+        },
+        {
+          "letter": "C",
+          "text": "They corrupt the protocol like stdout does"
+        },
+        {
+          "letter": "D",
+          "text": "They are sent to the model as context"
+        }
+      ],
+      "answer": "B",
+      "explanation": "With the stdio transport, everything logged to stderr is captured by the host automatically — which is why stderr is the correct logging destination for stdio servers, while stdout is reserved for JSON-RPC.",
+      "tags": [
+        "debugging",
+        "logging",
+        "stdio"
+      ]
+    },
+    {
+      "id": "ch10-q9",
+      "chapter": 10,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Which events does the debugging guide list as important to log?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Startup steps, resource access, tool execution, error conditions, and performance metrics"
+        },
+        {
+          "letter": "B",
+          "text": "Only fatal crashes"
+        },
+        {
+          "letter": "C",
+          "text": "User passwords for reproduction"
+        },
+        {
+          "letter": "D",
+          "text": "Nothing; logging slows servers down"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Important events to log: startup steps, resource access, tool execution, error conditions, and performance metrics — with structured formats, context, timestamps, and request IDs.",
+      "tags": [
+        "debugging",
+        "logging",
+        "best-practices"
+      ]
+    },
+    {
+      "id": "ch10-q10",
+      "chapter": 10,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Where are Claude Desktop's MCP log files located on Windows?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "C:\\Program Files\\Claude\\logs"
+        },
+        {
+          "letter": "B",
+          "text": "%APPDATA%\\Claude\\logs"
+        },
+        {
+          "letter": "C",
+          "text": "C:\\Windows\\Temp\\claude"
+        },
+        {
+          "letter": "D",
+          "text": "The Windows Event Viewer only"
+        }
+      ],
+      "answer": "B",
+      "explanation": "On Windows the logs are under %APPDATA%\\Claude\\logs (on macOS: ~/Library/Logs/Claude). They capture connection events, configuration issues, runtime errors, and message exchanges.",
+      "tags": [
+        "debugging",
+        "logs",
+        "windows"
+      ]
+    },
+    {
+      "id": "ch10-q11",
+      "chapter": 10,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "How many log severity levels does MCP define, and from which standard do they come?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Three levels from POSIX"
+        },
+        {
+          "letter": "B",
+          "text": "Eight levels (debug through emergency) from RFC 5424 (syslog)"
+        },
+        {
+          "letter": "C",
+          "text": "Five levels from log4j"
+        },
+        {
+          "letter": "D",
+          "text": "Ten custom levels"
+        }
+      ],
+      "answer": "B",
+      "explanation": "MCP defines eight RFC 5424 severity levels, from debug through emergency. Under 2026-07-28, clients opt in per request via the io.modelcontextprotocol/logLevel _meta field.",
+      "tags": [
+        "debugging",
+        "logging",
+        "levels"
+      ]
+    },
+    {
+      "id": "ch10-q12",
+      "chapter": 10,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "SCENARIO: Your server runs perfectly when you launch it from your project directory in a terminal, but fails to find its data files when Claude Desktop launches it. What's the most likely cause?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Claude Desktop blocks file access entirely"
+        },
+        {
+          "letter": "B",
+          "text": "The server uses relative paths, and the working directory of a client-launched server may be undefined (like / on macOS) — switch to absolute paths in config and .env files"
+        },
+        {
+          "letter": "C",
+          "text": "The transport changed from stdio to HTTP"
+        },
+        {
+          "letter": "D",
+          "text": "Node and Python resolve paths differently"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Servers launched via a client's config can't rely on the working directory. Testing from a terminal masks the problem because the cwd is your project directory. The fix is absolute paths everywhere; the env key may also be needed since stdio servers inherit a limited environment.",
+      "tags": [
+        "debugging",
+        "scenario",
+        "working-directory"
+      ]
+    },
+    {
+      "id": "ch10-q13",
+      "chapter": 10,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: A hand-rolled client's requests are all rejected with error -32602 (Invalid params), even simple tools/list calls. Given the 2026-07-28 per-request metadata rules, what should you check first?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Whether the server is out of disk space"
+        },
+        {
+          "letter": "B",
+          "text": "Whether every request's _meta carries the required io.modelcontextprotocol/protocolVersion and io.modelcontextprotocol/clientCapabilities fields — a request missing either is rejected with -32602"
+        },
+        {
+          "letter": "C",
+          "text": "Whether the JSON-RPC id is a UUID"
+        },
+        {
+          "letter": "D",
+          "text": "Whether OAuth scopes include mcp:tools"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Every request must carry protocolVersion and clientCapabilities in _meta (and should carry clientInfo). Requests missing a required field are rejected with -32602 — the same code as other malformed input — so inspecting _meta is the first debugging step.",
+      "tags": [
+        "debugging",
+        "scenario",
+        "meta",
+        "error-codes"
+      ]
+    },
+    {
+      "id": "ch10-q14",
+      "chapter": 10,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: A client fails to connect to a server and you suspect a protocol-version mismatch. Per the debugging guide, how do you confirm and resolve it?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Downgrade the client until it works"
+        },
+        {
+          "letter": "B",
+          "text": "Call server/discover to see the server's supported versions; if you get UnsupportedProtocolVersionError (-32022), its data field lists the versions the server supports, so you can pick a mutual one"
+        },
+        {
+          "letter": "C",
+          "text": "Clear the DNS cache"
+        },
+        {
+          "letter": "D",
+          "text": "Increase the connection timeout"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The connection-problems checklist says to verify protocol compatibility by calling server/discover; a -32022 error explicitly lists the server's supported versions in its data field, telling you exactly which version to retry with.",
+      "tags": [
+        "debugging",
+        "scenario",
+        "versioning",
+        "error-codes"
+      ]
+    },
+    {
+      "id": "ch10-q15",
+      "chapter": 10,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "According to the 'testing changes' guidance, which tool supports the quickest iteration loop while developing a server?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Rebuilding the host application"
+        },
+        {
+          "letter": "B",
+          "text": "The MCP Inspector — while configuration or server-code changes in a client like Claude Desktop require a full client restart"
+        },
+        {
+          "letter": "C",
+          "text": "Editing the model's system prompt"
+        },
+        {
+          "letter": "D",
+          "text": "tcpdump"
+        }
+      ],
+      "answer": "B",
+      "explanation": "For quick iteration, use the Inspector during development. Configuration and server code changes in a real client require restarting it (fully quitting Claude Desktop, not just closing the window).",
+      "tags": [
+        "debugging",
+        "workflow",
+        "inspector"
+      ]
+    }
+  ]
+}

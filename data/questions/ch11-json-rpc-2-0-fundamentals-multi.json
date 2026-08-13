@@ -1,0 +1,335 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 11 (Multi-Select): JSON-RPC 2.0 Fundamentals",
+    "protocolVersion": "2026-07-28",
+    "chapter": 11,
+    "chapterName": "JSON-RPC 2.0 Fundamentals",
+    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
+    "questionCount": 8
+  },
+  "questions": [
+    {
+      "id": "ch11-m1",
+      "chapter": 11,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which members can legally appear in a JSON-RPC 2.0 Request object? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "jsonrpc (must be exactly \"2.0\")"
+        },
+        {
+          "letter": "B",
+          "text": "method (a String; names starting with 'rpc.' are reserved)"
+        },
+        {
+          "letter": "C",
+          "text": "params (optional; must be an Array or Object when present)"
+        },
+        {
+          "letter": "D",
+          "text": "id (String, Number, or Null; omit it to make the request a notification)"
+        },
+        {
+          "letter": "E",
+          "text": "headers (an Object of transport headers)"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "jsonrpc, method, params, and id are the four members. Transport headers live outside the JSON-RPC payload.",
+      "tags": [
+        "json-rpc",
+        "request"
+      ]
+    },
+    {
+      "id": "ch11-m2",
+      "chapter": 11,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which statements about JSON-RPC 2.0 Response objects are true? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Exactly one of result or error must be present — never both"
+        },
+        {
+          "letter": "B",
+          "text": "The id must equal the request's id"
+        },
+        {
+          "letter": "C",
+          "text": "If the request's id couldn't be detected (parse error / invalid request), the response id must be Null"
+        },
+        {
+          "letter": "D",
+          "text": "A response is returned for every notification"
+        },
+        {
+          "letter": "E",
+          "text": "The error object's code must be an integer"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ],
+      "explanation": "Notifications get no response by definition — the server MUST NOT reply to them, even inside batches. The other four rules are verbatim from the spec.",
+      "tags": [
+        "json-rpc",
+        "response",
+        "errors"
+      ]
+    },
+    {
+      "id": "ch11-m3",
+      "chapter": 11,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which reserved error-code facts are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "-32700 Parse error — invalid JSON received"
+        },
+        {
+          "letter": "B",
+          "text": "-32601 Method not found"
+        },
+        {
+          "letter": "C",
+          "text": "-32602 Invalid params"
+        },
+        {
+          "letter": "D",
+          "text": "-32000 to -32099 is reserved for implementation-defined server errors"
+        },
+        {
+          "letter": "E",
+          "text": "-32768 to -32000 is freely available for application-defined errors"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "The -32768..-32000 range is RESERVED for pre-defined errors; the remainder of the space (outside it) is what's available for application-defined errors.",
+      "tags": [
+        "json-rpc",
+        "error-codes"
+      ]
+    },
+    {
+      "id": "ch11-m4",
+      "chapter": 11,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which batch-call rules does the JSON-RPC 2.0 spec state? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The server may process batch requests concurrently and in any order"
+        },
+        {
+          "letter": "B",
+          "text": "Responses may return in any order; clients match by id"
+        },
+        {
+          "letter": "C",
+          "text": "Notifications within a batch produce no Response objects"
+        },
+        {
+          "letter": "D",
+          "text": "A batch of only notifications returns nothing at all (not an empty array)"
+        },
+        {
+          "letter": "E",
+          "text": "An empty array [] is a valid no-op"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "All but E: an empty array is invalid and yields a single -32600 Invalid Request error response.",
+      "tags": [
+        "json-rpc",
+        "batch"
+      ]
+    },
+    {
+      "id": "ch11-m5",
+      "chapter": 11,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Per the JSON-RPC 2.0 specification, which statements about notifications are true? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A notification is a Request object without an id member"
+        },
+        {
+          "letter": "B",
+          "text": "The server MUST NOT reply to a notification — not even with an error"
+        },
+        {
+          "letter": "C",
+          "text": "Notifications signal the sender's disinterest in any response"
+        },
+        {
+          "letter": "D",
+          "text": "A request with id: null is a notification"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Omitting id makes a notification; id: null is a (discouraged) regular request, kept distinct because v1 used null-id notifications.",
+      "tags": [
+        "json-rpc",
+        "notifications"
+      ]
+    },
+    {
+      "id": "ch11-m6",
+      "chapter": 11,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which id-related rules does the JSON-RPC 2.0 spec state? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The id must be a String, a Number, or Null if present"
+        },
+        {
+          "letter": "B",
+          "text": "Null as an id value is discouraged"
+        },
+        {
+          "letter": "C",
+          "text": "Fractional number ids should be avoided because they may not round-trip exactly"
+        },
+        {
+          "letter": "D",
+          "text": "The response id must equal the request id, or be Null when the request id couldn't be determined"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "Every clause is verbatim from §4 and §5 of the spec — a legitimate all-of-the-above.",
+      "tags": [
+        "json-rpc",
+        "id",
+        "spec"
+      ]
+    },
+    {
+      "id": "ch11-m7",
+      "chapter": 11,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which error codes carry their standard JSON-RPC meaning? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "-32700 Parse error"
+        },
+        {
+          "letter": "B",
+          "text": "-32600 Invalid Request"
+        },
+        {
+          "letter": "C",
+          "text": "-32601 Method not found"
+        },
+        {
+          "letter": "D",
+          "text": "-32603 Internal error"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "The classic quartet (plus -32602 Invalid params) — all correct, so E is too.",
+      "tags": [
+        "json-rpc",
+        "error-codes"
+      ]
+    },
+    {
+      "id": "ch11-m8",
+      "chapter": 11,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which statements about method names and reserved space are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Method names beginning with 'rpc.' are reserved for rpc-internal methods and extensions"
+        },
+        {
+          "letter": "B",
+          "text": "The error-code range -32768 to -32000 is reserved for pre-defined errors"
+        },
+        {
+          "letter": "C",
+          "text": "MCP additionally reserves -32020 to -32099 for the specification, leaving -32000 to -32019 implementation-defined"
+        },
+        {
+          "letter": "D",
+          "text": "Application servers may freely define a method named rpc.status"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "rpc.-prefixed names are exactly what applications must NOT define; A–C are the correct layering of JSON-RPC and MCP reservations.",
+      "tags": [
+        "json-rpc",
+        "reserved",
+        "mcp-error-codes"
+      ]
+    }
+  ]
+}

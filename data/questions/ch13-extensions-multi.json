@@ -1,0 +1,338 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 13 (Multi-Select): Extensions (MCP Apps, Tasks, Auth Extensions)",
+    "protocolVersion": "2026-07-28",
+    "chapter": 13,
+    "chapterName": "Extensions (MCP Apps, Tasks, Auth Extensions)",
+    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
+    "questionCount": 8
+  },
+  "questions": [
+    {
+      "id": "ch13-m1",
+      "chapter": 13,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which elements make up the MCP Apps security model? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Mandatory sandboxed iframes for all UI content"
+        },
+        {
+          "letter": "B",
+          "text": "A host-constructed CSP from server-declared domains, defaulting to deny-all network when nothing is declared"
+        },
+        {
+          "letter": "C",
+          "text": "Auditable JSON-RPC-over-postMessage communication between UI and host"
+        },
+        {
+          "letter": "D",
+          "text": "UI-triggered tool calls go through the host's ordinary audit and consent path"
+        },
+        {
+          "letter": "E",
+          "text": "UI resources fetch data directly from the internet, bypassing the host"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "The whole point of the model is that nothing bypasses the host: sandboxed iframes, declared-domain CSP (hosts may tighten, never loosen), auditable messaging, and consent-gated tool calls.",
+      "tags": [
+        "extensions",
+        "mcp-apps",
+        "security"
+      ]
+    },
+    {
+      "id": "ch13-m2",
+      "chapter": 13,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which task statuses are TERMINAL in the Tasks extension? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "completed"
+        },
+        {
+          "letter": "B",
+          "text": "failed"
+        },
+        {
+          "letter": "C",
+          "text": "cancelled"
+        },
+        {
+          "letter": "D",
+          "text": "working"
+        },
+        {
+          "letter": "E",
+          "text": "input_required"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "completed, failed, and cancelled are terminal — once reached, state never changes. working and input_required are in-progress states.",
+      "tags": [
+        "extensions",
+        "tasks",
+        "lifecycle"
+      ]
+    },
+    {
+      "id": "ch13-m3",
+      "chapter": 13,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which obligations does the Tasks extension place on a consuming CLIENT? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Declare io.modelcontextprotocol/tasks in its per-request capabilities"
+        },
+        {
+          "letter": "B",
+          "text": "Handle polymorphic results: a supported request may return either the normal result or a CreateTaskResult"
+        },
+        {
+          "letter": "C",
+          "text": "Poll tasks/get respecting pollIntervalMs until a terminal status"
+        },
+        {
+          "letter": "D",
+          "text": "Persist task IDs durably so polling survives a crash or restart"
+        },
+        {
+          "letter": "E",
+          "text": "Send tasks/result to block until completion"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "tasks/result was the old blocking method removed in the redesign — polling via tasks/get replaced it. The other four are the documented client steps (plus answering input_required via tasks/update).",
+      "tags": [
+        "extensions",
+        "tasks",
+        "clients"
+      ]
+    },
+    {
+      "id": "ch13-m4",
+      "chapter": 13,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which statements about the extensions framework are true? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Extensions are always opt-in, requiring explicit support from both client and server"
+        },
+        {
+          "letter": "B",
+          "text": "Identifiers follow {vendor-prefix}/{extension-name}; official ones use io.modelcontextprotocol"
+        },
+        {
+          "letter": "C",
+          "text": "Official extensions live in MCP GitHub org repos prefixed ext-"
+        },
+        {
+          "letter": "D",
+          "text": "An extension support matrix documents which clients implement which official extensions"
+        },
+        {
+          "letter": "E",
+          "text": "Any server may silently enable an extension for clients that never declared it"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "Negotiation is mandatory in both directions — e.g., a server must never return a task to a client that didn't declare the tasks extension.",
+      "tags": [
+        "extensions",
+        "framework",
+        "negotiation"
+      ]
+    },
+    {
+      "id": "ch13-m5",
+      "chapter": 13,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which method names exist in the redesigned Tasks extension? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "tasks/get — poll current state and, at terminal status, the result or error"
+        },
+        {
+          "letter": "B",
+          "text": "tasks/update — supply inputResponses for an input_required task"
+        },
+        {
+          "letter": "C",
+          "text": "tasks/cancel — cooperative cancellation intent"
+        },
+        {
+          "letter": "D",
+          "text": "tasks/list — enumerate all tasks on the server"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "tasks/list existed in the experimental core feature and was removed in the extension redesign (SEP-2663), along with the blocking tasks/result.",
+      "tags": [
+        "extensions",
+        "tasks",
+        "methods"
+      ]
+    },
+    {
+      "id": "ch13-m6",
+      "chapter": 13,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which statements about MCP Apps resources are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "UI resources use the ui:// URI scheme"
+        },
+        {
+          "letter": "B",
+          "text": "The MIME type is text/html;profile=mcp-app"
+        },
+        {
+          "letter": "C",
+          "text": "A tool links to its UI via _meta.ui.resourceUri"
+        },
+        {
+          "letter": "D",
+          "text": "The View communicates with the host via JSON-RPC over postMessage"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "The full linkage chain is accurate end to end — a true all-of-the-above.",
+      "tags": [
+        "extensions",
+        "mcp-apps",
+        "ui-resources"
+      ]
+    },
+    {
+      "id": "ch13-m7",
+      "chapter": 13,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which properties does the Tasks extension require of task IDs and task creation? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Task IDs are generated with sufficient entropy to prevent enumeration"
+        },
+        {
+          "letter": "B",
+          "text": "The task must be durably created (findable via tasks/get) before the CreateTaskResult is sent"
+        },
+        {
+          "letter": "C",
+          "text": "The CreateTaskResult carries taskId, initial status, ttlMs, and pollIntervalMs"
+        },
+        {
+          "letter": "D",
+          "text": "Servers may return a task to any client, since tasks are server-directed"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Server-directed creation is still capability-gated: a task must never go to a client that didn't declare io.modelcontextprotocol/tasks in its per-request capabilities.",
+      "tags": [
+        "extensions",
+        "tasks",
+        "security"
+      ]
+    },
+    {
+      "id": "ch13-m8",
+      "chapter": 13,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which auth extension matches which deployment need? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Nightly unattended data-sync agent → OAuth Client Credentials (io.modelcontextprotocol/oauth-client-credentials)"
+        },
+        {
+          "letter": "B",
+          "text": "Company-wide zero-touch server provisioning via the IdP → Enterprise-Managed Authorization"
+        },
+        {
+          "letter": "C",
+          "text": "EMA lets the IdP scope access by user group (e.g., engineering read-only vs marketing read/write)"
+        },
+        {
+          "letter": "D",
+          "text": "Both extensions activate by default whenever a server advertises them"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Extensions are never active by default — the client must declare support. That false D takes E down with it.",
+      "tags": [
+        "extensions",
+        "auth",
+        "ema",
+        "client-credentials"
+      ]
+    }
+  ]
+}

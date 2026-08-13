@@ -1,0 +1,334 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 4 (Multi-Select): Client Features (Elicitation, Roots, Sampling)",
+    "protocolVersion": "2026-07-28",
+    "chapter": 4,
+    "chapterName": "Client Features (Elicitation, Roots, Sampling)",
+    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
+    "questionCount": 8
+  },
+  "questions": [
+    {
+      "id": "ch4-m1",
+      "chapter": 4,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which statements about elicitation are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Form mode collects structured data against a schema the client uses to build and validate an input form"
+        },
+        {
+          "letter": "B",
+          "text": "URL mode sends the user to a URL out of band, suitable for credentials and third-party OAuth"
+        },
+        {
+          "letter": "C",
+          "text": "Servers must not use form mode for passwords, API keys, tokens, or payment credentials"
+        },
+        {
+          "letter": "D",
+          "text": "The server delivers elicitation/create as a direct server-initiated request over a reverse channel in 2026-07-28"
+        },
+        {
+          "letter": "E",
+          "text": "Users may decline or cancel an elicitation"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ],
+      "explanation": "All are true except D: under 2026-07-28, elicitation rides the MRTR pattern — the server returns an InputRequiredResult and the client retries the original request with inputResponses; server-initiated requests are gone.",
+      "tags": [
+        "client-features",
+        "elicitation",
+        "mrtr"
+      ]
+    },
+    {
+      "id": "ch4-m2",
+      "chapter": 4,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which client-side features are deprecated as of protocol version 2026-07-28? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Sampling"
+        },
+        {
+          "letter": "B",
+          "text": "Roots"
+        },
+        {
+          "letter": "C",
+          "text": "Elicitation"
+        },
+        {
+          "letter": "D",
+          "text": "Protocol-level logging via notifications/message"
+        },
+        {
+          "letter": "E",
+          "text": "Tools"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "D"
+      ],
+      "explanation": "SEP-2577 deprecates Roots, Sampling, and Logging. Elicitation remains active (now via MRTR), and tools are a core server primitive.",
+      "tags": [
+        "client-features",
+        "deprecations"
+      ]
+    },
+    {
+      "id": "ch4-m3",
+      "chapter": 4,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "For URL-mode elicitation, which client behaviors does the specification require or describe? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Show the full URL to the user"
+        },
+        {
+          "letter": "B",
+          "text": "Gather explicit consent before opening the URL"
+        },
+        {
+          "letter": "C",
+          "text": "Never fetch the URL automatically"
+        },
+        {
+          "letter": "D",
+          "text": "Capture the data the user enters on the target site and return it to the server"
+        },
+        {
+          "letter": "E",
+          "text": "Learn only whether the user consented"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ],
+      "explanation": "URL mode exists precisely so the data stays out of band: the client shows the URL, gets consent, never auto-fetches, and learns only the consent outcome. Capturing the entered data would defeat the mode's purpose.",
+      "tags": [
+        "client-features",
+        "elicitation",
+        "security"
+      ]
+    },
+    {
+      "id": "ch4-m4",
+      "chapter": 4,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which fields belonged to the (deprecated) sampling request's modelPreferences? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "hints — suggested model names"
+        },
+        {
+          "letter": "B",
+          "text": "costPriority"
+        },
+        {
+          "letter": "C",
+          "text": "speedPriority"
+        },
+        {
+          "letter": "D",
+          "text": "intelligencePriority"
+        },
+        {
+          "letter": "E",
+          "text": "gpuMemoryLimit"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "modelPreferences carried model hints plus three 0–1 priorities (cost, speed, intelligence) guiding the client's model selection. There is no GPU field.",
+      "tags": [
+        "client-features",
+        "sampling"
+      ]
+    },
+    {
+      "id": "ch4-m5",
+      "chapter": 4,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "In the MRTR pattern, which elements appear in the flow? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The server returns an InputRequiredResult with resultType: \"input_required\""
+        },
+        {
+          "letter": "B",
+          "text": "The inputRequests field carries the elicitations or other requests needing answers"
+        },
+        {
+          "letter": "C",
+          "text": "The client retries the ORIGINAL request, attaching inputResponses keyed to the requests"
+        },
+        {
+          "letter": "D",
+          "text": "The server-echoed requestState rides along so any stateless instance can resume the work"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "That is the complete MRTR loop (SEP-2322): interim result → client gathers input → retry with inputResponses + requestState. All statements hold.",
+      "tags": [
+        "client-features",
+        "mrtr"
+      ]
+    },
+    {
+      "id": "ch4-m6",
+      "chapter": 4,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which data may a server legitimately collect via FORM-mode elicitation? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A project name (string with a description)"
+        },
+        {
+          "letter": "B",
+          "text": "A priority level (enum of low/medium/high)"
+        },
+        {
+          "letter": "C",
+          "text": "A boolean confirmation"
+        },
+        {
+          "letter": "D",
+          "text": "The user's GitHub personal access token"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Form mode is for ordinary structured data. Credentials — passwords, API keys, tokens, payment details — must never go through form mode; that's what URL mode exists for.",
+      "tags": [
+        "client-features",
+        "elicitation",
+        "security"
+      ]
+    },
+    {
+      "id": "ch4-m7",
+      "chapter": 4,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which migrations does the changelog suggest for the features deprecated by SEP-2577? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Roots → pass directories/files via tool parameters, resource URIs, or server configuration"
+        },
+        {
+          "letter": "B",
+          "text": "Sampling → integrate directly with LLM provider APIs"
+        },
+        {
+          "letter": "C",
+          "text": "Logging → log to stderr (stdio) or use OpenTelemetry"
+        },
+        {
+          "letter": "D",
+          "text": "Roots → replace with the ping method"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "A–C are the documented migration paths. ping was itself removed in 2026-07-28, so D is doubly wrong.",
+      "tags": [
+        "client-features",
+        "deprecations",
+        "migration"
+      ]
+    },
+    {
+      "id": "ch4-m8",
+      "chapter": 4,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Why did 2026-07-28 remove notifications/elicitation/complete and the elicitationId field? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Under MRTR, the client learns the outcome by retrying the original request, so a server-initiated completion signal no longer fits"
+        },
+        {
+          "letter": "B",
+          "text": "Server-to-client requests outside a request's response no longer exist in the stateless model"
+        },
+        {
+          "letter": "C",
+          "text": "Servers needing to correlate an elicitation across retries encode their own identifier in requestState"
+        },
+        {
+          "letter": "D",
+          "text": "Elicitation as a whole was removed from the protocol"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Elicitation survives — only its 2025-11-25 completion-notification plumbing went away, replaced by the MRTR retry loop. D is the snuck-in falsehood.",
+      "tags": [
+        "client-features",
+        "elicitation",
+        "changelog"
+      ]
+    }
+  ]
+}

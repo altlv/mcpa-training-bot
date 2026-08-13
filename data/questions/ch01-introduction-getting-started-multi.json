@@ -1,0 +1,325 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 1 (Multi-Select): MCP Fundamentals",
+    "protocolVersion": "2026-07-28",
+    "chapter": 1,
+    "chapterName": "MCP Fundamentals",
+    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
+    "questionCount": 8
+  },
+  "questions": [
+    {
+      "id": "ch1-m1",
+      "chapter": 1,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which of the following are part of the Model Context Protocol's official project scope? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The MCP Specification"
+        },
+        {
+          "letter": "B",
+          "text": "Language-specific MCP SDKs"
+        },
+        {
+          "letter": "C",
+          "text": "Development tools such as the MCP Inspector"
+        },
+        {
+          "letter": "D",
+          "text": "A hosted LLM inference service"
+        },
+        {
+          "letter": "E",
+          "text": "Reference server implementations"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ],
+      "explanation": "MCP's scope covers the specification, SDKs, development tools (like the Inspector), and reference server implementations. MCP does not provide model inference and doesn't dictate how applications use LLMs.",
+      "tags": [
+        "fundamentals",
+        "scope"
+      ]
+    },
+    {
+      "id": "ch1-m2",
+      "chapter": 1,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "According to the intro docs, which stakeholders gain the listed benefit from MCP? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Developers: reduced development time and complexity when building or integrating with AI applications"
+        },
+        {
+          "letter": "B",
+          "text": "AI applications/agents: access to an ecosystem of data sources, tools, and apps"
+        },
+        {
+          "letter": "C",
+          "text": "End users: more capable AI applications that can access their data and act on their behalf"
+        },
+        {
+          "letter": "D",
+          "text": "GPU vendors: reduced memory bandwidth requirements"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "The intro lists exactly these three beneficiary groups. Hardware efficiency is not part of MCP's value proposition.",
+      "tags": [
+        "fundamentals",
+        "ecosystem"
+      ]
+    },
+    {
+      "id": "ch1-m3",
+      "chapter": 1,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which of the following are examples the documentation gives of what MCP can enable? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Agents accessing Google Calendar and Notion as a personalized assistant"
+        },
+        {
+          "letter": "B",
+          "text": "Claude Code generating a web app from a Figma design"
+        },
+        {
+          "letter": "C",
+          "text": "Enterprise chatbots connecting to multiple databases for chat-based analysis"
+        },
+        {
+          "letter": "D",
+          "text": "AI models creating 3D designs in Blender and printing them on a 3D printer"
+        },
+        {
+          "letter": "E",
+          "text": "Training a foundation model on private data"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "All four are flagship examples in the intro. Model training is out of scope — MCP is about context exchange, not model development.",
+      "tags": [
+        "fundamentals",
+        "use-cases"
+      ]
+    },
+    {
+      "id": "ch1-m4",
+      "chapter": 1,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which statements about MCP's design philosophy are true? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "MCP focuses solely on the protocol for context exchange"
+        },
+        {
+          "letter": "B",
+          "text": "MCP dictates how AI applications must manage the context they receive"
+        },
+        {
+          "letter": "C",
+          "text": "MCP takes inspiration from the Language Server Protocol"
+        },
+        {
+          "letter": "D",
+          "text": "It reduces the M×N integration problem to roughly M+N implementations"
+        },
+        {
+          "letter": "E",
+          "text": "MCP requires all servers to be open source"
+        }
+      ],
+      "answers": [
+        "A",
+        "C",
+        "D"
+      ],
+      "explanation": "MCP deliberately does NOT dictate LLM usage or context management, and both open- and closed-source servers exist (the registry supports both). The LSP parallel and the M×N→M+N reduction are core framing.",
+      "tags": [
+        "fundamentals",
+        "design",
+        "mxn-problem"
+      ]
+    },
+    {
+      "id": "ch1-m5",
+      "chapter": 1,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Per the specification overview, MCP provides a standardized way for applications to... (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "share contextual information with language models"
+        },
+        {
+          "letter": "B",
+          "text": "expose tools and capabilities to AI systems"
+        },
+        {
+          "letter": "C",
+          "text": "build composable integrations and workflows"
+        },
+        {
+          "letter": "D",
+          "text": "train and fine-tune foundation models"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "The spec names exactly three: sharing context, exposing tools/capabilities, and composable integrations. Model training is out of scope, which also makes 'All of the above' wrong.",
+      "tags": [
+        "fundamentals",
+        "spec",
+        "standardization"
+      ]
+    },
+    {
+      "id": "ch1-m6",
+      "chapter": 1,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which are core server primitives defined by the MCP specification? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Tools — callable functions invoked by the model"
+        },
+        {
+          "letter": "B",
+          "text": "Resources — readable context identified by URI"
+        },
+        {
+          "letter": "C",
+          "text": "Prompts — reusable templates the user selects"
+        },
+        {
+          "letter": "D",
+          "text": "Sessions — durable server-side conversation state"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Tools, resources, and prompts are the three server primitives. Protocol-level sessions were removed in 2026-07-28 (SEP-2567), so D — and therefore 'All of the above' — is wrong.",
+      "tags": [
+        "fundamentals",
+        "primitives"
+      ]
+    },
+    {
+      "id": "ch1-m7",
+      "chapter": 1,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which statements about MCP's governance artifacts are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Specification changes are proposed via SEPs with PR-derived numbering"
+        },
+        {
+          "letter": "B",
+          "text": "Official extensions live in ext-prefixed repositories under the modelcontextprotocol GitHub org"
+        },
+        {
+          "letter": "C",
+          "text": "The specification uses BCP 14 / RFC 2119 keywords (MUST, SHOULD, MAY)"
+        },
+        {
+          "letter": "D",
+          "text": "SEPs are approved by a public token-holder vote"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "SEPs go through sponsors and maintainer review via PR labels — there is no token vote. A–C are accurate, so the all-of-the-above trap fails on D.",
+      "tags": [
+        "fundamentals",
+        "governance",
+        "seps"
+      ]
+    },
+    {
+      "id": "ch1-m8",
+      "chapter": 1,
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "MCP reduces integration effort because... (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "each AI application implements the client side of the protocol once"
+        },
+        {
+          "letter": "B",
+          "text": "each external system exposes one MCP server usable by any compliant client"
+        },
+        {
+          "letter": "C",
+          "text": "M applications × N systems collapses from M×N custom connectors to roughly M+N implementations"
+        },
+        {
+          "letter": "D",
+          "text": "every server must be rewritten for each new host application"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "D describes the world MCP replaces. The M+N economics only work because servers are host-agnostic.",
+      "tags": [
+        "fundamentals",
+        "mxn-problem"
+      ]
+    }
+  ]
+}
