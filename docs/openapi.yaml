@@ -1,0 +1,446 @@
+openapi: 3.0.0
+info:
+  title: MCPA Training Bot API
+  description: |
+    API for the MCPA (Model Context Protocol Associate) Training Bot.
+    
+    This API powers a quiz system for exam preparation, supporting:
+    - Tag-based question filtering
+    - Randomized quiz sessions
+    - Single and multiple-select questions
+    - Score tracking and results
+    
+    ## Features
+    - 250+ questions across 15 chapters
+    - 208 unique tags for filtering
+    - Support for single-select (MCQ) and multi-select questions
+    - Randomized question and answer order
+  version: 1.0.0
+  contact:
+    name: MCPA Training Bot
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+tags:
+  - name: Health
+    description: Server health checks
+  - name: Tags
+    description: Question tag management
+  - name: Quiz
+    description: Quiz session operations
+  - name: Questions
+    description: Question retrieval
+
+paths:
+  /api/health:
+    get:
+      tags: [Health]
+      summary: Health check
+      description: Returns server status and basic statistics
+      operationId: getHealth
+      responses:
+        '200':
+          description: Server is running
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: ok
+                questions: 250
+                tags: 208
+
+  /api/tags:
+    get:
+      tags: [Tags]
+      summary: Get all tags
+      description: |
+        Returns all available tags with question counts.
+        Use these tags to filter questions when starting a quiz.
+      operationId: getTags
+      responses:
+        '200':
+          description: List of tags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagsResponse'
+              example:
+                tags:
+                  - name: mcp-basics
+                    count: 15
+                  - name: security
+                    count: 25
+                totalQuestions: 250
+
+  /api/quiz/start:
+    post:
+      tags: [Quiz]
+      summary: Start a quiz session
+      description: |
+        Creates a new quiz session with randomized questions.
+        
+        The session includes:
+        - Questions filtered by selected tags
+        - Randomized question order
+        - Randomized answer options
+        
+        Use the returned sessionId to submit answers later.
+      operationId: startQuiz
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartQuizRequest'
+            example:
+              tags:
+                - security
+                - oauth
+              count: 10
+      responses:
+        '200':
+          description: Quiz session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizSessionResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: At least one tag must be selected
+                code: INVALID_TAGS
+        '404':
+          description: No questions found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: No questions found for selected tags
+                code: NO_QUESTIONS
+
+  /api/quiz/submit:
+    post:
+      tags: [Quiz]
+      summary: Submit quiz answers
+      description: |
+        Submits answers for a quiz session and returns results.
+        
+        Results include:
+        - Total score
+        - Percentage
+        - Detailed results for each question
+        - Correct answers and explanations
+      operationId: submitQuiz
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitQuizRequest'
+            example:
+              sessionId: quiz_1234567890_abc123
+              answers:
+                ch1-q1: A
+                ch1-q2:
+                  - A
+                  - C
+                ch2-m1:
+                  - B
+                  - D
+      responses:
+        '200':
+          description: Quiz results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizResultsResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Quiz session not found
+                code: SESSION_NOT_FOUND
+
+  /api/questions/{id}:
+    get:
+      tags: [Questions]
+      summary: Get question by ID
+      description: |
+        Retrieves a single question by its ID.
+        Useful for reviewing specific questions after a quiz.
+      operationId: getQuestionById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Question ID (e.g., ch1-q1, ch2-m1)
+          schema:
+            type: string
+          example: ch1-q1
+      responses:
+        '200':
+          description: Question found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuestionResponse'
+        '404':
+          description: Question not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: Question not found
+                code: QUESTION_NOT_FOUND
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        questions:
+          type: integer
+          description: Total number of questions
+          example: 250
+        tags:
+          type: integer
+          description: Total number of unique tags
+          example: 208
+
+    TagsResponse:
+      type: object
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        totalQuestions:
+          type: integer
+          example: 250
+
+    Tag:
+      type: object
+      properties:
+        name:
+          type: string
+          example: mcp-basics
+        count:
+          type: integer
+          description: Number of questions with this tag
+          example: 15
+
+    StartQuizRequest:
+      type: object
+      required:
+        - tags
+      properties:
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags to filter questions by
+          example:
+            - security
+            - oauth
+        count:
+          oneOf:
+            - type: integer
+              minimum: 1
+              description: Number of questions to include
+            - type: string
+              enum: [all]
+              description: Include all matching questions
+          default: all
+          example: 10
+
+    QuizSessionResponse:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          description: Unique session identifier
+          example: quiz_1786766314245_o089af651
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuizQuestion'
+        totalQuestions:
+          type: integer
+          example: 10
+
+    QuizQuestion:
+      type: object
+      properties:
+        id:
+          type: string
+          example: ch1-q1
+        chapter:
+          type: integer
+          example: 1
+        chapterName:
+          type: string
+          example: MCP Fundamentals
+        type:
+          type: string
+          enum: [mcq, multi_select, true-false, scenario]
+          example: mcq
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+          example: medium
+        question:
+          type: string
+          example: What does MCP stand for?
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+        tags:
+          type: array
+          items:
+            type: string
+
+    Option:
+      type: object
+      properties:
+        letter:
+          type: string
+          enum: [A, B, C, D]
+          example: A
+        text:
+          type: string
+          example: Model Context Protocol
+
+    SubmitQuizRequest:
+      type: object
+      required:
+        - sessionId
+        - answers
+      properties:
+        sessionId:
+          type: string
+          description: Session ID from startQuiz response
+          example: quiz_1786766314245_o089af651
+        answers:
+          type: object
+          description: |
+            Map of question IDs to answers.
+            For single-select: letter (e.g., "A")
+            For multi-select: array of letters (e.g., ["A", "C"])
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: array
+                items:
+                  type: string
+          example:
+            ch1-q1: A
+            ch2-m1:
+              - A
+              - C
+
+    QuizResultsResponse:
+      type: object
+      properties:
+        score:
+          type: integer
+          description: Number of correct answers
+          example: 8
+        total:
+          type: integer
+          description: Total questions answered
+          example: 10
+        percentage:
+          type: integer
+          description: Score percentage (0-100)
+          example: 80
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuestionResult'
+
+    QuestionResult:
+      type: object
+      properties:
+        questionId:
+          type: string
+          example: ch1-q1
+        question:
+          type: string
+          example: What does MCP stand for?
+        type:
+          type: string
+          example: mcq
+        yourAnswer:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: User's answer(s)
+        correctAnswer:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: Correct answer(s)
+        isCorrect:
+          type: boolean
+          example: true
+        explanation:
+          type: string
+          description: Why the correct answer is correct
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/OptionWithCorrectness'
+
+    OptionWithCorrectness:
+      type: object
+      properties:
+        letter:
+          type: string
+          example: A
+        text:
+          type: string
+          example: Model Context Protocol
+        isCorrect:
+          type: boolean
+          description: Whether this option is correct
+          example: true
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: Invalid request
+        code:
+          type: string
+          description: Error code for programmatic handling
+          example: INVALID_TAGS

@@ -1,10 +1,10 @@
 {
   "meta": {
-    "title": "MCP Question Bank — Chapter 3: Server Concepts (Tools, Resources, Prompts)",
+    "title": "MCP Question Bank — Chapter 3: Server Features (Tools, Resources, Prompts)",
     "protocolVersion": "2026-07-28",
     "chapter": 3,
-    "chapterName": "Server Concepts (Tools, Resources, Prompts)",
-    "questionCount": 15
+    "chapterName": "Server Features (Tools, Resources, Prompts)",
+    "questionCount": 28
   },
   "questions": [
     {
@@ -484,6 +484,415 @@
         "server-concepts",
         "tools",
         "trust-safety"
+      ]
+    },
+    {
+      "id": "ch3-q16",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which content block types can appear in a tool result's content array?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Only plain text"
+        },
+        {
+          "letter": "B",
+          "text": "Text, images, audio, resource links, and embedded resources"
+        },
+        {
+          "letter": "C",
+          "text": "Text and video only"
+        },
+        {
+          "letter": "D",
+          "text": "Raw binary streams without type information"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Tool results are arrays of typed content blocks: text content, image content, audio content (both base64 with a mimeType), resource links (a URI reference without inline contents), and embedded resources (full resource contents inside the result).",
+      "tags": [
+        "server-features",
+        "tools",
+        "content-blocks"
+      ]
+    },
+    {
+      "id": "ch3-q17",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "What's the difference between a resource link and an embedded resource in a tool result?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "They are synonyms"
+        },
+        {
+          "letter": "B",
+          "text": "A resource link references a resource by URI without carrying its contents (the client may fetch it via resources/read); an embedded resource carries the full resource contents inline within the result"
+        },
+        {
+          "letter": "C",
+          "text": "Resource links are only for images"
+        },
+        {
+          "letter": "D",
+          "text": "Embedded resources must be fetched separately"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Links defer the payload — useful for large or optional data the client can read on demand; embedded resources inline the payload so no follow-up read is needed.",
+      "tags": [
+        "server-features",
+        "content-blocks",
+        "resources"
+      ]
+    },
+    {
+      "id": "ch3-q18",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "How are binary payloads like images and audio carried in MCP content blocks?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "As raw bytes appended after the JSON"
+        },
+        {
+          "letter": "B",
+          "text": "Base64-encoded in the block's data field, accompanied by a mimeType so the client knows how to interpret them"
+        },
+        {
+          "letter": "C",
+          "text": "As URLs only — binary data cannot travel inline"
+        },
+        {
+          "letter": "D",
+          "text": "As hexadecimal strings in the params"
+        }
+      ],
+      "answer": "B",
+      "explanation": "JSON-RPC is text-based, so image/audio content blocks carry base64 data plus a mimeType (e.g., image/png, audio/wav). Large binaries can alternatively be exposed as resources and referenced by link.",
+      "tags": [
+        "server-features",
+        "content-blocks",
+        "binary"
+      ]
+    },
+    {
+      "id": "ch3-q19",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "During a conversation, the LLM decides on its own that calling get_weather would help answer the user, and the host shows an approval prompt before executing. Which primitive and control model is this?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A Prompt - user-controlled"
+        },
+        {
+          "letter": "B",
+          "text": "A Resource - application-controlled"
+        },
+        {
+          "letter": "C",
+          "text": "A Tool - model-controlled, with human oversight via approval"
+        },
+        {
+          "letter": "D",
+          "text": "A Root - host-controlled"
+        }
+      ],
+      "answer": "C",
+      "explanation": "Tools are model-controlled: the LLM decides when to invoke them, while the host keeps a human in the loop (visibility, per-call approval, pre-approval settings, activity logs). (MCP docs, server concepts control model.)",
+      "tags": [
+        "control-model",
+        "tools"
+      ]
+    },
+    {
+      "id": "ch3-q20",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "A host application automatically attaches the contents of file:///project/README.md to the model's context before a chat turn, without the model or the user asking. Which control model is exercised?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Model-controlled, because the content reaches the model"
+        },
+        {
+          "letter": "B",
+          "text": "Application-controlled - Resources are retrieved and used at the host's discretion"
+        },
+        {
+          "letter": "C",
+          "text": "User-controlled, because the user owns the file"
+        },
+        {
+          "letter": "D",
+          "text": "Server-controlled, because the server exposes the URI"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Resources are application-driven: the host decides how and when to retrieve them and how to use them. Tools are model-controlled and Prompts are user-controlled - the classic Model->Tools, App->Resources, User->Prompts mapping. (MCP docs, server concepts.)",
+      "tags": [
+        "control-model",
+        "resources"
+      ]
+    },
+    {
+      "id": "ch3-q21",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "A user types the /code-review slash command, which the client fetched from a server via prompts/list. Which control model does this demonstrate?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Model-controlled"
+        },
+        {
+          "letter": "B",
+          "text": "Application-controlled"
+        },
+        {
+          "letter": "C",
+          "text": "User-controlled"
+        },
+        {
+          "letter": "D",
+          "text": "Transport-controlled"
+        }
+      ],
+      "answer": "C",
+      "explanation": "Prompts are user-controlled templates: they require explicit user invocation, typically surfaced as slash commands or menu entries. (MCP docs, server concepts.)",
+      "tags": [
+        "control-model",
+        "prompts"
+      ]
+    },
+    {
+      "id": "ch3-q22",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "A tool's downstream API returns HTTP 500 while executing tools/call. What should the MCP server return?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A JSON-RPC error response with code -32603"
+        },
+        {
+          "letter": "B",
+          "text": "A normal result (resultType \"complete\") whose payload sets isError: true and describes the failure"
+        },
+        {
+          "letter": "C",
+          "text": "resultType \"input_required\" so the client can retry"
+        },
+        {
+          "letter": "D",
+          "text": "HTTP 500 with an empty body"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Tool *execution* failures are reported inside the result via isError: true, so the model can see and react to the failure. JSON-RPC errors are reserved for protocol-level problems (unknown tool, invalid params, server bugs). (MCP docs, tools; a classic exam trap.)",
+      "tags": [
+        "tools",
+        "error-handling",
+        "is-error"
+      ]
+    },
+    {
+      "id": "ch3-q23",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Two different servers connected to the same host both expose a tool named search. Who is responsible for disambiguating?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The spec forbids connecting both servers simultaneously"
+        },
+        {
+          "letter": "B",
+          "text": "Tool names must be globally unique across the ecosystem, so one server is non-compliant"
+        },
+        {
+          "letter": "C",
+          "text": "Tool names are unique per server; handling cross-server collisions (e.g., prefixing) is the host's responsibility"
+        },
+        {
+          "letter": "D",
+          "text": "The registry rejects duplicate tool names at publish time"
+        }
+      ],
+      "answer": "C",
+      "explanation": "Uniqueness is scoped to a single server. When multiple servers collide, the host disambiguates - commonly by prefixing tool names with a server identifier. (MCP docs, server concepts.)",
+      "tags": [
+        "tools",
+        "naming",
+        "host"
+      ]
+    },
+    {
+      "id": "ch3-q24",
+      "chapter": 3,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which of the following is one of the spec's Security and Trust key principles, stated correctly?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Tool descriptions and annotations are considered untrusted unless obtained from a trusted server"
+        },
+        {
+          "letter": "B",
+          "text": "Servers must sandbox every tool in a container"
+        },
+        {
+          "letter": "C",
+          "text": "Hosts may transmit resource data to third parties as long as it is encrypted"
+        },
+        {
+          "letter": "D",
+          "text": "User consent is only required for write operations, not reads"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Under Tool Safety, tools represent arbitrary code execution and descriptions/annotations are untrusted unless from a trusted server. The other statements contradict the principles: hosts must not transmit resource data elsewhere without consent, and explicit consent covers all data access and operations. (Spec 2026-07-28 overview, Security and Trust.)",
+      "tags": [
+        "security-principles",
+        "tool-safety"
+      ]
+    },
+    {
+      "id": "ch3-q25",
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which method does the client use to discover available tools from a server?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "prompts/list"
+        },
+        {
+          "letter": "B",
+          "text": "resources/list"
+        },
+        {
+          "letter": "C",
+          "text": "tools/list"
+        },
+        {
+          "letter": "D",
+          "text": "tools/call"
+        }
+      ],
+      "answer": "C",
+      "explanation": "The tools/list method returns all available tools. tools/call is used to invoke a tool, not discover it.",
+      "tags": [
+        "control-model",
+        "tools",
+        "methods"
+      ]
+    },
+    {
+      "id": "ch3-q26",
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "In the control model, Tools are considered 'DO' primitives because:",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The model reads data from them"
+        },
+        {
+          "letter": "B",
+          "text": "The model executes actions through them"
+        },
+        {
+          "letter": "C",
+          "text": "The application controls them"
+        },
+        {
+          "letter": "D",
+          "text": "The user must approve them"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Tools are 'DO' primitives - the model decides to execute an action. Resources are 'IS' primitives - the model reads information.",
+      "tags": [
+        "control-model",
+        "do-vs-is"
+      ]
+    },
+    {
+      "id": "ch3-q27",
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "When the model decides to call a tool, what happens before execution?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Server automatically executes"
+        },
+        {
+          "letter": "B",
+          "text": "Model sends request directly"
+        },
+        {
+          "letter": "C",
+          "text": "Host obtains user consent"
+        },
+        {
+          "letter": "D",
+          "text": "Client validates the request"
+        }
+      ],
+      "answer": "C",
+      "explanation": "The host must obtain user consent before executing a tool. This is a key security principle - human-in-the-loop.",
+      "tags": [
+        "control-model",
+        "tools",
+        "approval",
+        "security"
+      ]
+    },
+    {
+      "id": "ch3-q28",
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "A user asks the AI to 'read the README file and then fix the bug'. Which sequence of primitives is MOST likely?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Resource (read file) -> Tool (fix bug)"
+        },
+        {
+          "letter": "B",
+          "text": "Tool (read file) -> Tool (fix bug)"
+        },
+        {
+          "letter": "C",
+          "text": "Prompt (template) -> Resource (file) -> Tool (fix)"
+        },
+        {
+          "letter": "D",
+          "text": "Root (access) -> Tool (fix bug)"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Reading a file is a Resource (application-controlled, IS). Fixing a bug is a Tool (model-controlled, DO). The host decides which resources to include, then the model decides which tools to call.",
+      "tags": [
+        "control-model",
+        "tools",
+        "resources",
+        "scenario"
       ]
     }
   ]

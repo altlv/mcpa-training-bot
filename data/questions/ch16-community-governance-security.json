@@ -1,0 +1,490 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 16: Community, Governance & Security Policy",
+    "protocolVersion": "2026-07-28",
+    "chapter": 16,
+    "chapterName": "Community, Governance & Security Policy",
+    "questionCount": 15
+  },
+  "questions": [
+    {
+      "id": "ch16-q1",
+      "chapter": 16,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Under what legal structure and licenses does the MCP project operate?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A private Anthropic subsidiary; all rights reserved"
+        },
+        {
+          "letter": "B",
+          "text": "Model Context Protocol, a Series of LF Projects, LLC; code and specification contributions under Apache 2.0, documentation (excluding specs) under CC BY 4.0"
+        },
+        {
+          "letter": "C",
+          "text": "A Delaware C-corp; MIT license"
+        },
+        {
+          "letter": "D",
+          "text": "An informal GitHub org with no legal entity"
+        }
+      ],
+      "answer": "B",
+      "explanation": "MCP is established as 'Model Context Protocol a Series of LF Projects, LLC'. Code/spec contributions use Apache License 2.0; documentation is CC BY 4.0. Contributors retain copyright — no assignment to the project is required.",
+      "tags": [
+        "governance",
+        "licensing",
+        "lf-projects"
+      ]
+    },
+    {
+      "id": "ch16-q2",
+      "chapter": 16,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What is the technical governance hierarchy of the MCP project?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A flat structure where all contributors vote equally"
+        },
+        {
+          "letter": "B",
+          "text": "Contributors → Maintainers → Core Maintainers → Lead Maintainers (BDFL), modeled on projects like Python and PyTorch"
+        },
+        {
+          "letter": "C",
+          "text": "A board of corporate seat-holders"
+        },
+        {
+          "letter": "D",
+          "text": "Anthropic employees only"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The hierarchy runs Contributors (issues/PRs) → Maintainers (SDKs, docs, Working Groups) → Core Maintainers (project direction) → Lead Maintainers (final decision authority, a.k.a. BDFL). Together the maintainer tiers form the MCP Steering Group.",
+      "tags": [
+        "governance",
+        "hierarchy",
+        "roles"
+      ]
+    },
+    {
+      "id": "ch16-q3",
+      "chapter": 16,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What is a defining rule of maintainer membership in MCP governance?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Seats are reserved for founding companies"
+        },
+        {
+          "letter": "B",
+          "text": "Membership is tied to individuals, not companies — no reserved corporate seats, merit-based, no term limit, and it stays with the person if they change employers"
+        },
+        {
+          "letter": "C",
+          "text": "Membership rotates alphabetically each quarter"
+        },
+        {
+          "letter": "D",
+          "text": "Only Anthropic staff may be Core Maintainers"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Governance membership is explicitly individual: no company seats, granted on merit after demonstrated expertise, associated with the person rather than the employer, and without term limits. This prioritizes protocol integrity over corporate interests.",
+      "tags": [
+        "governance",
+        "membership",
+        "individuals"
+      ]
+    },
+    {
+      "id": "ch16-q4",
+      "chapter": 16,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What can Lead Maintainers do that Core Maintainers cannot?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Merge pull requests"
+        },
+        {
+          "letter": "B",
+          "text": "Veto any decision by Core Maintainers or Maintainers (BDFL authority), and appoint or remove Core Maintainers — while being expected to publicly articulate their reasoning"
+        },
+        {
+          "letter": "C",
+          "text": "Write to SDK repositories"
+        },
+        {
+          "letter": "D",
+          "text": "Participate in Working Groups"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Lead Maintainers hold final authority: veto over any decision and the power to appoint/remove Core Maintainers, plus admin on all project infrastructure. Core Maintainers can veto Maintainer decisions by majority vote and appoint/remove Maintainers, but not override the Leads.",
+      "tags": [
+        "governance",
+        "roles",
+        "bdfl"
+      ]
+    },
+    {
+      "id": "ch16-q5",
+      "chapter": 16,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "SCENARIO: A Core Maintainer wants to change the specification repo. Per governance rules, how must they proceed?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Push directly to main — they have admin access"
+        },
+        {
+          "letter": "B",
+          "text": "Use the same pull-request contribution process as external contributors, providing visibility into intent and opportunity for discussion"
+        },
+        {
+          "letter": "C",
+          "text": "Email the change to the other maintainers"
+        },
+        {
+          "letter": "D",
+          "text": "Open a private Discord vote first, then push directly"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Maintainers at every level (Maintainers, Core, Lead) should use the same contribution process as external contributors rather than making direct changes — despite having write/admin access.",
+      "tags": [
+        "governance",
+        "process",
+        "scenario"
+      ]
+    },
+    {
+      "id": "ch16-q6",
+      "chapter": 16,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What is the difference between Interest Groups and Working Groups in MCP?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "They are two names for the same thing"
+        },
+        {
+          "letter": "B",
+          "text": "Interest Groups identify and articulate problems MCP should address through open discussion; Working Groups develop concrete solutions, producing deliverables like SEPs or implementations"
+        },
+        {
+          "letter": "C",
+          "text": "Interest Groups write code; Working Groups write blog posts"
+        },
+        {
+          "letter": "D",
+          "text": "Working Groups are for companies, Interest Groups for individuals"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The two collaboration structures split problem-space from solution-space: IGs surface and articulate problems; WGs (formalized under SEP-1302) produce SEPs and implementations that solve them.",
+      "tags": [
+        "governance",
+        "working-groups",
+        "interest-groups"
+      ]
+    },
+    {
+      "id": "ch16-q7",
+      "chapter": 16,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "How does the Core Maintainer group make and communicate decisions?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Annual closed-door summits with sealed minutes"
+        },
+        {
+          "letter": "B",
+          "text": "Bi-weekly meetings to discuss and vote on proposals, with notes made public; a shared Discord server for maintainer coordination where decisions and supporting discussions must be recorded transparently; in-person meetings targeted every 3–6 months"
+        },
+        {
+          "letter": "C",
+          "text": "Decisions are made solely by GitHub reactions"
+        },
+        {
+          "letter": "D",
+          "text": "There is no defined decision process"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The cadence is bi-weekly Core Maintainer meetings (public proposal notes), Discord as the recorded governance channel, and in-person meetings every three to six months.",
+      "tags": [
+        "governance",
+        "process",
+        "communication"
+      ]
+    },
+    {
+      "id": "ch16-q8",
+      "chapter": 16,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which roles does the Contributor Ladder define OUTSIDE the MCP Steering Group?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Member and Community Moderator"
+        },
+        {
+          "letter": "B",
+          "text": "Intern and Apprentice"
+        },
+        {
+          "letter": "C",
+          "text": "Sponsor and Auditor"
+        },
+        {
+          "letter": "D",
+          "text": "There are no roles outside the Steering Group"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The Contributor Ladder is the canonical definition of all roles — requirements, privileges, advancement, inactivity policy — and includes Member and Community Moderator, which sit outside the Steering Group (Maintainers + Core + Lead).",
+      "tags": [
+        "governance",
+        "contributor-ladder",
+        "roles"
+      ]
+    },
+    {
+      "id": "ch16-q9",
+      "chapter": 16,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "How should a security vulnerability in an MCP SDK be reported?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Open a public GitHub issue with full reproduction details"
+        },
+        {
+          "letter": "B",
+          "text": "Through GitHub Security Advisories (private vulnerability reporting) on the affected repository — never via public issues, discussions, or pull requests"
+        },
+        {
+          "letter": "C",
+          "text": "Post it on the public Discord"
+        },
+        {
+          "letter": "D",
+          "text": "Email it to any maintainer's personal address"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Private vulnerability reporting is enabled on the specification repo and every official SDK repo in the modelcontextprotocol org. Public channels are explicitly ruled out for security reports.",
+      "tags": [
+        "security-policy",
+        "disclosure",
+        "ghsa"
+      ]
+    },
+    {
+      "id": "ch16-q10",
+      "chapter": 16,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "How are CVEs assigned for MCP vulnerabilities?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Through GitHub's CNA as part of the GHSA (GitHub Security Advisory) workflow"
+        },
+        {
+          "letter": "B",
+          "text": "Anthropic operates its own CNA"
+        },
+        {
+          "letter": "C",
+          "text": "MCP does not use CVEs"
+        },
+        {
+          "letter": "D",
+          "text": "Reporters must request CVEs directly from MITRE"
+        }
+      ],
+      "answer": "A",
+      "explanation": "CVE assignment rides the GHSA workflow via GitHub's CVE Numbering Authority — no separate process is needed once the private advisory is filed.",
+      "tags": [
+        "security-policy",
+        "cve",
+        "cna"
+      ]
+    },
+    {
+      "id": "ch16-q11",
+      "chapter": 16,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: A vulnerability report is filed against the Python SDK, and the flaw stems from a transport pattern all official SDKs implement the same way. What does the security policy say happens next?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Each SDK team handles it independently whenever they notice"
+        },
+        {
+          "letter": "B",
+          "text": "The receiving maintainers assess cross-SDK impact and coordinate with other SDK maintainers so fixes and advisories release together — and if the root cause is a spec defect, they escalate to the specification maintainers"
+        },
+        {
+          "letter": "C",
+          "text": "The report is closed as out of scope"
+        },
+        {
+          "letter": "D",
+          "text": "The reporter must re-file against every SDK repo"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Many MCP vulnerabilities stem from shared patterns or spec-level behavior. The policy mandates cross-SDK coordination for simultaneous release (so no SDK is left exposed after others publish) and escalation to spec maintainers when the specification itself is the defect.",
+      "tags": [
+        "security-policy",
+        "coordination",
+        "scenario"
+      ]
+    },
+    {
+      "id": "ch16-q12",
+      "chapter": 16,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Why are 'stdio peer attacks' generally OUT of scope as vulnerabilities?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Because stdio is deprecated"
+        },
+        {
+          "letter": "B",
+          "text": "Because the client spawns the server locally and both may run at equivalent privilege: a malicious server already has arbitrary code execution by being run, and a malicious client has full process control over the server — the stdio transport is not a sandbox"
+        },
+        {
+          "letter": "C",
+          "text": "Because stdio traffic is encrypted"
+        },
+        {
+          "letter": "D",
+          "text": "Because the OS prevents such attacks"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The trust model treats stdio peers as within one trust boundary. Reports whose only impact is one stdio peer crashing, hanging, or DoS-ing the other are regular issues, not GHSAs. They come back IN scope if the code is reachable via remote transports or causes a sandbox escape.",
+      "tags": [
+        "security-policy",
+        "stdio",
+        "trust-model"
+      ]
+    },
+    {
+      "id": "ch16-q13",
+      "chapter": 16,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: A researcher finds that a malicious stdio server can hang its client with malformed output — and the same parsing code also runs in the Streamable HTTP transport. In scope or not?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Out of scope — anything involving stdio peers is excluded"
+        },
+        {
+          "letter": "B",
+          "text": "In scope — the stdio-peer exclusion falls away when the affected SDK code is reachable via a supported remote transport (or results in a sandbox escape)"
+        },
+        {
+          "letter": "C",
+          "text": "In scope only if a CVE already exists"
+        },
+        {
+          "letter": "D",
+          "text": "Out of scope because DoS never qualifies"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The exclusion is narrow: stdio-peer-only impact is out of scope, but reachability through remote transports (where the attacker is NOT a co-privileged local process) brings the same defect back into scope for a private advisory.",
+      "tags": [
+        "security-policy",
+        "scope",
+        "scenario"
+      ]
+    },
+    {
+      "id": "ch16-q14",
+      "chapter": 16,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which issue classes does the security policy list as in-scope vulnerabilities when caused by flaws in the spec or official SDKs?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Protocol-level vulnerabilities, authentication/authorization bypasses, injection and memory-safety bugs, sandbox escapes, session hijacking, token leakage, and cross-tenant access"
+        },
+        {
+          "letter": "B",
+          "text": "Only remote code execution"
+        },
+        {
+          "letter": "C",
+          "text": "Typos in documentation"
+        },
+        {
+          "letter": "D",
+          "text": "Performance regressions"
+        }
+      ],
+      "answer": "A",
+      "explanation": "That is the policy's scope list verbatim in substance — spanning protocol design flaws through implementation bugs to isolation failures.",
+      "tags": [
+        "security-policy",
+        "scope"
+      ]
+    },
+    {
+      "id": "ch16-q15",
+      "chapter": 16,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "What does the Security Interest Group do — and which security topics does it explicitly NOT own?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "It owns every security topic in the project"
+        },
+        {
+          "letter": "B",
+          "text": "It discusses MCP-specific threats, reviews security-relevant proposals, and routes disclosure questions; but OAuth flow mechanics belong to the Authorization IG, TLS/mTLS to the Transports WG, tool-annotation design to the Tool Annotations IG, and registry service operation to the Registry WG"
+        },
+        {
+          "letter": "C",
+          "text": "It only writes CVE descriptions"
+        },
+        {
+          "letter": "D",
+          "text": "It audits third-party servers for a fee"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The SIG charter is deliberately scoped: cross-cutting threat discussion, proposal review, and disclosure routing (a known contact for reporters who can't reach the right maintainer) — with adjacent domains delegated to their own groups.",
+      "tags": [
+        "security-policy",
+        "interest-groups",
+        "charter"
+      ]
+    }
+  ]
+}

@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 9,
     "chapterName": "MCP Inspector",
-    "questionCount": 20
+    "questionCount": 24
   },
   "questions": [
     {
@@ -645,6 +645,135 @@
         "inspector",
         "tui",
         "flags"
+      ]
+    },
+    {
+      "id": "ch9-q21",
+      "chapter": 9,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What is the key difference between the Inspector's --catalog and --config flags?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "--catalog is CLI-only; --config is web-only"
+        },
+        {
+          "letter": "B",
+          "text": "--catalog is the Inspector's own writable server list (default ~/.mcp-inspector/mcp.json, created and seeded if missing); --config is read-only, never written or seeded, and errors if the file is missing - and the two are mutually exclusive"
+        },
+        {
+          "letter": "C",
+          "text": "--config supports HTTP servers; --catalog supports only stdio"
+        },
+        {
+          "letter": "D",
+          "text": "They are aliases for the same behavior"
+        }
+      ],
+      "answer": "B",
+      "explanation": "--catalog = your working set (web-editable, seeded with samples in the web client, empty {} for CLI/TUI). --config = a read-only session against a file you did not write, guaranteed untouched. Passing both is rejected by all three clients. (Inspector docs, Configuration and flags.)",
+      "tags": [
+        "inspector",
+        "catalog",
+        "config"
+      ]
+    },
+    {
+      "id": "ch9-q22",
+      "chapter": 9,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "An Inspector CLI run in CI exits with code 3. Another exits with code 5. What happened?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "3 = server unreachable; 5 = usage error"
+        },
+        {
+          "letter": "B",
+          "text": "3 = server requires authentication (401/403, OAuth); 5 = tools/call returned isError: true or the tool was not found"
+        },
+        {
+          "letter": "C",
+          "text": "3 = no MCP App on the tool; 5 = success with warnings"
+        },
+        {
+          "letter": "D",
+          "text": "3 = timeout; 5 = malformed catalog"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Exit codes: 0 success, 1 usage/unexpected, 2 no MCP App (--app-info), 3 auth required, 4 server unreachable, 5 tool error/not found. Each non-zero exit also writes one JSON error line to stderr for branching. (Inspector docs, CLI client.)",
+      "tags": [
+        "inspector",
+        "cli",
+        "exit-codes"
+      ]
+    },
+    {
+      "id": "ch9-q23",
+      "chapter": 9,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which flag makes Inspector CLI authentication predictable in CI, and what does it do?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "--relogin: forces a fresh browser OAuth flow"
+        },
+        {
+          "letter": "B",
+          "text": "--stored-auth-only: never starts interactive OAuth or step-up and never auto-opens a browser; uses tokens from the shared store if present, otherwise fails immediately with auth_required"
+        },
+        {
+          "letter": "C",
+          "text": "--wait-for-auth: blocks for 15 minutes on the callback"
+        },
+        {
+          "letter": "D",
+          "text": "--print-handoff: disables auth entirely"
+        }
+      ],
+      "answer": "B",
+      "explanation": "--stored-auth-only is the CI flag: fail fast instead of hanging on a localhost OAuth callback nobody will complete. --use-stored-auth reuses (and refreshes) tokens the web Inspector already obtained. (Inspector docs, CLI authorization.)",
+      "tags": [
+        "inspector",
+        "cli",
+        "auth",
+        "ci"
+      ]
+    },
+    {
+      "id": "ch9-q24",
+      "chapter": 9,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Why must DANGEROUSLY_OMIT_AUTH never be combined with DANGEROUSLY_BIND_ALL_INTERFACES on the Inspector web backend?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The flags conflict and crash the process"
+        },
+        {
+          "letter": "B",
+          "text": "The backend spawns processes and holds OAuth tokens; removing the session-token check while binding 0.0.0.0 lets anyone who can reach the port drive it - effectively remote code execution plus token theft"
+        },
+        {
+          "letter": "C",
+          "text": "It disables the MCP Apps sandbox port"
+        },
+        {
+          "letter": "D",
+          "text": "It breaks the ALLOWED_ORIGINS allow-list"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Individually each flag has narrow uses; together they expose an unauthenticated process-spawning, token-holding backend to the network. Relatedly, the OAuth callback URL must stay on loopback (default 127.0.0.1:6276) because the code arrives over plaintext http; the web UI defaults to port 6274. (Inspector docs, Configuration and flags.)",
+      "tags": [
+        "inspector",
+        "security",
+        "environment-variables"
       ]
     }
   ]

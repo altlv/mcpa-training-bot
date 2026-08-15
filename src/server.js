@@ -1,33 +1,60 @@
 // src/server.js
 // This is our Express server - the heart of our MCPA Training Bot!
 
-// Step 1: Import Express
-// require() is how Node.js loads modules
-// We're importing the express package we just installed
 const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
+const yaml = require('js-yaml');
+const swaggerUi = require('swagger-ui-express');
+const questionService = require('./services/questionService');
+const quizRoutes = require('./routes/quiz');
 
-// Step 2: Create an Express application
-// app is our server object - we use it to define routes and settings
+// Create Express application
 const app = express();
-
-// Step 3: Define the port
-// process.env.PORT allows hosting services to set the port
-// We default to 3000 for local development
 const PORT = process.env.PORT || 3000;
 
-// Step 4: Define a route
-// When someone visits http://localhost:3000/, this function runs
-// req = request (what the client sent)
-// res = response (what we send back)
+// Load OpenAPI spec
+const openapiPath = __dirname + '/../docs/openapi.yaml';
+const openapiSpec = yaml.load(fs.readFileSync(openapiPath, 'utf8'));
+
+// Middleware
+app.use(cors()); // Enable CORS for frontend
+app.use(express.json()); // Parse JSON bodies
+app.use(express.static('public')); // Serve static files from public/
+
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'MCPA Training Bot API Docs'
+}));
+
+// Load questions on startup
+console.log('🚀 Starting MCPA Training Bot...\n');
+const stats = questionService.loadQuestions();
+console.log(`📊 Database: ${stats.totalQuestions} questions, ${stats.totalTags} tags\n`);
+
+// Routes
+app.use('/api', quizRoutes); // Mount quiz routes
+
+// Root route
 app.get('/', (req, res) => {
-  res.send('🤖 MCPA Training Bot is running! Day 1 complete!');
+  res.json({
+    name: 'MCPA Training Bot API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      tags: '/api/tags',
+      startQuiz: 'POST /api/quiz/start',
+      submitQuiz: 'POST /api/quiz/submit',
+      getQuestion: 'GET /api/questions/:id'
+    }
+  });
 });
 
-// Step 5: Start the server
-// app.listen() starts the server and listens for connections
-// The callback function runs once the server is ready
+// Start server
 app.listen(PORT, () => {
-  console.log(`✅ Server is running on http://localhost:${PORT}`);
-  console.log(`📚 MCPA Training Bot - Day 1`);
-  console.log(`💡 Press Ctrl+C to stop the server`);
+  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`📚 API available at http://localhost:${PORT}/api`);
+  console.log(`💡 Press Ctrl+C to stop\n`);
 });

@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 12,
     "chapterName": "Transports & Protocol Utilities",
-    "questionCount": 15
+    "questionCount": 20
   },
   "questions": [
     {
@@ -484,6 +484,166 @@
       "tags": [
         "utilities",
         "cancellation"
+      ]
+    },
+    {
+      "id": "ch12-q16",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Under SEP-2243, which Streamable HTTP POST messages must carry the Mcp-Method header, and why does it exist?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Only tools/call; it enables retries"
+        },
+        {
+          "letter": "B",
+          "text": "All requests AND notifications; it lets load balancers, gateways, and WAFs route and apply policy without parsing (or even decrypting) the JSON body"
+        },
+        {
+          "letter": "C",
+          "text": "Only requests with an id; notifications are exempt"
+        },
+        {
+          "letter": "D",
+          "text": "Only requests to legacy servers"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Mcp-Method mirrors the JSON-RPC method for every POST, including notifications, so intermediaries avoid deep packet inspection. Mcp-Name additionally accompanies tools/call, resources/read, and prompts/get. (SEP-2243, Standard Headers.)",
+      "tags": [
+        "http-headers",
+        "sep-2243",
+        "transports"
+      ]
+    },
+    {
+      "id": "ch12-q17",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What value does the Mcp-Name header carry for each of tools/call, resources/read, and prompts/get?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "params.name for tools/call and prompts/get, and params.uri for resources/read"
+        },
+        {
+          "letter": "B",
+          "text": "params.uri for all three"
+        },
+        {
+          "letter": "C",
+          "text": "The server's registry name"
+        },
+        {
+          "letter": "D",
+          "text": "The JSON-RPC id"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Mcp-Name mirrors the target's identifier: the tool name, the resource URI, or the prompt name. It is required on exactly those three request types. (SEP-2243, Standard Headers table.)",
+      "tags": [
+        "http-headers",
+        "sep-2243"
+      ]
+    },
+    {
+      "id": "ch12-q18",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "A gateway routes on Mcp-Name: tenant-a while the body actually calls a tool for tenant-b. How must a body-processing server respond, and what attack does this rule block?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Honor the body silently - headers are advisory"
+        },
+        {
+          "letter": "B",
+          "text": "Reject with HTTP 400 and JSON-RPC HeaderMismatch (-32020 in the final spec; originally numbered -32001 in the SEP), preventing header spoofing that routes around security policy while executing a different operation"
+        },
+        {
+          "letter": "C",
+          "text": "Return 403 insufficient_scope"
+        },
+        {
+          "letter": "D",
+          "text": "Strip the header and forward downstream"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Any component that processes the body MUST validate headers against body values and reject mismatches with 400 + HeaderMismatch. Otherwise a malicious client could evade region routing, tenant rate limits, or WAF policy. Note the renumbering: -32001 -> -32020. (SEP-2243 server behavior + changelog minor change 12.)",
+      "tags": [
+        "http-headers",
+        "sep-2243",
+        "error-codes",
+        "spoofing"
+      ]
+    },
+    {
+      "id": "ch12-q19",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which x-mcp-header rule set is correct for custom Mcp-Param-* headers?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Any JSON type may be mirrored, including objects"
+        },
+        {
+          "letter": "B",
+          "text": "Only primitive types (string, integer, boolean - explicitly NOT number); values must be case-insensitively unique in the schema; clients MUST reject violating tool definitions by excluding that tool from tools/list; sensitive parameters SHOULD NOT be marked since headers are visible to intermediaries"
+        },
+        {
+          "letter": "C",
+          "text": "Only top-level required parameters may be mirrored"
+        },
+        {
+          "letter": "D",
+          "text": "The feature is optional for clients but mandatory for servers"
+        }
+      ],
+      "answer": "B",
+      "explanation": "x-mcp-header is limited to primitives (number is excluded; integers within the JS safe range), names must be unique case-insensitively and match HTTP token syntax, invalid definitions cause the client to drop that one tool (not the whole list), and passwords/API keys/PII should never be mirrored. Servers MAY use the feature; clients MUST support it. (SEP-2243, custom headers.)",
+      "tags": [
+        "http-headers",
+        "sep-2243",
+        "x-mcp-header"
+      ]
+    },
+    {
+      "id": "ch12-q20",
+      "chapter": 12,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "A tool argument value is \"Hello, 世界\". How does the client transmit it in an Mcp-Param-* header?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "As-is - HTTP headers accept UTF-8"
+        },
+        {
+          "letter": "B",
+          "text": "Base64-encoded with the sentinel wrapper, e.g. Mcp-Param-Greeting: =?base64?...?=, because non-ASCII values (like leading/trailing whitespace or control characters) cannot ride as plain header values"
+        },
+        {
+          "letter": "C",
+          "text": "URL-encoded with %XX escapes"
+        },
+        {
+          "letter": "D",
+          "text": "The header is silently omitted"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Values with non-ASCII characters, leading/trailing whitespace, or control characters MUST be Base64-encoded and wrapped in the case-sensitive =?base64?...?= sentinel. Plain ASCII values like us-west1 travel readably. Header names are case-insensitive; method values are case-sensitive. (SEP-2243, Value Encoding.)",
+      "tags": [
+        "http-headers",
+        "sep-2243",
+        "encoding"
       ]
     }
   ]

@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 4,
     "chapterName": "Client Concepts (Elicitation, Roots, Sampling)",
-    "questionCount": 15
+    "questionCount": 27
   },
   "questions": [
     {
@@ -481,6 +481,380 @@
         "client-concepts",
         "sampling",
         "capabilities"
+      ]
+    },
+    {
+      "id": "ch4-q16",
+      "chapter": 4,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Put the MRTR flow in the correct order: (1) server returns InputRequiredResult, (2) client sends the initial request, (3) server returns a complete result, (4) client retries the original request with inputResponses and echoed requestState, (5) client gathers input from the user.",
+      "options": [
+        {
+          "letter": "A",
+          "text": "2, 1, 5, 4, 3"
+        },
+        {
+          "letter": "B",
+          "text": "1, 2, 5, 4, 3"
+        },
+        {
+          "letter": "C",
+          "text": "2, 5, 1, 4, 3"
+        },
+        {
+          "letter": "D",
+          "text": "2, 1, 4, 5, 3"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Client sends the request; server answers resultType \"input_required\" with inputRequests and requestState; client gathers the answers; client retries the original request with inputResponses plus the echoed requestState; server completes. (Spec basic/patterns/mrtr.)",
+      "tags": [
+        "mrtr",
+        "flow"
+      ]
+    },
+    {
+      "id": "ch4-q17",
+      "chapter": 4,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "On which client requests MAY a server return an InputRequiredResult?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Any request, including tools/list and server/discover"
+        },
+        {
+          "letter": "B",
+          "text": "Only tools/call"
+        },
+        {
+          "letter": "C",
+          "text": "prompts/get, resources/read, and tools/call - and servers MUST NOT send it on any other request"
+        },
+        {
+          "letter": "D",
+          "text": "Only requests sent over Streamable HTTP"
+        }
+      ],
+      "answer": "C",
+      "explanation": "The MRTR supported-requests table lists exactly prompts/get, resources/read, and tools/call. InputRequiredResult on anything else is a protocol violation. (Spec basic/patterns/mrtr, Supported Requests.)",
+      "tags": [
+        "mrtr",
+        "supported-requests"
+      ]
+    },
+    {
+      "id": "ch4-q18",
+      "chapter": 4,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What kinds of request objects may appear as values in an InputRequiredResult's inputRequests map?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "ElicitRequest, CreateMessageRequest (sampling), or ListRootsRequest"
+        },
+        {
+          "letter": "B",
+          "text": "Any JSON-RPC request the server defines"
+        },
+        {
+          "letter": "C",
+          "text": "Only ElicitRequest, since sampling and roots are removed"
+        },
+        {
+          "letter": "D",
+          "text": "tools/call requests aimed back at the client"
+        }
+      ],
+      "answer": "A",
+      "explanation": "inputRequests values MUST be one of ElicitRequest, CreateMessageRequest, or ListRootsRequest, keyed by server-assigned identifiers unique within the request. Sampling and roots are deprecated but still ride MRTR during the deprecation window - a favorite trap. (Spec basic/patterns/mrtr.)",
+      "tags": [
+        "mrtr",
+        "input-requests"
+      ]
+    },
+    {
+      "id": "ch4-q19",
+      "chapter": 4,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which client behavior around requestState is compliant?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Base64-decode requestState to pre-fill the elicitation form"
+        },
+        {
+          "letter": "B",
+          "text": "Echo the exact requestState value on the retry, without inspecting, parsing, or modifying it - and omit it entirely if the server sent none"
+        },
+        {
+          "letter": "C",
+          "text": "Attach the requestState to a parallel tools/call to reuse the server's context"
+        },
+        {
+          "letter": "D",
+          "text": "Cache requestState and reuse it for future unrelated requests to skip prompts"
+        }
+      ],
+      "answer": "B",
+      "explanation": "requestState is opaque to clients: they MUST NOT inspect, parse, modify, or assume anything about it; MUST echo it exactly on the retry; MUST NOT include one if none was given; and MUST NOT use it for any other request. (Spec basic/patterns/mrtr, client requirements.)",
+      "tags": [
+        "mrtr",
+        "request-state"
+      ]
+    },
+    {
+      "id": "ch4-q20",
+      "chapter": 4,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "When a client retries the original request in an MRTR flow, what must be true of the JSON-RPC id?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "It must be identical to the initial request's id so the server can correlate them"
+        },
+        {
+          "letter": "B",
+          "text": "It must be null to mark it as a retry"
+        },
+        {
+          "letter": "C",
+          "text": "It must be different from the initial request's id - the retry is an independent request"
+        },
+        {
+          "letter": "D",
+          "text": "It must be the requestState value"
+        }
+      ],
+      "answer": "C",
+      "explanation": "The initial request and the retry are completely independent requests, so the retry MUST use a different id. Correlation happens through the echoed requestState, not the JSON-RPC id. (Spec basic/patterns/mrtr, client requirements.)",
+      "tags": [
+        "mrtr",
+        "json-rpc"
+      ]
+    },
+    {
+      "id": "ch4-q21",
+      "chapter": 4,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "A server wants to return an InputRequiredResult that contains neither inputRequests nor requestState. Is that allowed?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Yes - both fields are optional"
+        },
+        {
+          "letter": "B",
+          "text": "No - every InputRequiredResult MUST include at least one of inputRequests or requestState"
+        },
+        {
+          "letter": "C",
+          "text": "Yes, but only on prompts/get"
+        },
+        {
+          "letter": "D",
+          "text": "No - both fields are always required together"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Each field is individually optional, but the spec requires at least one of them in every InputRequiredResult; an empty one would give the client nothing to act on. (Spec basic/patterns/mrtr, server requirement 6.)",
+      "tags": [
+        "mrtr",
+        "input-required-result"
+      ]
+    },
+    {
+      "id": "ch4-q22",
+      "chapter": 4,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "A client's per-request capabilities do not declare elicitation. The server still needs user input to finish a tools/call. What may the server do?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Include an elicitation/create entry in inputRequests anyway - the client will figure it out"
+        },
+        {
+          "letter": "B",
+          "text": "Fall back to a server-initiated elicitation/create request over the same stream"
+        },
+        {
+          "letter": "C",
+          "text": "It MUST NOT include elicitation requests in inputRequests for that client; it can fail the request or complete without that input"
+        },
+        {
+          "letter": "D",
+          "text": "Return resultType \"task\" to force the input later"
+        }
+      ],
+      "answer": "C",
+      "explanation": "Servers MUST NOT send an inputRequests entry the client has not declared support for. Server-initiated requests no longer exist in the modern era, so the server must handle the request without elicitation or fail it. (Spec basic/patterns/mrtr, server requirement 7.)",
+      "tags": [
+        "mrtr",
+        "capabilities"
+      ]
+    },
+    {
+      "id": "ch4-q23",
+      "chapter": 4,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "requestState passes through the client on every MRTR retry. What does the spec require of servers when this state influences authorization or business logic?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Nothing - clients are trusted to echo it faithfully"
+        },
+        {
+          "letter": "B",
+          "text": "Treat it as attacker-controlled input: protect its integrity (e.g., HMAC or AEAD) and reject state that fails verification; bind principal, TTL, and originating request inside the protected payload to bound replay"
+        },
+        {
+          "letter": "C",
+          "text": "Encrypt it with the client's public key"
+        },
+        {
+          "letter": "D",
+          "text": "Store a copy server-side and compare on retry"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Servers MUST treat requestState as attacker-controlled. If it affects authorization, resource access, or business logic they MUST integrity-protect it and reject failures; they SHOULD embed the authenticated principal, a short TTL, and an identifier of the originating request. Single-use invariants still need server-side enforcement. (Spec basic/patterns/mrtr, server requirements 4-5.)",
+      "tags": [
+        "mrtr",
+        "request-state",
+        "security"
+      ]
+    },
+    {
+      "id": "ch4-q24",
+      "chapter": 4,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "A client's retry omits one of the answers the server asked for, and the server cannot proceed without it. What SHOULD the server do?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Return -32602 Invalid params"
+        },
+        {
+          "letter": "B",
+          "text": "Return a new InputRequiredResult requesting the missing information again"
+        },
+        {
+          "letter": "C",
+          "text": "Complete the request with default values"
+        },
+        {
+          "letter": "D",
+          "text": "Close the connection to reset the flow"
+        }
+      ],
+      "answer": "B",
+      "explanation": "If necessary information is missing, the server SHOULD respond with a fresh InputRequiredResult re-requesting it rather than erroring; unexpected extra fields in InputResponses are simply ignored. Servers may loop like this across multiple attempts. (Spec basic/patterns/mrtr, error handling.)",
+      "tags": [
+        "mrtr",
+        "error-handling"
+      ]
+    },
+    {
+      "id": "ch4-q25",
+      "chapter": 4,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Why does MRTR let stateless server fleets handle elicitation without sticky routing or shared storage?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Load balancers pin MRTR retries to the original instance via a cookie"
+        },
+        {
+          "letter": "B",
+          "text": "The server encodes everything it needs into requestState, which the client echoes back - so any instance can reconstitute the state from the retry alone"
+        },
+        {
+          "letter": "C",
+          "text": "The client stores the server's internal state in localStorage"
+        },
+        {
+          "letter": "D",
+          "text": "MRTR requires a Redis-compatible shared cache"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The retry is self-contained: the instance handling it needs nothing beyond the request itself, because the prior context travels in the opaque requestState. That removes shared-storage and stateful load-balancing requirements. (Spec basic/patterns/mrtr, basic workflow.)",
+      "tags": [
+        "mrtr",
+        "statelessness",
+        "scaling"
+      ]
+    },
+    {
+      "id": "ch4-q26",
+      "chapter": 4,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "An InputRequiredResult arrives carrying only requestState and no inputRequests. What may the client do?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Treat it as a protocol error"
+        },
+        {
+          "letter": "B",
+          "text": "Retry the original request immediately, echoing the requestState"
+        },
+        {
+          "letter": "C",
+          "text": "Prompt the user with a generic form"
+        },
+        {
+          "letter": "D",
+          "text": "Send tasks/get to fetch the pending questions"
+        }
+      ],
+      "answer": "B",
+      "explanation": "If inputRequests is absent the client MAY retry the original request immediately (with the echoed requestState). Only when inputRequests is present must the client construct the requested inputs first. (Spec basic/patterns/mrtr, client requirement 1.)",
+      "tags": [
+        "mrtr",
+        "flow"
+      ]
+    },
+    {
+      "id": "ch4-q27",
+      "chapter": 4,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Which resultType value marks an MRTR interim result?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "\"pending\""
+        },
+        {
+          "letter": "B",
+          "text": "\"input_required\""
+        },
+        {
+          "letter": "C",
+          "text": "\"task\""
+        },
+        {
+          "letter": "D",
+          "text": "\"incomplete\""
+        }
+      ],
+      "answer": "B",
+      "explanation": "An InputRequiredResult is identified by resultType \"input_required\". \"complete\" is a normal final result and \"task\" belongs to the Tasks extension. (Spec basic/index, ResultType.)",
+      "tags": [
+        "mrtr",
+        "result-type"
       ]
     }
   ]

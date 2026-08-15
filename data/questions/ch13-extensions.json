@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 13,
     "chapterName": "Extensions (MCP Apps, Tasks, Auth Extensions)",
-    "questionCount": 15
+    "questionCount": 19
   },
   "questions": [
     {
@@ -483,6 +483,135 @@
         "extensions",
         "ecosystem",
         "client-matrix"
+      ]
+    },
+    {
+      "id": "ch13-q16",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "How is the Tasks extension negotiated in the modern protocol?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "It is on by default for tools/call"
+        },
+        {
+          "letter": "B",
+          "text": "The client includes io.modelcontextprotocol/tasks under extensions in its per-request clientCapabilities; the server advertises the same extension in its server/discover capabilities - and a server must never return a task to a client that did not declare support"
+        },
+        {
+          "letter": "C",
+          "text": "The server sends notifications/tasks/offer once per connection"
+        },
+        {
+          "letter": "D",
+          "text": "The host enables it in claude_desktop_config.json"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Extensions are opt-in on both sides. The server decides per-request whether to create a task (no per-request client flag needed), but only for clients that declared the extension capability. (Tasks extension overview.)",
+      "tags": [
+        "extensions",
+        "tasks",
+        "negotiation"
+      ]
+    },
+    {
+      "id": "ch13-q17",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which task methods exist in the redesigned io.modelcontextprotocol/tasks extension, and which were removed?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "tasks/get, tasks/update, tasks/cancel exist; tasks/list was removed and the blocking tasks/result was replaced by polling tasks/get"
+        },
+        {
+          "letter": "B",
+          "text": "tasks/list, tasks/get, tasks/result exist; tasks/cancel was removed"
+        },
+        {
+          "letter": "C",
+          "text": "Only tasks/get exists"
+        },
+        {
+          "letter": "D",
+          "text": "tasks/get, tasks/result, tasks/update exist; tasks/cancel was removed"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The 2026-07-28 redesign removed tasks/list, replaced blocking tasks/result with tasks/get polling, and added tasks/update for client-to-server input. Trap 8: tasks/list and tasks/result do NOT exist. (Changelog major change 6; Tasks extension.)",
+      "tags": [
+        "extensions",
+        "tasks",
+        "methods"
+      ]
+    },
+    {
+      "id": "ch13-q18",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Which task statuses are terminal?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "working and input_required"
+        },
+        {
+          "letter": "B",
+          "text": "completed, failed, and cancelled"
+        },
+        {
+          "letter": "C",
+          "text": "completed only"
+        },
+        {
+          "letter": "D",
+          "text": "cancelled and input_required"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Once a task reaches completed, failed, or cancelled its state never changes. working and input_required are transient. Cancellation is cooperative, so a cancelled request may still finish in another terminal state. (Tasks extension, task lifecycle.)",
+      "tags": [
+        "extensions",
+        "tasks",
+        "lifecycle"
+      ]
+    },
+    {
+      "id": "ch13-q19",
+      "chapter": 13,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "A polled task reports status input_required. How does the client supply the requested information?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "It retries the original tools/call with inputResponses, exactly like core MRTR"
+        },
+        {
+          "letter": "B",
+          "text": "It reads the inputRequests map from the tasks/get response and submits the answers via tasks/update (the server acks and ignores unknown or already-satisfied keys)"
+        },
+        {
+          "letter": "C",
+          "text": "It opens a second connection for a server-initiated elicitation"
+        },
+        {
+          "letter": "D",
+          "text": "It cancels and recreates the task with the answers inline"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Tasks handle mid-flight input through tasks/update rather than retrying the original request - the durable taskId already anchors the state. Servers can also push full task state via notifications/tasks over subscriptions/listen, replacing polls. (Tasks extension, implementation guide.)",
+      "tags": [
+        "extensions",
+        "tasks",
+        "input-required",
+        "mrtr"
       ]
     }
   ]

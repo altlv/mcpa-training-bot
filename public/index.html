@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MCPA Training Bot - Practice for the MCP Associate Certification">
+  <title>MCPA Training Bot - Quiz Interface</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div>
+        <h1 class="header-title">MCPA Training Bot</h1>
+        <p class="header-subtitle">Model Context Protocol Associate Certification Prep</p>
+      </div>
+    </div>
+  </header>
+  
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container">
+      
+      <!-- Loading Container -->
+      <div id="loading-container" class="loading-container hidden">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading...</div>
+      </div>
+      
+      <!-- Resume Dialog -->
+      <div id="resume-dialog" class="card hidden">
+        <div class="card-header">
+          <h2 class="card-title">Resume Quiz?</h2>
+        </div>
+        <p>You have a quiz in progress. Would you like to resume?</p>
+        <div style="display: flex; gap: var(--spacing-md); margin-top: var(--spacing-lg);">
+          <button id="resume-yes-btn" class="btn btn-primary">Yes, Resume</button>
+          <button id="resume-no-btn" class="btn btn-secondary">No, Start New</button>
+        </div>
+      </div>
+      
+      <!-- Screen 1: Tag Selection -->
+      <div id="tag-selection-screen" class="card fade-in">
+        <div class="card-header">
+          <h2 class="card-title">Select Topics</h2>
+        </div>
+        
+        <p>Choose the topics you want to practice. You can select multiple topics.</p>
+        
+        <div class="tags-container" id="tags-container">
+          <!-- Tags will be loaded here -->
+        </div>
+        
+        <div class="tags-actions">
+          <button id="select-all-btn" class="btn btn-sm btn-outline">Select All</button>
+          <button id="deselect-all-btn" class="btn btn-sm btn-outline">Deselect All</button>
+        </div>
+        
+        <div class="selected-count" id="selected-count">0 tags selected</div>
+        
+        <div class="form-group" style="margin-top: var(--spacing-lg);">
+          <label class="form-label" for="question-count">Number of Questions</label>
+          <select id="question-count" class="form-select">
+            <option value="20">Up to 20</option>
+            <option value="50">Up to 50</option>
+            <option value="all" selected>All available</option>
+          </select>
+        </div>
+        
+        <button id="start-quiz-btn" class="btn btn-primary btn-lg" disabled>
+          Start Quiz
+        </button>
+      </div>
+      
+      <!-- Screen 2: Quiz -->
+      <div id="quiz-screen" class="hidden">
+        <!-- Quiz Header -->
+        <div class="quiz-header">
+          <div class="quiz-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+            <span class="progress-text" id="progress-text">Question 1 of 10</span>
+          </div>
+          <div class="quiz-timer" id="quiz-timer">00:00</div>
+        </div>
+        
+        <!-- Question Card -->
+        <div class="question-card">
+          <div class="question-meta" id="question-meta">
+            <!-- Difficulty and type badges -->
+          </div>
+          
+          <div class="question-text" id="question-text">
+            <!-- Question text -->
+          </div>
+          
+          <div class="question-instruction" id="question-instruction">
+            <!-- Instructions -->
+          </div>
+          
+          <div class="options-container" id="options-container">
+            <!-- Options will be rendered here -->
+          </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="quiz-navigation">
+          <div class="quiz-nav-left">
+            <button id="prev-btn" class="btn btn-secondary">
+              ← Previous
+            </button>
+            <button id="skip-btn" class="btn btn-outline">
+              Skip
+            </button>
+          </div>
+          <div class="quiz-nav-right">
+            <button id="next-btn" class="btn btn-primary">
+              Next →
+            </button>
+            <button id="submit-btn" class="btn btn-success btn-lg hidden">
+              Submit Quiz
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Screen 3: Summary -->
+      <div id="summary-screen" class="hidden">
+        <div class="card summary-card fade-in">
+          <h2>Quiz Complete!</h2>
+          
+          <div class="score-display">
+            <div class="score-circle">
+              <span class="score-percentage" id="score-percentage">0%</span>
+              <span class="score-label">Score</span>
+            </div>
+            
+            <div class="score-details">
+              <p>
+                You answered <strong id="score-correct">0</strong> out of 
+                <strong id="score-total">0</strong> questions correctly
+              </p>
+              <p>Time: <strong id="score-time">00:00</strong></p>
+            </div>
+          </div>
+          
+          <div class="results-list" id="results-list">
+            <!-- Results will be rendered here -->
+          </div>
+          
+          <div style="margin-top: var(--spacing-xl);">
+            <button onclick="location.reload()" class="btn btn-primary btn-lg">
+              Take Another Quiz
+            </button>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </main>
+  
+  <!-- Footer -->
+  <footer style="background: var(--bg-tertiary); padding: var(--spacing-lg) 0; text-align: center; color: var(--text-secondary); font-size: var(--font-size-small);">
+    <div class="container">
+      <p>MCPA Training Bot © 2026 | Practice for MCP Associate Certification</p>
+      <p>Built with ❤️ for the MCP Community</p>
+    </div>
+  </footer>
+  
+  <!-- Scripts -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

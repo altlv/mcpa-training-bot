@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 8,
     "chapterName": "Security & Trust",
-    "questionCount": 17
+    "questionCount": 27
   },
   "questions": [
     {
@@ -547,6 +547,326 @@
         "audience",
         "tokens",
         "scenario"
+      ]
+    },
+    {
+      "id": "ch8-q18",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which combination of conditions makes an MCP proxy server vulnerable to the confused deputy attack?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "PKCE enabled + short-lived tokens + refresh rotation"
+        },
+        {
+          "letter": "B",
+          "text": "Static client ID at the third-party AS + dynamic client registration for MCP clients + a consent cookie set after first authorization + no per-client consent at the proxy"
+        },
+        {
+          "letter": "C",
+          "text": "Wildcard scopes + long-lived refresh tokens"
+        },
+        {
+          "letter": "D",
+          "text": "stdio transport + unsandboxed subprocesses"
+        }
+      ],
+      "answer": "B",
+      "explanation": "All four conditions together let an attacker register a malicious client with their own redirect_uri, reuse the victim's consent cookie (set for the proxy's static client ID), skip the consent screen, and receive the authorization code. (Security Best Practices, Confused Deputy.)",
+      "tags": [
+        "attack-patterns",
+        "confused-deputy",
+        "oauth"
+      ]
+    },
+    {
+      "id": "ch8-q19",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What is the required mitigation for the confused deputy problem in MCP proxy servers?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Rotate the static client ID daily"
+        },
+        {
+          "letter": "B",
+          "text": "Per-client consent: keep a registry of approved client_id values per user and check it BEFORE forwarding to the third-party authorization flow"
+        },
+        {
+          "letter": "C",
+          "text": "Disable dynamic client registration entirely"
+        },
+        {
+          "letter": "D",
+          "text": "Use longer authorization codes"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Proxies MUST implement per-client consent that runs before the third-party flow, storing decisions bound to the specific client_id - never trusting a consent cookie that reflects a different client. The consent UI must show the client name, scopes, and redirect_uri. (Security Best Practices, Confused Deputy mitigation.)",
+      "tags": [
+        "attack-patterns",
+        "confused-deputy",
+        "consent"
+      ]
+    },
+    {
+      "id": "ch8-q20",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "For an MCP proxy's OAuth flow, when must the state-tracking cookie or session be set, and why?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Before showing the consent screen, so the state survives a refresh"
+        },
+        {
+          "letter": "B",
+          "text": "Immediately before redirecting to the third-party IdP, and only AFTER the user approved consent - otherwise an attacker can bypass the consent screen with a crafted request"
+        },
+        {
+          "letter": "C",
+          "text": "After the token exchange completes"
+        },
+        {
+          "letter": "D",
+          "text": "State cookies are forbidden; use localStorage"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Setting the state cookie before consent approval renders the consent screen ineffective. State values must also be cryptographically random, single-use, short-lived, and validated exactly at the callback. (Security Best Practices, OAuth state parameter validation.)",
+      "tags": [
+        "attack-patterns",
+        "oauth",
+        "state-parameter"
+      ]
+    },
+    {
+      "id": "ch8-q21",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Why is token passthrough forbidden for MCP servers?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "It doubles token size on the wire"
+        },
+        {
+          "letter": "B",
+          "text": "Accepting tokens not issued to the MCP server (wrong audience) breaks OAuth boundaries, bypasses rate limiting and audit controls, and lets the server be used as a proxy for exfiltration - servers MUST NOT accept tokens not explicitly issued for them"
+        },
+        {
+          "letter": "C",
+          "text": "It only works with opaque tokens, not JWTs"
+        },
+        {
+          "letter": "D",
+          "text": "It requires dynamic client registration, which is deprecated"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The two failure dimensions are audience-validation failure and forwarding unvalidated tokens downstream, which creates confused-deputy trust problems, breaks accountability/audit trails, and circumvents security controls. (Security Best Practices, Token Passthrough.)",
+      "tags": [
+        "attack-patterns",
+        "token-passthrough",
+        "aud"
+      ]
+    },
+    {
+      "id": "ch8-q22",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "During OAuth discovery, which attacker-controllable inputs create SSRF risk for an MCP client?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Only the token endpoint URL"
+        },
+        {
+          "letter": "B",
+          "text": "The resource_metadata URL from WWW-Authenticate, the authorization_servers URLs in Protected Resource Metadata, and endpoint URLs in Authorization Server Metadata"
+        },
+        {
+          "letter": "C",
+          "text": "The JSON-RPC id field"
+        },
+        {
+          "letter": "D",
+          "text": "The Mcp-Method header"
+        }
+      ],
+      "answer": "B",
+      "explanation": "A malicious server controls all three discovery inputs and can point them at internal IPs, localhost services, or the 169.254.169.254 cloud metadata endpoint - the client then fetches them. (Security Best Practices, SSRF attack description.)",
+      "tags": [
+        "attack-patterns",
+        "ssrf",
+        "oauth-discovery"
+      ]
+    },
+    {
+      "id": "ch8-q23",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which SSRF mitigation set matches the guidance for server-deployed MCP clients?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Allow http:// everywhere but log each request"
+        },
+        {
+          "letter": "B",
+          "text": "Require HTTPS except loopback during development; block private/reserved ranges (10/8, 172.16/12, 192.168/16, 127/8, 169.254/16 incl. metadata endpoints, fc00::/7, fe80::/10); avoid hand-rolled IP validation; validate redirect hops; consider egress proxies and DNS pinning against TOCTOU"
+        },
+        {
+          "letter": "C",
+          "text": "Resolve DNS once at startup and cache forever"
+        },
+        {
+          "letter": "D",
+          "text": "Only fetch metadata over HTTP/2"
+        }
+      ],
+      "answer": "B",
+      "explanation": "This is the full mitigation list. Manual IP parsing is explicitly discouraged because attackers exploit octal/hex/IPv4-mapped-IPv6 encodings; DNS rebinding creates time-of-check/time-of-use gaps; egress proxies like Smokescreen block internal destinations by design. (Security Best Practices, SSRF mitigation.)",
+      "tags": [
+        "attack-patterns",
+        "ssrf",
+        "mitigations"
+      ]
+    },
+    {
+      "id": "ch8-q24",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "An attacker guesses another user's shopping-cart handle and passes it as a tool argument. What server design defeats this state-handle hijacking?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Treat possession of the handle as proof of identity for speed"
+        },
+        {
+          "letter": "B",
+          "text": "Never treat handle possession as authentication: verify the bearer token on every request, mint non-deterministic random handles, and bind state server-side as <user_id>:<handle> where user_id comes from the verified token"
+        },
+        {
+          "letter": "C",
+          "text": "Use sequential integer handles so collisions are detectable"
+        },
+        {
+          "letter": "D",
+          "text": "Embed the user's password inside the handle"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Servers MUST NOT treat a state handle as authentication and MUST verify all inbound requests. Random, expiring handles plus server-side binding to the authenticated principal mean a guessed handle is useless to another caller. (Security Best Practices, State Handle Hijacking.)",
+      "tags": [
+        "attack-patterns",
+        "state-handles",
+        "statelessness"
+      ]
+    },
+    {
+      "id": "ch8-q25",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "A client offers one-click installation of a local MCP server from a link. Which consent behavior does the spec REQUIRE before executing anything?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Show a spinner while installing to avoid alarming the user"
+        },
+        {
+          "letter": "B",
+          "text": "Display the exact, untruncated command with all arguments, identify it as a potentially dangerous operation that executes code, require explicit approval, and let the user cancel"
+        },
+        {
+          "letter": "C",
+          "text": "Only require consent when the command contains sudo"
+        },
+        {
+          "letter": "D",
+          "text": "Run the command in a VM first and show the output"
+        }
+      ],
+      "answer": "B",
+      "explanation": "These four are the MUSTs for one-click local server configuration. SHOULDs add highlighting dangerous patterns (sudo, rm -rf), warning on sensitive paths, and sandboxing spawned servers. (Security Best Practices, Local MCP Server Compromise.)",
+      "tags": [
+        "attack-patterns",
+        "local-servers",
+        "consent"
+      ]
+    },
+    {
+      "id": "ch8-q26",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "A malicious server returns javascript:alert(document.cookie) as its OAuth authorization URL. Which client rules prevent the resulting XSS/RCE class of attacks?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Open the URL in a private browsing window"
+        },
+        {
+          "letter": "B",
+          "text": "Allow only http(s) schemes (http solely for loopback in development), reject javascript:/data:/file:/vbscript:, and never open URLs via shell commands - use non-shell platform mechanisms"
+        },
+        {
+          "letter": "C",
+          "text": "URL-encode the value before opening it"
+        },
+        {
+          "letter": "D",
+          "text": "Only open URLs shorter than 2048 characters"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Clients MUST validate authorization URL schemes with an allowlist and MUST NOT shell out to open URLs (shell interpretation enables command injection). Combined with a proxy architecture, such XSS can escalate to full RCE via stdio process spawning. (Security Best Practices, OAuth Authorization URL Validation.)",
+      "tags": [
+        "attack-patterns",
+        "url-schemes",
+        "xss"
+      ]
+    },
+    {
+      "id": "ch8-q27",
+      "chapter": 8,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "A client holding scopes [read:files] gets 403 insufficient_scope with scope=\"write:files\" when calling a privileged tool. What should it request when re-authorizing, and why?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Only write:files - minimal privilege means dropping old scopes"
+        },
+        {
+          "letter": "B",
+          "text": "The union of previously requested and newly challenged scopes (read:files write:files), so previously granted permissions are not lost while the server stays stateless about client scope sets"
+        },
+        {
+          "letter": "C",
+          "text": "All scopes in scopes_supported, to avoid future prompts"
+        },
+        {
+          "letter": "D",
+          "text": "An admin scope that implies both"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Scope accumulation is a client-side responsibility: clients SHOULD compute the union of prior and challenged scopes on step-up. Requesting only the new scope loses existing grants; requesting the full catalog is the scope-inflation anti-pattern (wildcards, bundling, publishing everything in scopes_supported). (Security Best Practices, Scope Minimization.)",
+      "tags": [
+        "attack-patterns",
+        "scopes",
+        "step-up"
       ]
     }
   ]

@@ -1,14 +1,16 @@
 # MCPA Exam Cheat Sheet
 ## Fill this in as you study - Review before exam!
 
+> ✅ **Corrected 2026-08-15** against modelcontextprotocol.io spec 2026-07-28 (basic/index, basic/patterns/mrtr, server/discover, changelog, security best practices, Inspector docs, Tasks extension, SEP-2243) and aaif.io. Key fixes: MCP forbids `id: null`; SSRF mitigations are SHOULDs; HeaderMismatch renumbered -32001→-32020; server/discover mandatory for servers but optional for clients; expanded MRTR hard rules + new Traps 11–14.
+
 ---
 
-## EXAM DOMAIN WEIGHTS (study time allocator!)
+## ⭐ EXAM DOMAIN WEIGHTS (study time allocator!)
 
 | Domain | Weight | Maps to Chapters | Question Bank |
 |--------|--------|------------------|---------------|
 | **Interactions & Execution** | **26%** | Server Features, Client Features, Building Servers, Client Best Practices, Debugging | ch3–6, 10 |
-| **Security & Governance** | **24%** | Authorization (OAuth 2.1), Security & Trust, Lifecycle/Changelog | ch7, 8, 15 |
+| **Security & Governance** | **24%** | Authorization (OAuth 2.1), Security & Trust, Lifecycle/Changelog, Governance & Security Policy | ch7, 8, 15, 16 |
 | **Use Cases & Ecosystem** | **20%** | Inspector, Extensions, Registry | ch9, 13, 14 |
 | **MCP Fundamentals** | **16%** | Fundamentals | ch1 |
 | **Architecture & Components** | **14%** | Architecture, JSON-RPC, Transports | ch2, 11, 12 |
@@ -31,7 +33,7 @@
 
 ---
 
-## THE STATELESS CORE (2026-07-28) — HIGHEST-VALUE SECTION
+## 🔥 THE STATELESS CORE (2026-07-28) — HIGHEST-VALUE SECTION
 
 ### What changed (memorize this table!)
 | Old (legacy, ≤2025-11-25) | New (modern, 2026-07-28) |
@@ -47,10 +49,17 @@
 ### Every request MUST carry in `_meta`:
 1. `io.modelcontextprotocol/protocolVersion` (required)
 2. `io.modelcontextprotocol/clientCapabilities` (required)
-3. `io.modelcontextprotocol/clientInfo` (SHOULD)
+3. `io.modelcontextprotocol/clientInfo` (SHOULD — optional!)
+4. `io.modelcontextprotocol/logLevel` (optional — per-request log level)
 
-### `server/discover` (mandatory RPC — replaces handshake discovery)
-Returns: `supportedVersions` · `capabilities` (incl. extensions) · `serverInfo` · `ttlMs` · `cacheScope`
+> ⚠️ Missing a REQUIRED field = malformed request → **-32602 + HTTP 400**.
+> Fields present but a needed *capability* undeclared → **-32021** (`data.requiredCapabilities` lists what's missing). Don't confuse the two!
+> Every *result* SHOULD carry `io.modelcontextprotocol/serverInfo` in its `_meta` — self-reported, display/logging only, NEVER for security decisions.
+
+### `server/discover` (servers MUST implement — clients MAY call)
+Returns: `supportedVersions` · `capabilities` (incl. extensions) · `serverInfo` (in result `_meta`) · optional `instructions` · `ttlMs` + `cacheScope` (cacheable)
+- Clients can skip it entirely and just handle `-32022 UnsupportedProtocolVersion` inline
+- Main uses: present server info in one call · **stdio legacy-vs-modern probe** (no HTTP status to drive fallback)
 
 ### `resultType` (required on EVERY result)
 | Value | Meaning |
@@ -69,6 +78,15 @@ Returns: `supportedVersions` · `capabilities` (incl. extensions) · `serverInfo
 5. Server completes (resultType: "complete")
 ```
 > requestState = server's encoded state, so ANY stateless instance can resume.
+
+### MRTR hard rules (spec MUSTs — trap-heavy!)
+- Only **3 requests** support `InputRequiredResult`: `prompts/get`, `resources/read`, `tools/call` — MUST NOT on anything else
+- Every `InputRequiredResult` MUST include **≥ 1 of** `inputRequests` / `requestState`; if only `requestState`, client MAY retry immediately
+- Retry MUST use a **NEW JSON-RPC id** (independent request — correlation is via requestState, not id)
+- `inputRequests` values = only `ElicitRequest` · `CreateMessageRequest` · `ListRootsRequest`; server MUST NOT send a type the client didn't declare in capabilities
+- Client MUST echo `requestState` exactly — never inspect/parse/modify; omit it if the server sent none; never reuse on other requests
+- Server MUST treat `requestState` as **attacker-controlled**: HMAC/AEAD if it affects authz/business logic; embed principal + short TTL + request digest for replay defense; single-use must be enforced server-side
+- Retry missing requested info → server SHOULD send a **new InputRequiredResult** (re-ask), NOT an error; unknown extra fields are ignored
 
 ---
 
@@ -127,28 +145,34 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 | **stdio** | Client launches the server as a subprocess |
 | **stdio** | Communication via `stdin`/`stdout` (newline-delimited JSON-RPC) |
 | **stdio** | Single shared bidirectional channel |
-| **stdio** |  stdout is protocol-only — log to **stderr** (`print()`/`console.log()` = corruption!) |
+| **stdio** | ⚠️ stdout is protocol-only — log to **stderr** (`print()`/`console.log()` = corruption!) |
 | **stdio** | Best for local, same-machine integrations |
 | **Streamable HTTP** | Server runs as an independent process handling multiple clients |
 | **Streamable HTTP** | Client sends each JSON-RPC message as an HTTP POST |
 | **Streamable HTTP** | Server responds with either a single JSON object or a per-request SSE stream |
 | **Streamable HTTP** | Supports remote/networked deployments |
-| **HTTP+SSE (legacy)** |  DEPRECATED — two-endpoint design replaced by Streamable HTTP (2025-03-26) |
+| **HTTP+SSE (legacy)** | ❌ DEPRECATED — two-endpoint design replaced by Streamable HTTP (2025-03-26) |
 
 ### Required HTTP headers (SEP-2243) — NEW EXAM MATERIAL
 | Header | When | Purpose |
 |--------|------|---------|
-| `Mcp-Method` | **Every request** | Gateway routing without body parsing |
-| `Mcp-Name` | `tools/call`, `resources/read`, `prompts/get` | Names the target |
+| `Mcp-Method` | **Every request AND notification** | Gateway routing without body parsing |
+| `Mcp-Name` | `tools/call` (`params.name`), `resources/read` (`params.uri`), `prompts/get` (`params.name`) | Names the target |
 | `Mcp-Param-*` | Params annotated `x-mcp-header` | Surface arg values to infra |
-| Header ≠ body? | → **400 + HeaderMismatch (-32020)** | Anti-spoofing |
+| Header ≠ body / missing / bad Base64? | → **400 + HeaderMismatch (-32020)** | Anti-spoofing |
 
-### subscriptions/listen (replaces GET endpoint + resources/subscribe)
-- Opt-in types: `toolsListChanged` · `promptsListChanged` · `resourcesListChanged` · `resourceSubscriptions`
-- Server ACKs first: `notifications/subscriptions/acknowledged`
-- `subscriptionId` = the listen request's JSON-RPC id (tags every notification)
-- Delivery = **best-effort** (no replay — poll as backup)
--  `notifications/progress` does NOT ride here — it flows on the originating request's response stream
+- ⚠️ HeaderMismatch was **-32001 in the SEP text** — renumbered to **-32020** in the final spec (distractor alert!)
+- `x-mcp-header`: **primitive types only** — string/integer/boolean, `number` explicitly excluded; names case-insensitively unique; violating tool def → client drops **that one tool** from `tools/list` (not the whole list)
+- Non-ASCII / leading-trailing-space values → Base64 with sentinel `=?base64?...?=` (lowercase, case-sensitive markers)
+- Header **names** case-insensitive; method **values** case-sensitive (`TOOLS/CALL` = reject)
+- Never mark secrets/PII with `x-mcp-header` — headers are visible to every intermediary
+
+### subscriptions/listen (replaces GET endpoint + resources/subscribe/unsubscribe)
+- Long-lived **POST**-response stream; opt-in types: `toolsListChanged` · `promptsListChanged` · `resourcesListChanged` · `resourceSubscriptions`
+- Server acknowledges the subscription, then MUST tag every delivered notification with `io.modelcontextprotocol/subscriptionId` in its `_meta` (correlates to the originating listen request) — *(the exact ack method name / "id = listen request's id" claim is NOT stated in the spec pages — don't bet on it)*
+- Graceful close: server sends the empty `subscriptions/listen` JSON-RPC result before closing; stream drop **without** a result = unexpected disconnect → re-listen
+- Delivery = **best-effort** (no replay — poll as backup); its state is scoped to the *request*, not the connection
+- ⚠️ `notifications/progress` AND `notifications/message` do NOT ride here — they flow only on the originating request's response stream
 
 ### Caching (SEP-2549)
 - `ttlMs` + `cacheScope` (`public`/`private`) required on: `tools/list`, `prompts/list`, `resources/list`, `resources/templates/list`, `resources/read`
@@ -169,7 +193,8 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 ### Rules (MEMORIZE!)
 - `jsonrpc` must be **exactly "2.0"**
 - Response = `result` XOR `error` (never both)
-- Notification = **no id** → server MUST NOT reply (id `null` = discouraged request, NOT a notification)
+- Notification = **no id** → receiver MUST NOT reply
+- ⚠️ **MCP is stricter than base JSON-RPC on ids**: request id MUST be string or integer, **MUST NOT be `null`** (base JSON-RPC only *discourages* null — MCP forbids it), and MUST be unique among the sender's outstanding requests
 - Method names starting `rpc.` = reserved
 - Empty batch `[]` = invalid → single `-32600` error; batch responses arrive in any order, match by id
 
@@ -188,8 +213,11 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 | `-32020` | HeaderMismatch | HTTP headers disagree with body |
 | `-32021` | MissingRequiredClientCapability | Request `_meta` lacks a needed capability |
 | `-32022` | UnsupportedProtocolVersion | `data` field lists supported versions |
-| `-32000..-32019` | Implementation-defined | SDK/app errors (grandfathered) |
-| `-32020..-32099` | **Reserved for MCP spec** | Allocation policy |
+| `-32000..-32019` | Implementation-defined | Grandfathered SDK/app errors — **no NEW codes here** |
+| `-32020..-32099` | **Reserved for MCP spec** | Only spec-defined codes may be emitted |
+
+- `-32002` (old resource-not-found) & `-32042` (old URL-elicitation): modern servers **MUST NOT emit**, but clients **SHOULD still accept** `-32002` from legacy servers
+- New app-specific codes → allocate **outside** the JSON-RPC reserved range (`-32768..-32000`)
 
 ---
 
@@ -246,19 +274,19 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 
 ---
 
-## Client Features (26% domain) —  MOSTLY DEPRECATED IN 2026-07-28!
+## Client Features (26% domain) — ⚠️ MOSTLY DEPRECATED IN 2026-07-28!
 
 | Feature | Purpose | 2026-07-28 Status | Migration |
 |---------|---------|-------------------|-----------|
 | **Elicitation** | Server asks user for input | ✅ **Active** (via MRTR) | — |
-| **Sampling** | Server asks AI to generate | **Deprecated** (SEP-2577) | Direct LLM provider APIs |
-| **Roots** | Filesystem boundaries |  **Deprecated** (SEP-2577) | Tool params / resource URIs / config |
-| **Logging** | `notifications/message` |  **Deprecated** (SEP-2577) | stderr / OpenTelemetry |
+| **Sampling** | Server asks AI to generate | ❌ **Deprecated** (SEP-2577) | Direct LLM provider APIs |
+| **Roots** | Filesystem boundaries | ❌ **Deprecated** (SEP-2577) | Tool params / resource URIs / config |
+| **Logging** | `notifications/message` | ❌ **Deprecated** (SEP-2577) | stderr / OpenTelemetry |
 
 ### Elicitation — two modes (EXAM FAVORITE)
 | Mode | For | Rules |
 |------|-----|-------|
-| **Form** | Ordinary structured data (schema-validated) |  NEVER passwords/API keys/tokens/payment data |
+| **Form** | Ordinary structured data (schema-validated) | ❌ NEVER passwords/API keys/tokens/payment data |
 | **URL** | Credentials, third-party OAuth | Show full URL · explicit consent · NEVER auto-fetch · client learns only consent outcome |
 
 ---
@@ -353,9 +381,9 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 ### Attack patterns (know the mitigation!)
 | Attack | Mitigation |
 |--------|------------|
-| **Confused deputy** | Per-client user consent (never trust cached consent cookie from another client ID) |
-| **Token passthrough** | aud validation; reject same-issuer tokens for other services |
-| **SSRF** | HTTPS-only, block private IPs (10/8, 172.16/12, 192.168/16, **169.254.169.254**), no manual IP parsing, egress proxies |
+| **Confused deputy** | Per-client consent **before** the 3P flow (registry of approved client_ids per user; never trust a consent cookie from another client ID). Vulnerable combo: static client ID + DCR + consent cookie + no per-client consent. OAuth `state`: crypto-random, **set only AFTER consent approval**, single-use, short expiry, exact match at callback |
+| **Token passthrough** | MUST NOT accept tokens not issued **to this server** (aud validation); never forward client tokens downstream |
+| **SSRF** | MUST consider + mitigate; individual mitigations are SHOULDs: HTTPS (http loopback-only in dev), block private/reserved ranges (10/8, 172.16/12, 192.168/16, 127/8, **169.254/16 incl. 169.254.169.254**, `fc00::/7`, `fe80::/10`), no manual IP parsing (octal/hex/IPv6-mapped tricks), validate redirect hops, egress proxies (e.g. Smokescreen), pin DNS vs TOCTOU rebinding. Attacker-controlled inputs: `resource_metadata` (WWW-Authenticate) · `authorization_servers` (PRM) · AS-metadata endpoints |
 | **State-handle hijacking** | Handle ≠ auth! Random handles, bind `user_id:handle`, authorize via token every request |
 | **Malicious one-click config** | MUSTs: show full command · flag as dangerous · explicit approval · cancellable |
 | **URL scheme abuse** | Open only `http(s)://`, never pass to shell, reject `javascript:`/custom schemes |
@@ -370,8 +398,10 @@ Publishing all scopes in `scopes_supported` · wildcard scopes (`*`, `all`) · b
 ### MCP Inspector
 - Launch: `npx @modelcontextprotocol/inspector` (Node **22.19.0+**)
 - Web UI port **6274** (session token in URL) · CLI/TUI OAuth callback **6276**
-- `--catalog` (writable, default `~/.mcp-inspector/mcp.json`) vs `--config` (read-only) — **mutually exclusive!**
-- Protocol era: `auto` | `modern` | `legacy`
+- `--catalog` (writable, default `~/.mcp-inspector/mcp.json`; created + seeded if missing) vs `--config` (read-only, never written/seeded, **errors if file missing**) — **mutually exclusive!**
+- Seeding differs by client: web seeds 2 sample servers · CLI/TUI seed empty `{ "mcpServers": {} }`
+- Per-server `protocolEra` in catalog: default **`legacy`**; `modernLogLevel` default `debug`
+- OAuth callback URL MUST be loopback (`127.0.0.1`/`localhost`, default port 6276) — code arrives over plaintext http, no override flag exists
 - NEVER combine `DANGEROUSLY_OMIT_AUTH` + `DANGEROUSLY_BIND_ALL_INTERFACES`
 - CI: `--stored-auth-only` (fail fast, no interactive OAuth)
 
@@ -389,7 +419,7 @@ Publishing all scopes in `scopes_supported` · wildcard scopes (`*`, `all`) · b
 | Extension | Key facts |
 |-----------|-----------|
 | **MCP Apps** (`io.modelcontextprotocol/ui`) | `ui://` scheme · `text/html;profile=mcp-app` · `_meta.ui.resourceUri` · sandboxed iframe · postMessage JSON-RPC · UI tool calls hit normal consent path |
-| **Tasks** (`io.modelcontextprotocol/tasks`) | `CreateTaskResult` (resultType `"task"`) · poll `tasks/get` · `tasks/update` (input) · `tasks/cancel` (cooperative) · statuses: working, input_required, **completed✓ failed✓ cancelled✓** (✓=terminal) · NO tasks/list or tasks/result! |
+| **Tasks** (`io.modelcontextprotocol/tasks`) | `CreateTaskResult` (resultType `"task"`) · **server decides per-request** whether to return a task (client opts in once via extension capability, never per-call) · poll `tasks/get` (respect `pollIntervalMs`) · mid-flight input via **`tasks/update`** — NOT a retry of the original request (≠ core MRTR!) · `tasks/cancel` (cooperative — may still end non-cancelled) · statuses: working, input_required, **completed✓ failed✓ cancelled✓** (✓=terminal) · NO tasks/list or tasks/result! · optional `notifications/tasks` via subscriptions/listen replaces polling |
 | **Client Credentials** | M2M auth, no user in loop |
 | **EMA** | IdP-managed access, zero-touch SSO, per-group scoping |
 
@@ -403,7 +433,7 @@ Publishing all scopes in `scopes_supported` · wildcard scopes (`*`, `all`) · b
 | PyPI / NuGet | `mcp-name: <server>` in README |
 | Docker/OCI | `io.modelcontextprotocol.server.name` LABEL |
 | MCPB | URL contains "mcp" + `fileSha256` (client-validated) |
--  No private servers (self-host a registry) · consume via **aggregators**, not directly
+- ❌ No private servers (self-host a registry) · consume via **aggregators**, not directly
 
 ---
 
@@ -439,7 +469,7 @@ Publishing all scopes in `scopes_supported` · wildcard scopes (`*`, `all`) · b
 - "Nothing breaks on July 28"
 
 ### Deprecated vs Removed (2026-07-28) — TRAP MATERIAL
-|  Deprecated (still works 12 mo) | 🗑️ Removed (gone in modern era) |
+| ❌ Deprecated (still works 12 mo) | 🗑️ Removed (gone in modern era) |
 |----------------------------------|-------------------------------|
 | Roots, Sampling, Logging | `initialize` handshake, sessions/`Mcp-Session-Id` |
 | HTTP+SSE transport | `ping`, `logging/setLevel`, `notifications/roots/list_changed` |
@@ -465,6 +495,44 @@ Publishing all scopes in `scopes_supported` · wildcard scopes (`*`, `all`) · b
 ### MCP governance
 - Changes via **SEPs** (Specification Enhancement Proposals) — PR-based, sponsored, label-driven status
 - Know the big ones: SEP-2575 (stateless), SEP-2322 (MRTR/resultType), SEP-2577 (deprecations), SEP-2243 (headers), SEP-2596 (lifecycle)
+
+---
+
+## Governance & Security Policy (part of 24% — ch16)
+
+### Legal & licensing
+- Entity: **Model Context Protocol, a Series of LF Projects, LLC**
+- Code + spec contributions: **Apache 2.0** · Docs (excl. specs): **CC BY 4.0**
+- Contributors **retain copyright** (no assignment)
+
+### Governance hierarchy (like Python/PyTorch)
+| Role | Powers |
+|------|--------|
+| **Contributors** | Issues, PRs, discussions |
+| **Maintainers** | Own components (SDKs, docs, WGs), write access |
+| **Core Maintainers** | Project direction; veto Maintainers by majority; appoint/remove Maintainers; bi-weekly meetings (public notes) |
+| **Lead Maintainers (BDFL)** | Veto ANYTHING; appoint/remove Core; must publicly explain reasoning |
+
+- All maintainer tiers = **MCP Steering Group** (Member & Community Moderator sit outside it — see Contributor Ladder)
+- Membership = **individuals, not companies** (no corporate seats, merit-based, no term limit)
+- Everyone (even Leads) uses the **same PR process** as external contributors
+- **Interest Groups** articulate problems · **Working Groups** build solutions (SEPs/implementations) — SEP-1302
+- Governance channel = maintainer Discord; decisions must be recorded transparently
+
+### Security Policy (community/security)
+| Rule | Detail |
+|------|--------|
+| **Report via** | GitHub Security Advisories (**private** reporting) on the affected repo |
+| **NEVER via** | Public issues, discussions, PRs |
+| **CVEs** | GitHub's CNA through the GHSA workflow |
+| **Cross-SDK** | Receiving maintainers coordinate so fixes/advisories ship **together**; spec-level root cause → escalate to spec maintainers |
+| **In scope** | Protocol vulns, authn/z bypass, injection/memory-safety, sandbox escapes, session hijacking, token leakage, cross-tenant access |
+| **OUT of scope** | **stdio peer attacks** (peer-only crash/hang/DoS) — stdio transport is NOT a sandbox; peers share a trust boundary |
+| **Back IN scope** | Same code reachable via a **remote transport**, or causes a **sandbox escape** |
+
+### Security Interest Group (SIG) — owns vs delegates
+- Owns: MCP threat discussion, security proposal review, **disclosure routing**
+- Delegates: OAuth mechanics → Authorization IG · TLS/mTLS → Transports WG · annotation design → Tool Annotations IG · registry ops → Registry WG
 
 ---
 
@@ -503,7 +571,8 @@ Publishing all scopes in `scopes_supported` · wildcard scopes (`*`, `all`) · b
 
 ### Trap 2: Notification vs Request
 - Request expects response (has ID)
-- Notification doesn't (NO id member — `id: null` is NOT a notification!)
+- Notification doesn't (NO id member)
+- `id: null` is NOT a notification — and in MCP it's not a valid request either: **null ids are forbidden** (base JSON-RPC only discourages them)
 
 ### Trap 3: Transport Security
 - stdio = OS-level security (not OAuth)
@@ -530,6 +599,22 @@ Publishing all scopes in `scopes_supported` · wildcard scopes (`*`, `all`) · b
 
 ### Trap 10: Resource not found
 - Now -32602 (Invalid params), NOT -32002!
+- But clients SHOULD still ACCEPT -32002 from legacy servers
+
+### Trap 11: MRTR scope
+- InputRequiredResult is legal ONLY on prompts/get, resources/read, tools/call — never on tools/list, server/discover, etc.
+- The retry gets a NEW JSON-RPC id (correlation via requestState, not id)
+
+### Trap 12: HeaderMismatch numbering
+- SEP-2243 text says -32001; the final spec renumbered it to **-32020** — answer -32020 unless the question explicitly quotes the SEP
+
+### Trap 13: Missing _meta vs missing capability
+- Missing required _meta field → -32602 + HTTP 400
+- _meta present but needed capability undeclared → -32021 (data.requiredCapabilities)
+
+### Trap 14: Tasks input ≠ MRTR retry
+- Core MRTR: answer by RETRYING the original request with inputResponses
+- Tasks extension: answer via tasks/update against the taskId — no retry
 
 ---
 
@@ -549,6 +634,7 @@ Rate yourself 1-5 after studying each topic:
 | Security | 24% | ___/5 | |
 | OAuth 2.1 | 24% | ___/5 | |
 | Versioning & Lifecycle | 24% | ___/5 | |
+| Governance & Security Policy | 24% | ___/5 | |
 | Inspector | 20% | ___/5 | |
 | Extensions | 20% | ___/5 | |
 | Registry | 20% | ___/5 | |
@@ -561,8 +647,8 @@ Rate yourself 1-5 after studying each topic:
 ## Last-Minute Review (Exam Day)
 
 1. **Architecture diagram** - Can you draw it from memory?
-2. **The three required `_meta` fields** - protocolVersion, clientCapabilities, clientInfo?
-3. **MRTR loop** - input_required → inputResponses + requestState → retry?
+2. **`_meta` fields** - REQUIRED: protocolVersion + clientCapabilities (missing → -32602/400); clientInfo is only SHOULD?
+3. **MRTR loop** - input_required → inputResponses + echoed requestState → retry with a NEW id? Only on prompts/get, resources/read, tools/call?
 4. **Control model** - Model→Tools, App→Resources, User→Prompts?
 5. **OAuth flow** - 401 → PRM → AS metadata → PKCE → aud validation?
 6. **401 vs 403 vs 400** - authenticate / step-up scope union / header mismatch?
@@ -570,3 +656,5 @@ Rate yourself 1-5 after studying each topic:
 8. **Deprecated trio** - Roots, Sampling, Logging (12-month window)?
 9. **Task terminal statuses** - completed, failed, cancelled?
 10. **Registry markers** - mcpName / mcp-name / OCI label / fileSha256?
+11. **JSON-RPC id in MCP** - string or int, never null, unique among outstanding requests?
+12. **-32001 vs -32020** - HeaderMismatch is -32020 in the final spec (SEP text said -32001)?

@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 2,
     "chapterName": "Architecture & Components",
-    "questionCount": 19
+    "questionCount": 29
   },
   "questions": [
     {
@@ -609,6 +609,323 @@
         "participants",
         "scenario",
         "hosts"
+      ]
+    },
+    {
+      "id": "ch2-q20",
+      "chapter": 2,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "In the 2026-07-28 revision, what replaced the initialize/notifications/initialized handshake?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A new handshake/start method that must be called once per connection"
+        },
+        {
+          "letter": "B",
+          "text": "Every request carries its protocol version and client capabilities in _meta; server/discover is available for up-front discovery"
+        },
+        {
+          "letter": "C",
+          "text": "An HTTP-only Mcp-Session-Id header that carries the negotiated capabilities"
+        },
+        {
+          "letter": "D",
+          "text": "A TLS extension that embeds the protocol version in the certificate"
+        }
+      ],
+      "answer": "B",
+      "explanation": "SEP-2575 removed the handshake entirely. Each request self-describes via _meta (io.modelcontextprotocol/protocolVersion and clientCapabilities), and clients MAY call server/discover for up-front version/capability discovery. (Spec 2026-07-28 changelog, major change 2-3.)",
+      "tags": [
+        "stateless-core",
+        "meta",
+        "handshake"
+      ]
+    },
+    {
+      "id": "ch2-q21",
+      "chapter": 2,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which _meta fields are REQUIRED on every client request in protocol version 2026-07-28?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "io.modelcontextprotocol/protocolVersion, clientCapabilities, and clientInfo"
+        },
+        {
+          "letter": "B",
+          "text": "io.modelcontextprotocol/protocolVersion and clientCapabilities only"
+        },
+        {
+          "letter": "C",
+          "text": "io.modelcontextprotocol/clientInfo and clientCapabilities only"
+        },
+        {
+          "letter": "D",
+          "text": "io.modelcontextprotocol/protocolVersion only"
+        }
+      ],
+      "answer": "B",
+      "explanation": "protocolVersion and clientCapabilities are required on every request. clientInfo is a SHOULD (recommended but optional), and logLevel is optional. A common trap is treating clientInfo as required. (Spec basic/index, per-request protocol fields table.)",
+      "tags": [
+        "stateless-core",
+        "meta"
+      ]
+    },
+    {
+      "id": "ch2-q22",
+      "chapter": 2,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "A request arrives missing the required io.modelcontextprotocol/clientCapabilities _meta field. What must the server return?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "-32021 MissingRequiredClientCapability"
+        },
+        {
+          "letter": "B",
+          "text": "-32602 Invalid params, and on HTTP a 400 Bad Request status"
+        },
+        {
+          "letter": "C",
+          "text": "-32600 Invalid request, and on HTTP a 401 status"
+        },
+        {
+          "letter": "D",
+          "text": "It should process the request assuming empty capabilities"
+        }
+      ],
+      "answer": "B",
+      "explanation": "A request missing a required _meta field is malformed: the server MUST reject it with -32602 (Invalid params) and HTTP 400. -32021 is different: it applies when the fields are present but a needed capability was not declared. (Spec basic/index.)",
+      "tags": [
+        "stateless-core",
+        "meta",
+        "error-codes"
+      ]
+    },
+    {
+      "id": "ch2-q23",
+      "chapter": 2,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "A client's request includes valid _meta, but processing it requires a capability the client did not declare in clientCapabilities. What does the spec require?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The server proceeds and hopes the client can handle the response"
+        },
+        {
+          "letter": "B",
+          "text": "The server returns -32602 Invalid params"
+        },
+        {
+          "letter": "C",
+          "text": "The server returns MissingRequiredClientCapabilityError (-32021) with data.requiredCapabilities listing what is missing, HTTP 400"
+        },
+        {
+          "letter": "D",
+          "text": "The server silently downgrades to a reduced feature set"
+        }
+      ],
+      "answer": "C",
+      "explanation": "A server MUST NOT rely on capabilities the client has not declared. If a needed capability is absent, it MUST return -32021 with data.requiredCapabilities listing the missing capabilities (HTTP 400). (Spec basic/index.)",
+      "tags": [
+        "stateless-core",
+        "capabilities",
+        "error-codes"
+      ]
+    },
+    {
+      "id": "ch2-q24",
+      "chapter": 2,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which statement about server/discover is correct in 2026-07-28?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Clients MUST call it before any other request"
+        },
+        {
+          "letter": "B",
+          "text": "Servers MUST implement it; clients MAY call it (e.g., for up-front version selection or as a stdio backward-compatibility probe)"
+        },
+        {
+          "letter": "C",
+          "text": "It is optional for servers but mandatory for clients on stdio"
+        },
+        {
+          "letter": "D",
+          "text": "It replaces tools/list, prompts/list, and resources/list"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Servers MUST implement server/discover, but calling it is optional for clients - a client can invoke any RPC inline and handle UnsupportedProtocolVersionError. It is useful for presenting server info in one request and as the stdio legacy-vs-modern probe. (Spec server/discover.)",
+      "tags": [
+        "stateless-core",
+        "discovery"
+      ]
+    },
+    {
+      "id": "ch2-q25",
+      "chapter": 2,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Which set of information does a server/discover result carry?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "supportedVersions, capabilities (including extensions), serverInfo in _meta, optional instructions, plus ttlMs and cacheScope"
+        },
+        {
+          "letter": "B",
+          "text": "Only supportedVersions and a session token"
+        },
+        {
+          "letter": "C",
+          "text": "The complete tools, prompts, and resources catalogs"
+        },
+        {
+          "letter": "D",
+          "text": "The server's OAuth client_id and scopes_supported"
+        }
+      ],
+      "answer": "A",
+      "explanation": "DiscoverResult includes supportedVersions, capabilities, _meta['io.modelcontextprotocol/serverInfo'], and optional instructions; the operation supports caching, so it also carries ttlMs and cacheScope. It does not return full primitive catalogs. (Spec server/discover.)",
+      "tags": [
+        "stateless-core",
+        "discovery",
+        "caching"
+      ]
+    },
+    {
+      "id": "ch2-q26",
+      "chapter": 2,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "A stdio server keeps a long-lived process per client and infers 'this connection already told me its capabilities' from an earlier request. Why does this violate 2026-07-28?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "stdio servers must restart after each request"
+        },
+        {
+          "letter": "B",
+          "text": "Servers MUST NOT rely on prior requests over the same connection for context; an open connection is not a session, and clients may interleave unrelated requests on one transport"
+        },
+        {
+          "letter": "C",
+          "text": "Capabilities may only be transmitted over HTTP headers"
+        },
+        {
+          "letter": "D",
+          "text": "It is allowed, as long as the process was launched by the client"
+        }
+      ],
+      "answer": "B",
+      "explanation": "MCP is stateless: every request supplies its own metadata in _meta, and connection or process identity is explicitly not a proxy for session continuity. Cross-request state must use explicit identifiers passed on each request. (Spec basic/index, Statelessness.)",
+      "tags": [
+        "stateless-core",
+        "statelessness",
+        "stdio"
+      ]
+    },
+    {
+      "id": "ch2-q27",
+      "chapter": 2,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "A Streamable HTTP response stream breaks mid-request in the modern era. What must the client do?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Reconnect with the Last-Event-ID header to resume the stream"
+        },
+        {
+          "letter": "B",
+          "text": "Send notifications/resume with the old request ID"
+        },
+        {
+          "letter": "C",
+          "text": "Re-issue the lost request as a new request with a new request ID"
+        },
+        {
+          "letter": "D",
+          "text": "Wait for the server to replay missed SSE events"
+        }
+      ],
+      "answer": "C",
+      "explanation": "SSE resumability (Last-Event-ID and event IDs) was removed in 2026-07-28. A broken response stream loses the in-flight request; the client MUST re-issue it as a new request with a new ID. (Spec 2026-07-28 changelog, major change 9.)",
+      "tags": [
+        "stateless-core",
+        "transports",
+        "sse"
+      ]
+    },
+    {
+      "id": "ch2-q28",
+      "chapter": 2,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which statement about the resultType field is FALSE under 2026-07-28?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A result with an unrecognized resultType value must be considered invalid by the client"
+        },
+        {
+          "letter": "B",
+          "text": "Clients must treat an absent resultType from an earlier-protocol server as \"complete\""
+        },
+        {
+          "letter": "C",
+          "text": "Extensions may add resultType values, but only ones advertised via capabilities count as supported"
+        },
+        {
+          "letter": "D",
+          "text": "A modern server may omit resultType on small results to save bytes"
+        }
+      ],
+      "answer": "D",
+      "explanation": "Every result MUST include resultType in 2026-07-28 - there is no size exception. The other three statements are the exact spec rules: unrecognized values are invalid, absence from legacy servers means \"complete\", and extensions extend the value set via advertised capabilities. (Spec basic/index, ResultType.)",
+      "tags": [
+        "stateless-core",
+        "result-type"
+      ]
+    },
+    {
+      "id": "ch2-q29",
+      "chapter": 2,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Where does a modern server identify itself, and how much should clients trust that identity?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "In io.modelcontextprotocol/serverInfo within each result's _meta (SHOULD); it is self-reported and must not drive security decisions"
+        },
+        {
+          "letter": "B",
+          "text": "In a signed X-Server-Identity HTTP header that clients MUST verify"
+        },
+        {
+          "letter": "C",
+          "text": "Only in the server/discover response; other results never carry identity"
+        },
+        {
+          "letter": "D",
+          "text": "In the OAuth token's aud claim"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Servers SHOULD include io.modelcontextprotocol/serverInfo in every result's _meta. It is self-reported, intended for display/logging/debugging; implementations SHOULD NOT change behavior or make security decisions based on it. (Spec basic/index, per-response protocol fields.)",
+      "tags": [
+        "stateless-core",
+        "meta",
+        "server-info"
       ]
     }
   ]

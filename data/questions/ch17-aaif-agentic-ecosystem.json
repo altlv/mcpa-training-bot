@@ -1,0 +1,330 @@
+{
+  "meta": {
+    "title": "MCP Question Bank — Chapter 17: AAIF & the Agentic Ecosystem",
+    "protocolVersion": "2026-07-28",
+    "chapter": 17,
+    "chapterName": "AAIF & the Agentic Ecosystem",
+    "questionCount": 10
+  },
+  "questions": [
+    {
+      "id": "ch17-q1",
+      "chapter": 17,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "What is the Agentic AI Foundation (AAIF)?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A commercial marketplace for AI agents"
+        },
+        {
+          "letter": "B",
+          "text": "A vendor-neutral foundation under the Linux Foundation, announced December 9, 2025, that serves as the open-governance home for the agentic AI stack"
+        },
+        {
+          "letter": "C",
+          "text": "Anthropic's internal research division"
+        },
+        {
+          "letter": "D",
+          "text": "A certification body that licenses AI models"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The Linux Foundation announced the AAIF on December 9, 2025 as a neutral home where the open standard agentic AI stack is built — governing core standards and protocols so agents can interoperate across platforms, with no single company dominating.",
+      "tags": [
+        "aaif",
+        "ecosystem",
+        "linux-foundation"
+      ]
+    },
+    {
+      "id": "ch17-q2",
+      "chapter": 17,
+      "type": "mcq",
+      "difficulty": "easy",
+      "question": "Which projects anchored the AAIF at its founding?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Kubernetes, Docker, and Terraform"
+        },
+        {
+          "letter": "B",
+          "text": "MCP (contributed by Anthropic), goose (Block), AGENTS.md (OpenAI), and agentgateway"
+        },
+        {
+          "letter": "C",
+          "text": "TensorFlow and PyTorch"
+        },
+        {
+          "letter": "D",
+          "text": "Only MCP"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The founding project contributions were Anthropic's Model Context Protocol, Block's goose, and OpenAI's AGENTS.md, with agentgateway also among the founding projects — uniting competing vendors' key agentic projects under one neutral roof.",
+      "tags": [
+        "aaif",
+        "projects",
+        "founding"
+      ]
+    },
+    {
+      "id": "ch17-q3",
+      "chapter": 17,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What is goose?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A benchmark suite for LLMs"
+        },
+        {
+          "letter": "B",
+          "text": "Block's open-source, local-first AI agent framework that combines language models, extensible tools, and standardized MCP-based integration"
+        },
+        {
+          "letter": "C",
+          "text": "An MCP server for bird-watching data"
+        },
+        {
+          "letter": "D",
+          "text": "OpenAI's coding assistant"
+        }
+      ],
+      "answer": "B",
+      "explanation": "goose is Block's contribution: an open-source, local-first agent framework whose tool integration is standardized on MCP — also a canonical example of an MCP host application.",
+      "tags": [
+        "aaif",
+        "goose",
+        "host"
+      ]
+    },
+    {
+      "id": "ch17-q4",
+      "chapter": 17,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What is AGENTS.md?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The changelog file of the MCP repository"
+        },
+        {
+          "letter": "B",
+          "text": "A simple, universal standard (contributed by OpenAI) giving AI coding agents a consistent source of project-specific guidance so they operate reliably across repositories and toolchains"
+        },
+        {
+          "letter": "C",
+          "text": "A registry of approved AI agents"
+        },
+        {
+          "letter": "D",
+          "text": "MCP's authorization configuration file"
+        }
+      ],
+      "answer": "B",
+      "explanation": "AGENTS.md (initially released August 2025, contributed by OpenAI to the AAIF) standardizes how repos hand project-specific instructions to coding agents; it's been adopted by tens of thousands of open-source projects and integrated by tools like Cursor, GitHub Copilot, and VS Code.",
+      "tags": [
+        "aaif",
+        "agents-md",
+        "standards"
+      ]
+    },
+    {
+      "id": "ch17-q5",
+      "chapter": 17,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What is agentgateway?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "An MCP gateway/proxy project in the AAIF for mediating agent and MCP traffic"
+        },
+        {
+          "letter": "B",
+          "text": "A paid API rate limiter from Anthropic"
+        },
+        {
+          "letter": "C",
+          "text": "The Registry's REST endpoint"
+        },
+        {
+          "letter": "D",
+          "text": "A browser extension for MCP Apps"
+        }
+      ],
+      "answer": "A",
+      "explanation": "agentgateway (originally from Solo.io) is the AAIF's gateway/proxy project — infrastructure that sits in front of agent/MCP traffic, exactly the layer that benefits from 2026-07-28's Mcp-Method/Mcp-Name header routing.",
+      "tags": [
+        "aaif",
+        "agentgateway",
+        "infrastructure"
+      ]
+    },
+    {
+      "id": "ch17-q6",
+      "chapter": 17,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "Why did Anthropic donate MCP to a foundation rather than keep sole control?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Regulatory requirements forced the transfer"
+        },
+        {
+          "letter": "B",
+          "text": "Neutral, open governance ensures the protocol evolves by community consensus rather than one company's roadmap — protecting downstream developers from unilateral changes and encouraging competitors to adopt a standard no rival controls"
+        },
+        {
+          "letter": "C",
+          "text": "To sell the trademark"
+        },
+        {
+          "letter": "D",
+          "text": "Because MCP was feature-complete and needed no further development"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The AAIF rationale: when connection protocols are owned by a single vendor, every downstream developer is exposed to unilateral pricing/compatibility/deprecation decisions. Neutral stewardship under the Linux Foundation model is what lets AWS, Google, Microsoft, and OpenAI all invest in the same standard.",
+      "tags": [
+        "aaif",
+        "governance",
+        "neutrality"
+      ]
+    },
+    {
+      "id": "ch17-q7",
+      "chapter": 17,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Which companies were platinum members of the AAIF at launch?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Only Anthropic and Block"
+        },
+        {
+          "letter": "B",
+          "text": "Amazon Web Services, Anthropic, Block, Bloomberg, Cloudflare, Google, Microsoft, and OpenAI"
+        },
+        {
+          "letter": "C",
+          "text": "Apple, Meta, and Netflix"
+        },
+        {
+          "letter": "D",
+          "text": "The foundation has no corporate members"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The launch platinum tier spanned the competitive landscape: AWS, Anthropic, Block, Bloomberg, Cloudflare, Google, Microsoft, and OpenAI — rivals cooperating on shared agentic infrastructure.",
+      "tags": [
+        "aaif",
+        "members"
+      ]
+    },
+    {
+      "id": "ch17-q8",
+      "chapter": 17,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "SCENARIO: On the exam, you're asked which ecosystem role each party plays: a database company shipping an MCP server, a startup building an AI assistant, and Claude Desktop / goose. Match them.",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Tool provider → builds MCP servers; app developer → builds MCP clients; Claude Desktop and goose → host applications"
+        },
+        {
+          "letter": "B",
+          "text": "All three are hosts"
+        },
+        {
+          "letter": "C",
+          "text": "The database company builds clients; the startup builds servers"
+        },
+        {
+          "letter": "D",
+          "text": "Hosts are only built by Anthropic"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The who-builds-what triad: tool/data providers expose servers, application developers implement clients inside their products, and hosts (Claude Desktop, goose, IDEs) coordinate clients and the LLM.",
+      "tags": [
+        "ecosystem",
+        "use-cases",
+        "scenario"
+      ]
+    },
+    {
+      "id": "ch17-q9",
+      "chapter": 17,
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "What is the core portability benefit MCP gives the ecosystem?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Servers run faster on ARM processors"
+        },
+        {
+          "letter": "B",
+          "text": "Write a server once and it works in any compliant MCP client/host — no vendor lock-in, and each new server or client enriches the whole ecosystem"
+        },
+        {
+          "letter": "C",
+          "text": "Free hosting for all servers"
+        },
+        {
+          "letter": "D",
+          "text": "Automatic translation of tools into every programming language"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Because the protocol is the contract, a weather server built for Claude Desktop also works in goose, Cursor, or VS Code — the M+N economics compound as the ecosystem grows.",
+      "tags": [
+        "ecosystem",
+        "portability",
+        "use-cases"
+      ]
+    },
+    {
+      "id": "ch17-q10",
+      "chapter": 17,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "SCENARIO: An exam question claims 'MCP is governed by Anthropic, which holds final authority over the specification.' What's wrong with that statement in 2026?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Nothing — Anthropic owns MCP"
+        },
+        {
+          "letter": "B",
+          "text": "MCP was contributed to the AAIF under the Linux Foundation; it's governed by the community model (SEPs, Working Groups, individual-based maintainer hierarchy) — Anthropic created MCP but no company holds governance seats or final authority"
+        },
+        {
+          "letter": "C",
+          "text": "Google holds final authority"
+        },
+        {
+          "letter": "D",
+          "text": "The Linux Foundation writes all SEPs itself"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Post-donation, governance is vendor-neutral: maintainer membership is individual (explicitly not corporate), Lead Maintainers hold BDFL authority within the community model, and the AAIF/LF provides the legal umbrella. 'Created by Anthropic' remains true; 'governed by Anthropic' does not.",
+      "tags": [
+        "aaif",
+        "governance",
+        "trap"
+      ]
+    }
+  ]
+}

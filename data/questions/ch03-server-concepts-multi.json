@@ -5,7 +5,7 @@
     "chapter": 3,
     "chapterName": "Server Features (Tools, Resources, Prompts)",
     "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
-    "questionCount": 8
+    "questionCount": 13
   },
   "questions": [
     {
@@ -332,6 +332,182 @@
         "tools",
         "schemas",
         "headers"
+      ]
+    },
+    {
+      "id": "ch3-m9",
+      "chapter": 3,
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which statements about tool-result content blocks are correct? (Select all that apply.)",
+      "options": [
+        {
+          "letter": "A",
+          "text": "A single result may mix multiple block types (e.g., text plus an image)"
+        },
+        {
+          "letter": "B",
+          "text": "Image and audio blocks carry base64 data with a mimeType"
+        },
+        {
+          "letter": "C",
+          "text": "A resource link lets the client fetch large data on demand instead of inlining it"
+        },
+        {
+          "letter": "D",
+          "text": "Every result must contain exactly one text block"
+        },
+        {
+          "letter": "E",
+          "text": "All of the above"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Results are arrays — mixing types is the point, and there's no exactly-one-text-block rule (structured-only or media-only results are fine).",
+      "tags": [
+        "server-features",
+        "content-blocks"
+      ]
+    },
+    {
+      "id": "ch3-m10",
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which of the following are methods used to interact with server primitives?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "tools/list"
+        },
+        {
+          "letter": "B",
+          "text": "resources/read"
+        },
+        {
+          "letter": "C",
+          "text": "prompts/get"
+        },
+        {
+          "letter": "D",
+          "text": "tools/execute"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "The valid methods are tools/list, resources/read, and prompts/get. There is no tools/execute method - tools are invoked via tools/call.",
+      "tags": [
+        "control-model",
+        "methods"
+      ]
+    },
+    {
+      "id": "ch3-m11",
+      "type": "multi_select",
+      "difficulty": "medium",
+      "question": "Which statements about the control model are correct?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Tools are controlled by the model (LLM decides)"
+        },
+        {
+          "letter": "B",
+          "text": "Resources are controlled by the application (host decides)"
+        },
+        {
+          "letter": "C",
+          "text": "Prompts are controlled by the user (explicit selection)"
+        },
+        {
+          "letter": "D",
+          "text": "All three primitives are controlled by the server"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Tools = model-controlled, Resources = application-controlled, Prompts = user-controlled. The server exposes primitives but does not control who uses them.",
+      "tags": [
+        "control-model",
+        "do-vs-is"
+      ]
+    },
+    {
+      "id": "ch3-m12",
+      "type": "multi_select",
+      "difficulty": "hard",
+      "question": "Which scenarios demonstrate correct use of the control model?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "User types /summarize to trigger a prompt"
+        },
+        {
+          "letter": "B",
+          "text": "Model decides to call get_weather to answer a question"
+        },
+        {
+          "letter": "C",
+          "text": "Host automatically includes project README as context"
+        },
+        {
+          "letter": "D",
+          "text": "Server sends a notification to the client"
+        }
+      ],
+      "answers": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "/summarize is user-controlled (Prompt), get_weather is model-controlled (Tool), README is application-controlled (Resource). Server notifications are not part of the control model.",
+      "tags": [
+        "control-model",
+        "tools",
+        "resources",
+        "prompts"
+      ]
+    },
+    {
+      "id": "ch3-m13",
+      "type": "multi_select",
+      "difficulty": "easy",
+      "question": "What are the two interaction paradigms in the control model?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "DO - model executes actions"
+        },
+        {
+          "letter": "B",
+          "text": "IS - model reads information"
+        },
+        {
+          "letter": "C",
+          "text": "RUN - server processes requests"
+        },
+        {
+          "letter": "D",
+          "text": "GET - client retrieves data"
+        }
+      ],
+      "answers": [
+        "A",
+        "B"
+      ],
+      "explanation": "The control model has two paradigms: DO (model executes actions via Tools) and IS (model reads information via Resources). RUN and GET are not official terms.",
+      "tags": [
+        "control-model",
+        "do-vs-is"
       ]
     }
   ]

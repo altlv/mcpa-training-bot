@@ -1,0 +1,379 @@
+{
+  "info": {
+    "name": "MCPA Training Bot API",
+    "description": "API endpoints for the MCPA Training Bot quiz system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Tags",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function() {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response has tags array', function() {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('tags');",
+              "    pm.expect(jsonData.tags).to.be.an('array');",
+              "    console.log('Total tags:', jsonData.tags.length);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/tags",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "tags"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Start Quiz - Single Tag",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function() {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response has sessionId and questions', function() {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('sessionId');",
+              "    pm.expect(jsonData).to.have.property('questions');",
+              "    pm.expect(jsonData.questions).to.be.an('array');",
+              "    console.log('Session ID:', jsonData.sessionId);",
+              "    console.log('Questions count:', jsonData.totalQuestions);",
+              "});",
+              "",
+              "// Save sessionId for later use",
+              "var jsonData = pm.response.json();",
+              "pm.environment.set('sessionId', jsonData.sessionId);",
+              "pm.environment.set('firstQuestionId', jsonData.questions[0].id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/quiz/start",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "quiz", "start"]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tags\": [\"mcp-basics\"],\n  \"count\": 3\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Start Quiz - Multiple Tags",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function() {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Questions from multiple tags', function() {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.questions.length).to.be.above(0);",
+              "    console.log('Total questions:', jsonData.totalQuestions);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/quiz/start",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "quiz", "start"]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tags\": [\"security\", \"oauth\"],\n  \"count\": 10\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Start Quiz - All Questions",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function() {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Returns all questions', function() {",
+              "    var jsonData = pm.response.json();",
+              "    console.log('All questions loaded:', jsonData.totalQuestions);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/quiz/start",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "quiz", "start"]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tags\": [\"mcp-basics\"],\n  \"count\": \"all\"\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Start Quiz - Error (No Tags)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 400', function() {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test('Error message about tags', function() {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('error');",
+              "    pm.expect(jsonData.error).to.include('tag');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/quiz/start",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "quiz", "start"]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tags\": [],\n  \"count\": 3\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Question by ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function() {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response has question object', function() {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('question');",
+              "    pm.expect(jsonData.question).to.have.property('id');",
+              "    console.log('Question:', jsonData.question.question);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/questions/ch1-q1",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "questions", "ch1-q1"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Quiz - Complete Flow",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function() {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response has score and results', function() {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('score');",
+              "    pm.expect(jsonData).to.have.property('total');",
+              "    pm.expect(jsonData).to.have.property('percentage');",
+              "    pm.expect(jsonData).to.have.property('results');",
+              "    console.log('Score:', jsonData.score + '/' + jsonData.total);",
+              "    console.log('Percentage:', jsonData.percentage + '%');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/quiz/submit",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "quiz", "submit"]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sessionId\": \"{{sessionId}}\",\n  \"answers\": {\n    \"{{firstQuestionId}}\": \"A\",\n    \"ch1-q2\": \"B\",\n    \"ch1-q3\": [\"A\", \"C\"]\n  }\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Quiz - Error (No Session)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 400', function() {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test('Error about session ID', function() {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('error');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/quiz/submit",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "quiz", "submit"]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"answers\": {\n    \"ch1-q1\": \"A\"\n  }\n}"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Quiz - Error (Invalid Session)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 404', function() {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test('Error about session not found', function() {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('error');",
+              "    pm.expect(jsonData.error).to.include('not found');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/quiz/submit",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "quiz", "submit"]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"sessionId\": \"invalid-session-id\",\n  \"answers\": {\n    \"ch1-q1\": \"A\"\n  }\n}"
+        }
+      },
+      "response": []
+    }
+  ]
+}
