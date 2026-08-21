@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quiz API Test</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+    .correct { background: #d4edda; }
+    .incorrect { background: #f8d7da; }
+    button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>Quiz API Test</h1>
+  
+  <h2>Step 1: Start Quiz</h2>
+  <button onclick="startQuiz()">Start Quiz (Control Model, 3 questions)</button>
+  <div id="start-result"></div>
+  
+  <h2>Step 2: Submit Answers</h2>
+  <button onclick="submitQuiz()" disabled id="submit-btn">Submit Answers</button>
+  <div id="submit-result"></div>
+  
+  <script>
+    let sessionId = null;
+    let questions = [];
+    
+    async function startQuiz() {
+      const response = await fetch('http://localhost:3000/api/quiz/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tags: ['control-model'], count: 3 })
+      });
+      const data = await response.json();
+      sessionId = data.sessionId;
+      questions = data.questions;
+      
+      document.getElementById('start-result').innerHTML = `
+        <div class="result">
+          <strong>Session ID:</strong> ${sessionId}<br>
+          <strong>Questions:</strong> ${questions.length}<br>
+          <pre>${JSON.stringify(questions, null, 2)}</pre>
+        </div>
+      `;
+      document.getElementById('submit-btn').disabled = false;
+    }
+    
+    async function submitQuiz() {
+      // Submit wrong answers (all A) to test scoring
+      const answers = {};
+      questions.forEach(q => { answers[q.id] = 'A'; });
+      
+      const response = await fetch('http://localhost:3000/api/quiz/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, answers })
+      });
+      const data = await response.json();
+      
+      document.getElementById('submit-result').innerHTML = `
+        <div class="result ${data.score > 0 ? 'correct' : 'incorrect'}">
+          <strong>Score:</strong> ${data.score}/${data.total} (${data.percentage}%)<br>
+          <strong>Results:</strong>
+          <pre>${JSON.stringify(data.results, null, 2)}</pre>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

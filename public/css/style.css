@@ -610,6 +610,65 @@ a:hover {
   color: var(--text-primary);
 }
 
+/* Tag Breakdown */
+.tag-breakdown {
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.tag-breakdown h3 {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--text-primary);
+  font-size: var(--font-size-large);
+}
+
+.tag-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.tag-breakdown-item {
+  padding: var(--spacing-sm) 0;
+}
+
+.tag-breakdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.tag-breakdown-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  text-transform: capitalize;
+}
+
+.tag-breakdown-score {
+  color: var(--text-secondary);
+  font-size: var(--font-size-small);
+  font-weight: 500;
+}
+
+.tag-breakdown-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-tertiary, #e0e0e0);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.tag-breakdown-fill {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  transition: width 0.5s ease;
+}
+
 /* Results List */
 .results-list {
   text-align: left;

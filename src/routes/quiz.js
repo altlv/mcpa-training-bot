@@ -105,6 +105,7 @@ router.post('/quiz/start', (req, res) => {
       question: q.question,
       options: q.options, // Already shuffled
       tags: q.tags
+      // NOTE: correctAnswers are stored in session for scoring, not sent to client
     }));
 
     res.json({

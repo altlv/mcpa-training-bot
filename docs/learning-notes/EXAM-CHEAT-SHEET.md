@@ -139,6 +139,31 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 | **stdio** | Local, same machine | OS permissions |
 | **Streamable HTTP** | Remote, network | TLS + OAuth |
 
+
+
+#### Transport deep-dive — EXAM CRITICAL
+| Feature | stdio | Streamable HTTP |
+|---------|-------|-----------------|
+| **Connection** | Client launches server as subprocess | HTTP POST to server endpoint |
+| **Message format** | Newline-delimited JSON-RPC over stdin/stdout | JSON-RPC in HTTP POST body |
+| **Server-to-client** | stdout | Optional SSE stream on POST response |
+| **Logging** | stderr (captured by client) | Server-side log aggregation / OpenTelemetry |
+| **Multi-client** | Single client only | Multiple clients supported |
+| **Resumability** | N/A | **Removed in 2026-07-28** (was Last-Event-ID) |
+| **Sessions** | N/A | **Removed in 2026-07-28** (was Mcp-Session-Id) |
+
+#### Streamable HTTP vs legacy HTTP+SSE (EXAM TRAP!)
+- **HTTP+SSE** = two endpoints (GET/SSE for server→client + POST for client→server) → **Deprecated** 2026-07-28
+- **Streamable HTTP** = single endpoint, POST carries client messages, optional SSE streaming on response
+- **Key removals in 2026-07-28:** sessions, Last-Event-ID resumability, standalone GET endpoint
+- **Broken stream = re-issue as new request** (no resume, no replay)
+
+#### Mcp-Method / Mcp-Name headers (SEP-2243) — NEW EXAM MATERIAL
+- `Mcp-Method` required on **every request AND notification** (e.g., `tools/call`)
+- `Mcp-Name` required for `tools/call`, `resources/read`, `prompts/get` (the target name)
+- **Purpose:** Gateway routing, WAF policies, rate limiting — without parsing JSON body
+- **Mismatch = 400 + HeaderMismatch (-32020)** — headers and body must agree
+
 ### MCP Transport details
 | Transport | Characteristic |
 |-----------|----------------|
@@ -318,6 +343,24 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 
 ---
 
+
+
+### Agent Skills — building MCP servers with AI (Ch5, EXAM material!)
+- **mcp-server-dev plugin** bundles three skills: `build-mcp-server`, `build-mcp-app`, `build-mcpb`
+- **Entry skill** (`build-mcp-server`) runs discovery first: connection target, audience, action surface, interaction needs, auth — then recommends a deployment path
+- **Four deployment paths:**
+
+| Path | When to Use | Example |
+|------|-------------|---------|
+| **Remote Streamable HTTP** | Wrapping cloud APIs (default recommendation) | CRM connector, weather API |
+| **MCP Apps** | Interactive UI widgets rendered in chat | Dashboard, form builder |
+| **MCPB (MCP Bundles)** | Local server + runtime as single `.mcpb` archive | File system access, desktop apps |
+| **Local stdio** | Prototyping, upgrade path to MCPB | Quick dev testing |
+
+- **MCPB** = packages local stdio server + runtime → one-click install, no dev environment needed
+- **Remote Streamable HTTP** = zero install friction, one deployment serves all users, OAuth works properly
+- **Multi-language support** — skills cover Python, TypeScript, and more (NOT Python-only!)
+
 ## Client Best Practices (26% domain)
 
 ### Progressive tool discovery
@@ -491,6 +534,21 @@ Publishing all scopes in `scopes_supported` · wildcard scopes (`*`, `all`) · b
 | **Goose** | Open-source AI agent |
 | **AGENTS.md** | Agent configuration standard |
 | **agentgateway** | MCP gateway/proxy |
+
+
+
+### AGENTS.md — agent configuration standard (Ch17)
+- **What:** Universal standard giving AI coding agents consistent project-specific guidance
+- **Contributed by:** OpenAI to the AAIF (August 2025)
+- **Adoption:** Tens of thousands of open-source projects; integrated by Cursor, GitHub Copilot, VS Code
+- **Purpose:** Repos hand project-specific instructions to coding agents → agents operate reliably across repositories and toolchains
+- **NOT:** A changelog, a registry of agents, or an authorization config file
+
+### AgentGateway — MCP infrastructure proxy (Ch17)
+- **What:** AAIF gateway/proxy project (originally from Solo.io)
+- **Purpose:** Mediate agent and MCP traffic — sits in front of agent/MCP traffic
+- **Why it matters:** Benefits from 2026-07-28's `Mcp-Method`/`Mcp-Name` header routing — can route, meter, and authorize at the edge without body parsing
+- **Use case:** Per-tool rate limiting, WAF policies, load balancing — all visible in HTTP headers
 
 ### MCP governance
 - Changes via **SEPs** (Specification Enhancement Proposals) — PR-based, sponsored, label-driven status

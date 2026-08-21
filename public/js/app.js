@@ -293,20 +293,27 @@ const App = {
     this.elements.optionsContainer.querySelectorAll('.option-item').forEach(item => {
       item.addEventListener('click', () => {
         const input = item.querySelector('input');
-        input.checked = true;
         
-        // Update selected state
-        this.elements.optionsContainer.querySelectorAll('.option-item').forEach(opt => {
-          opt.classList.remove('selected');
-        });
-        item.classList.add('selected');
-        
-        // Save answer
         if (isMultiSelect) {
+          // Toggle checkbox
+          input.checked = !input.checked;
+          item.classList.toggle('selected', input.checked);
+          
+          // Save all selected
           const selected = Array.from(this.elements.optionsContainer.querySelectorAll('input:checked'))
             .map(inp => inp.value);
-          QuizEngine.setAnswer(selected);
+          QuizEngine.setAnswer(selected.length > 0 ? selected : null);
         } else {
+          // Single select: always select this one
+          input.checked = true;
+          
+          // Update selected state
+          this.elements.optionsContainer.querySelectorAll('.option-item').forEach(opt => {
+            opt.classList.remove('selected');
+          });
+          item.classList.add('selected');
+          
+          // Save answer
           QuizEngine.setAnswer(input.value);
         }
       });
@@ -395,9 +402,16 @@ const App = {
   },
   
   /**
-   * Next question
+   * Next question - requires an answer unless skipped
    */
   nextQuestion() {
+    // Check if current question has an answer
+    const currentAnswer = QuizEngine.getCurrentAnswer();
+    if (!currentAnswer) {
+      this.showError('Please select an answer before proceeding. Use Skip to skip this question.');
+      return;
+    }
+    
     if (QuizEngine.nextQuestion()) {
       this.renderCurrentQuestion();
     }
@@ -416,14 +430,6 @@ const App = {
    * Submit quiz
    */
   async submitQuiz() {
-    // Check for unanswered questions
-    const unanswered = QuizEngine.getUnansweredCount();
-    if (unanswered > 0) {
-      if (!confirm(`You have ${unanswered} unanswered question${unanswered !== 1 ? 's' : ''}. Submit anyway?`)) {
-        return;
-      }
-    }
-    
     try {
       this.showLoading('Submitting answers...');
       const results = await QuizEngine.submitQuiz();
@@ -458,10 +464,83 @@ const App = {
       this.elements.scoreTime.textContent = stats.timeFormatted;
     }
     
+    // Render tag breakdown
+    this.renderTagBreakdown(results.results);
+    
     // Render results list
     this.renderResults(results.results);
   },
   
+  /**
+   * Render tag-based score breakdown
+   * @param {object[]} results - Array of question results
+   */
+  renderTagBreakdown(results) {
+    // Calculate per-tag stats
+    const tagStats = {};
+    
+    results.forEach(result => {
+      const tags = result.tags || [];
+      tags.forEach(tag => {
+        if (!tagStats[tag]) {
+          tagStats[tag] = { correct: 0, total: 0 };
+        }
+        tagStats[tag].total++;
+        if (result.isCorrect) {
+          tagStats[tag].correct++;
+        }
+      });
+    });
+    
+    // Sort by percentage (lowest first — so you see weak areas first)
+    const sortedTags = Object.entries(tagStats)
+      .map(([tag, stats]) => ({
+        tag,
+        correct: stats.correct,
+        total: stats.total,
+        percentage: Math.round((stats.correct / stats.total) * 100)
+      }))
+      .sort((a, b) => a.percentage - b.percentage);
+    
+    // Find or create container
+    let container = document.getElementById('tag-breakdown-container');
+    if (!container) {
+      // Insert before results list
+      const resultsList = document.getElementById('results-list');
+      if (resultsList) {
+        container = document.createElement('div');
+        container.id = 'tag-breakdown-container';
+        resultsList.parentNode.insertBefore(container, resultsList);
+      }
+    }
+    
+    if (!container || sortedTags.length === 0) return;
+    
+    container.innerHTML = `
+      <div class="tag-breakdown">
+        <h3>📊 Score by Topic</h3>
+        <div class="tag-breakdown-list">
+          ${sortedTags.map(item => {
+            const barColor = item.percentage >= 80 ? 'var(--color-success)' 
+              : item.percentage >= 50 ? 'var(--color-warning)' 
+              : 'var(--color-error)';
+            return `
+              <div class="tag-breakdown-item">
+                <div class="tag-breakdown-header">
+                  <span class="tag-breakdown-name">${item.tag}</span>
+                  <span class="tag-breakdown-score">${item.correct}/${item.total} (${item.percentage}%)</span>
+                </div>
+                <div class="tag-breakdown-bar">
+                  <div class="tag-breakdown-fill" style="width: ${item.percentage}%; background: ${barColor}"></div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  },
+
   /**
    * Render results list
    * @param {object[]} results - Array of question results
@@ -484,13 +563,13 @@ const App = {
           <span>
             <span class="answer-label">Your answer:</span>
             <span class="answer-value ${result.isCorrect ? 'correct' : 'incorrect'}">
-              ${result.userAnswer || 'No answer'}
+              ${this.formatAnswerDisplay(result.yourAnswer, result.options)}
             </span>
           </span>
           ${!result.isCorrect ? `
           <span>
             <span class="answer-label">Correct answer:</span>
-            <span class="answer-value correct">${result.correctAnswer}</span>
+            <span class="answer-value correct">${this.formatAnswerDisplay(result.correctAnswer, result.options)}</span>
           </span>
           ` : ''}
         </div>
@@ -513,6 +592,27 @@ const App = {
     `).join('');
   },
   
+
+  /**
+   * Format answer for display (letter + text)
+   * @param {string|string[]} answer - Letter(s)
+   * @param {object[]} options - Options array with letter and text
+   * @returns {string} Formatted answer string
+   */
+  formatAnswerDisplay(answer, options) {
+    if (!answer) return 'No answer';
+    
+    const lookup = (letter) => {
+      const opt = options.find(o => o.letter === letter);
+      return opt ? `${letter}) ${opt.text}` : letter;
+    };
+    
+    if (Array.isArray(answer)) {
+      return answer.map(lookup).join(', ');
+    }
+    return lookup(answer);
+  },
+
   /**
    * Start quiz timer
    */

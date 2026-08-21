@@ -20,9 +20,9 @@ class QuestionService {
   loadQuestions() {
     const questionsDir = path.join(__dirname, '../../data/questions');
     
-    // Only load single-select files (not -multi files for now)
+    // Load all question files (both single-select and multi-select)
     const files = fs.readdirSync(questionsDir)
-      .filter(f => f.endsWith('.json') && !f.includes('-multi') && !f.includes('bank'));
+      .filter(f => f.endsWith('.json') && !f.includes('bank'));
 
     console.log(`📚 Loading questions from ${files.length} files...`);
 
@@ -34,6 +34,11 @@ class QuestionService {
         data.questions.forEach(q => {
           // Add chapter name from metadata
           q.chapterName = data.meta?.chapterName || `Chapter ${q.chapter}`;
+          
+          // Mark multi-select questions from -multi files
+          if (file.includes('-multi') && q.type === 'mcq') {
+            q.type = 'multi_select';
+          }
           
           this.questions.push(q);
           
@@ -128,22 +133,34 @@ class QuestionService {
   }
 
   /**
-   * Prepare questions for quiz (shuffle options, mark correct)
+   * Prepare questions for quiz (re-assign letters, mark correct)
+   * No shuffle — with 300+ questions, memorization isn't a concern
    */
   prepareQuizQuestions(questions) {
     return questions.map(q => {
-      // Shuffle options
-      const shuffledOptions = this.shuffleArray(q.options);
+      // Re-assign letters A, B, C... based on position
+      const optionsWithNewLetters = q.options.map((opt, index) => ({
+        letter: String.fromCharCode(65 + index),
+        text: opt.text
+      }));
       
-      // Determine correct answers
-      let correctAnswers = [];
+      // Determine correct answers by matching text content
+      let correctTexts = [];
       if (q.answers && Array.isArray(q.answers)) {
-        // Multi-select
-        correctAnswers = q.answers;
+        correctTexts = q.answers.map(letter => {
+          const opt = q.options.find(o => o.letter === letter);
+          return opt ? opt.text : null;
+        }).filter(Boolean);
       } else if (q.answer) {
-        // Single-select
-        correctAnswers = [q.answer];
+        const opt = q.options.find(o => o.letter === q.answer);
+        correctTexts = opt ? [opt.text] : [];
       }
+
+      // Find new letters for correct answers AFTER re-lettering
+      const correctLetters = correctTexts.map(text => {
+        const opt = optionsWithNewLetters.find(o => o.text === text);
+        return opt ? opt.letter : null;
+      }).filter(Boolean);
 
       return {
         id: q.id,
@@ -152,11 +169,8 @@ class QuestionService {
         type: q.type,
         difficulty: q.difficulty,
         question: q.question,
-        options: shuffledOptions.map(opt => ({
-          letter: opt.letter,
-          text: opt.text
-        })),
-        correctAnswers: correctAnswers,
+        options: optionsWithNewLetters,
+        correctAnswers: correctLetters,
         explanation: q.explanation,
         tags: q.tags
       };
@@ -193,6 +207,7 @@ class QuestionService {
         questionId: q.id,
         question: q.question,
         type: q.type,
+        tags: q.tags || [],
         yourAnswer: userAnswer,
         correctAnswer: q.correctAnswers.length === 1 ? q.correctAnswers[0] : q.correctAnswers,
         isCorrect: isCorrect,
