@@ -5,6 +5,8 @@
 
 const express = require('express');
 const router = express.Router();
+const fs = require('fs');
+const path = require('path');
 const questionService = require('../services/questionService');
 
 // In-memory quiz sessions (could use Redis/DB in production)
@@ -168,6 +170,32 @@ router.post('/quiz/submit', (req, res) => {
 
     // Score answers
     const results = questionService.scoreAnswers(session.questions, answers);
+
+    // Save results to file for MCP tools to read
+    const resultsDir = path.join(__dirname, '../data/results');
+    if (!fs.existsSync(resultsDir)) {
+      fs.mkdirSync(resultsDir, { recursive: true });
+    }
+    const resultFile = {
+      sessionId,
+      timestamp: new Date().toISOString(),
+      tags: session.questions.flatMap(q => q.tags || []),
+      totalQuestions: results.total,
+      score: results.score,
+      percentage: results.percentage,
+      results: results.results.map(r => ({
+        questionId: r.questionId,
+        question: r.question,
+        tags: r.tags,
+        isCorrect: r.isCorrect,
+        yourAnswer: r.yourAnswer,
+        correctAnswer: r.correctAnswer
+      }))
+    };
+    fs.writeFileSync(
+      path.join(resultsDir, `quiz_${Date.now()}.json`),
+      JSON.stringify(resultFile, null, 2)
+    );
 
     res.json(results);
 

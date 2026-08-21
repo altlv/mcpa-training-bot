@@ -1,0 +1,101 @@
+# MCPA Training Bot — Plan
+
+**Exam:** Sep 12, 2026
+**Started:** Aug 13, 2026
+**Daily Commitment:** 2+ hours
+
+---
+
+## ✅ Completed
+
+### Phase 1: Quiz Engine (Aug 13-20)
+- [x] Express server + API + Swagger UI
+- [x] 471 questions across 17 chapters (34 JSON files)
+- [x] Quiz GUI: tag selection, session, results, tag scoring
+- [x] Scoring accuracy (single + multi-select)
+- [x] Question letter re-assignment by position
+
+### Phase 2: MCP Server (Aug 21)
+- [x] MCP SDK + stdio transport
+- [x] 6 tools: search, explain, questions, sections, weak areas, similar
+- [x] 3 resources: cheat-sheet, exam-domains, glossary
+- [x] 2 prompts: teach-concept, compare
+- [x] Full test coverage (20 tests)
+
+### Phase 3: Teaching Assistant (Aug 22)
+- [x] Chat service (rule-based, no AI dependency)
+- [x] Chat API (message, context, action, history)
+- [x] Training mode UI (split screen: quiz + chat)
+- [x] Instant feedback after each answer
+- [x] Quick action buttons: "Why?" + "What concept?"
+
+### Phase 4: Test Quality (Aug 21-22)
+- [x] QA agent audit → found issues → fixed
+- [x] Upgraded MCP test assertions
+- [x] Added edge case + error path tests
+- [x] Fixed 2 production bugs
+- [x] 73/73 tests passing
+
+---
+
+## 🔲 Next Steps
+
+### Week of Aug 25-31
+- [ ] Fix 23 multi-select questions (all 5 options marked correct)
+- [ ] Git commit all changes
+- [ ] Practice exam mode (60 questions, 90 min timer)
+- [ ] Domain-weighted question selection
+- [ ] Weak areas dashboard
+
+### Week of Sep 1-7
+- [ ] Speed training mode (timed rapid-fire)
+- [ ] Progress persistence across sessions
+- [ ] Final practice exams
+- [ ] Cheat sheet review sessions
+
+### Exam Week (Sep 8-12)
+- [ ] Final practice exam
+- [ ] Light review only
+- [ ] REST day (Sep 11)
+- [ ] EXAM DAY (Sep 12) 🎯
+
+---
+
+## What We Built vs Original Plan
+
+| Original Plan | What Actually Happened |
+|---------------|----------------------|
+| Vectra/RAG for knowledge retrieval | Removed — cheat sheet search is sufficient |
+| SQLite for progress tracking | Not needed — JSON files work fine |
+| Separate quiz + knowledge servers | Unified server is simpler |
+| 3 questions per page | 1 question per page (better for training) |
+| AI-powered chat (OpenAI API) | Rule-based chat (no API costs, works offline) |
+| 30-day timeline | Core features done in ~4 days |
+
+---
+
+## Architecture (Current)
+
+```
+Browser
+  ├── index.html (Exam Mode)
+  └── training.html (Training Mode: quiz + chat)
+        │
+        ▼
+Express Server (port 3000)
+  ├── /api/quiz/* (start, submit, tags, questions)
+  ├── /api/chat/* (message, context, action, history)
+  └── /api/docs (Swagger UI)
+        │
+        ├── QuestionService (load + score questions)
+        ├── ChatService (search cheat sheet + explain)
+        └── JSON files (471 questions)
+
+MCP Server (stdio) — separate process
+  └── 6 tools, 3 resources, 2 prompts
+      Used by: Goose, Claude Desktop, etc.
+```
+
+---
+
+*Last updated: 2026-08-22*

@@ -1,258 +1,136 @@
-# MCPA Training Bot - Decision Log
-## Why We Made Each Choice
+# Decision Log
+
+Technical decisions and their rationale.
 
 ---
 
-## Decision 001: Use MCP for Quiz Engine
-**Date:** 2026-08-13
-**Decision:** Build quiz engine as MCP server
-**Alternatives considered:**
-- Regular npm package
-- REST API
-- Direct function calls
-
-**Why MCP?**
-1. You're learning MCP - building it teaches you better than just reading
-2. Standard interface - can swap quiz engine later
-3. Reusable - other apps can use your quiz engine
-4. Portfolio piece - shows you can build MCP servers
-
-**Trade-off:** More complexity than a simple function, but worth it for learning.
+## Decision 001: Use Express for API
+**Date:** Aug 13, 2026
+**Decision:** Express.js for HTTP server
+**Alternatives considered:** Fastify, Koa, raw Node.js http
+**Why:** Simple, well-documented, good for learning
+**Trade-off:** Slightly slower than Fastify, but irrelevant at this scale
 
 ---
 
-## Decision 002: Use ChromaDB for RAG
-**Date:** 2026-08-13
-**Decision:** ChromaDB as vector database
-**Alternatives considered:**
-- Pinecone (cloud)
-- Weaviate (more complex)
-- FAISS (Facebook's, harder to use)
-- Simple text search
-
-**Why ChromaDB?**
-1. Local-first (no cloud costs)
-2. Simple API (beginner-friendly)
-3. Docker or npm install (flexible)
-4. Good documentation
-5. Works great for small-medium datasets
-
-**Trade-off:** Less scalable than cloud options, but you don't need scale for learning.
+## Decision 002: JSON files for question storage
+**Date:** Aug 13, 2026
+**Decision:** Store questions in JSON files (not database)
+**Alternatives considered:** SQLite, MongoDB, PostgreSQL
+**Why:**
+- No database server to install
+- Git-friendly (version control)
+- 471 questions load in <100ms
+- Simple to edit and validate
+**Trade-off:** Can't query efficiently at scale (not needed here)
 
 ---
 
-## Decision 003: Node.js Backend
-**Date:** 2026-08-13
-**Decision:** Node.js + JavaScript
-**Alternatives considered:**
-- Python
-- Go
-- Rust
-
-**Why Node.js?**
-1. You already have Goose (Node-based)
-2. JavaScript/TypeScript is everywhere
-3. Huge ecosystem (npm)
-4. Easy to find help
-5. Fast enough for this project
-
-**Trade-off:** Python has better ML libraries, but we don't need them for quiz generation.
+## Decision 003: MCP SDK v1.30.0 with Zod schemas
+**Date:** Aug 21, 2026
+**Decision:** Use official MCP SDK with Zod for tool parameter validation
+**Alternatives considered:** Manual JSON-RPC, raw stdio
+**Why:**
+- Official SDK handles protocol details
+- Zod provides runtime validation
+- Matches real-world MCP usage
+**Trade-off:** Dependency on SDK version
 
 ---
 
-## Decision 004: SQLite for Progress
-**Date:** 2026-08-13
-**Decision:** SQLite for progress tracking
-**Alternatives considered:**
-- localStorage (browser only)
-- PostgreSQL (overkill)
-- JSON files
-- MongoDB
-
-**Why SQLite?**
-1. Single file (easy to backup)
-2. No server needed
-3. Queryable (can ask complex questions)
-4. Built into most systems
-5. Perfect for personal projects
-
-**Trade-off:** Not multi-user, but you don't need that.
+## Decision 004: Single-file MCP server
+**Date:** Aug 21, 2026
+**Decision:** All MCP tools/resources/prompts in one server.js file
+**Alternatives considered:** Separate files per tool (src/mcp/tools/*.js)
+**Why:**
+- Simpler to navigate and debug
+- Single file is only ~500 lines
+- No need for dynamic loading
+**Trade-off:** Harder to modularize if it grows significantly
 
 ---
 
-## Decision 005: Simple HTML Frontend
-**Date:** 2026-08-13
-**Decision:** Plain HTML/CSS/JS (no frameworks)
-**Alternatives considered:**
-- React
-- Vue
-- Angular
-- Electron (desktop app)
-
-**Why simple HTML?**
-1. Less to learn (focus on MCP, not React)
-2. Faster to build
-3. No build step (just open the file)
-4. Good enough for MVP
-5. Can upgrade later
-
-**Trade-off:** Less interactive than React, but fine for quiz interface.
+## Decision 005: Rule-based chat (no AI dependency)
+**Date:** Aug 22, 2026
+**Decision:** Chat service uses cheat sheet search, not LLM
+**Alternatives considered:** OpenAI API, local LLM, Claude API
+**Why:**
+- No API costs
+- No internet required
+- Deterministic responses
+- Works offline
+**Trade-off:** Less flexible than AI, but sufficient for exam prep
 
 ---
 
-## Decision 006: Local-First Architecture
-**Date:** 2026-08-13
-**Decision:** Everything runs on your machine
-**Alternatives considered:**
-- Vercel/Netlify (frontend)
-- Railway/Render (backend)
-- AWS/GCP (full stack)
-
-**Why local?**
-1. No API costs (learning should be free!)
-2. No internet required
-3. Faster iteration (no deploy wait)
-4. Your data stays private
-5. Simpler debugging
-
-**Trade-off:** Can't share easily, but you can add deployment later.
+## Decision 006: Letter re-assignment by position
+**Date:** Aug 21, 2026
+**Decision:** Re-assign A/B/C/D based on option position (not shuffle)
+**Alternatives considered:** Fisher-Yates shuffle, no re-assignment
+**Why:**
+- 300+ questions eliminates memorization concern
+- Correct answers tracked by TEXT content
+- Simplifies debugging and testing
+**Trade-off:** Options always appear in same order within a session
 
 ---
 
-## Decision 007: Task-Based Learning
-**Date:** 2026-08-13
-**Decision:** Break into small, numbered tasks
-**Alternatives considered:**
-- Build everything at once
-- Follow a tutorial exactly
-- wing it
-
-**Why task-based?**
-1. Clear progress (check boxes = dopamine!)
-2. Can stop and resume easily
-3. Easier to ask for help ("Task 2.3 is stuck")
-4. Reduces overwhelm
-5. Better for switching models/sessions
-
-**Trade-off:** More planning upfront, but saves time overall.
+## Decision 007: Instant feedback in training mode
+**Date:** Aug 22, 2026
+**Decision:** Show correct/wrong immediately after answering
+**Alternatives considered:** Delayed feedback (exam mode), on-demand
+**Why:**
+- Learning science: immediate correction improves retention
+- Chat can explain while question is fresh
+- More engaging than waiting for submit
+**Trade-off:** Less realistic than exam conditions (that's what exam mode is for)
 
 ---
 
-## Decision 008: Document Everything
-**Date:** 2026-08-13
-**Decision:** Create ARCHITECTURE.md, DECISIONS.md, LEARNING.md
-**Alternatives considered:**
-- Comments in code only
-- README only
-- No documentation
-
-**Why so much documentation?**
-1. Learning requires reflection
-2. Future you will forget
-3. Others can learn from your journey
-4. Interview gold ("I built X because Y")
-5. QA mindset = document behavior
-
-**Trade-off:** Takes time, but saves more time later.
+## Decision 008: Split-screen training UI
+**Date:** Aug 22, 2026
+**Decision:** Quiz on left, chat on right (side by side)
+**Alternatives considered:** Tab switching, overlay, separate pages
+**Why:**
+- See question + chat simultaneously
+- No context switching
+- Natural conversation flow
+**Trade-off:** Requires wider screen (responsive: stacks on mobile)
 
 ---
 
-## Decision 009: Start with MCP Ch1-4 Questions
-**Date:** 2026-08-13
-**Decision:** Build quiz questions for completed sections first
-**Alternatives considered:**
-- Build all questions at once
-- Start with random chapter
-- Use external question bank
-
-**Why start with completed sections?**
-1. You already understand the content
-2. Can verify accuracy
-3. Quick win (questions you can answer!)
-4. Tests the system with known-good data
-5. Builds confidence
-
-**Trade-off:** Limited scope initially, but better for learning.
+## Decision 009: 10-message chat limit
+**Date:** Aug 22, 2026
+**Decision:** Keep last 10 messages per chat session
+**Alternatives considered:** Unlimited, 20, 50
+**Why:**
+- Prevents context window bloat
+- Focuses on recent discussion
+- Matches real chat UX
+**Trade-off:** Older explanations not visible (but quiz results persist)
 
 ---
 
-## Decision 010: Use Goose for Development
-**Date:** 2026-08-13
-**Decision:** Build this bot using Goose
-**Alternatives considered:**
-- Build manually in VS Code
-- Use another AI assistant
-- Follow YouTube tutorials
-
-**Why Goose?**
-1. You already have it!
-2. Can ask questions while building
-3. Goose understands MCP (it uses it!)
-4. Can delegate complex tasks
-5. Interactive learning (not just reading)
-
-**Trade-off:** Dependency on AI, but you're learning the concepts too.
+## Decision 010: Node:test for test runner
+**Date:** Aug 21, 2026
+**Decision:** Use built-in node:test (no Jest/Mocha)
+**Alternatives considered:** Jest, Mocha, Vitest
+**Why:**
+- Zero dependencies
+- Built into Node.js v18+
+- Sufficient for this project
+**Trade-off:** Less features than Jest (no built-in coverage, mocking)
 
 ---
 
-## How to Add New Decisions
+## Principles
 
-When you make a choice, add it here:
-
-```markdown
-## Decision 0XX: [Title]
-**Date:** YYYY-MM-DD
-**Decision:** [What you decided]
-**Alternatives considered:**
-- [Option 1]
-- [Option 2]
-
-**Why [Decision]?**
-1. [Reason 1]
-2. [Reason 2]
-
-**Trade-off:** [What you give up]
-```
+1. **Learning first** — Optimize for understanding, not performance
+2. **Local-first** — No cloud costs, works offline
+3. **Incremental** — Small steps, constant progress
+4. **Tested** — 73 tests prove correctness
+5. **Documented** — Every choice explained
 
 ---
 
-## Decision 011: Use Vectra (not ChromaDB)
-**Date:** 2026-08-13
-**Decision:** Vectra as vector database instead of ChromaDB
-**Alternatives considered:**
-- ChromaDB (Docker)
-- ChromaDB (cloud)
-- Pinecone
-- Weaviate
-- Simple JSON search
-
-**Why Vectra?**
-1. No Docker required (your PC can't run virtualization)
-2. Pure Node.js (no external server)
-3. Stores data locally in a folder
-4. Simple API, easy to learn
-5. Good stepping stone to more complex vector DBs later
-
-**Why not ChromaDB?**
-- Requires Docker (virtualization disabled on your PC)
-- More complex setup
-- Better for production, overkill for learning
-
-**Trade-off:** Less feature-rich than ChromaDB, but perfect for learning.
-
-**Upgrade path:** When Docker becomes available, can migrate to ChromaDB with minimal code changes.
-
----
-
-## Key Principles Behind Decisions
-
-1. **Learning first** - Optimize for understanding, not performance
-2. **Local-first** - Avoid cloud costs and complexity
-3. **Incremental** - Small steps, constant progress
-4. **Documented** - Every choice explained
-5. **Testable** - QA mindset throughout
-
----
-
-*Last updated: 2026-08-13*
-*Next review: After Phase 1 completion*
+*Last updated: 2026-08-22*

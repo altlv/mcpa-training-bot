@@ -114,6 +114,13 @@ class QuestionService {
   }
 
   /**
+   * Get all loaded questions
+   */
+  getAllQuestions() {
+    return this.questions;
+  }
+
+  /**
    * Get total question count
    */
   getTotalCount() {

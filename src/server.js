@@ -9,6 +9,7 @@ const yaml = require('js-yaml');
 const swaggerUi = require('swagger-ui-express');
 const questionService = require('./services/questionService');
 const quizRoutes = require('./routes/quiz');
+const chatRoutes = require('./routes/chat');
 
 // Create Express application
 const app = express();
@@ -36,6 +37,7 @@ console.log(`📊 Database: ${stats.totalQuestions} questions, ${stats.totalTags
 
 // Routes
 app.use('/api', quizRoutes); // Mount quiz routes
+app.use('/api/chat', chatRoutes); // Mount chat routes
 
 // Root route
 app.get('/', (req, res) => {

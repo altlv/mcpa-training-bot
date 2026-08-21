@@ -7,10 +7,10 @@
 ## What Is This?
 
 A local training bot that helps you study for the MCPA certification by:
-- Quizzing you on MCP concepts
-- Tracking your progress
-- Adapting to your learning style
-- Using RAG to pull from official documentation
+- Quizzing you on MCP concepts (471 questions across 17 chapters)
+- Providing instant feedback and scoring
+- Teaching you through a live tutoring chatbot
+- Tracking your weak areas across exam domains
 
 **Built with MCP, for learning MCP.**
 
@@ -19,8 +19,7 @@ A local training bot that helps you study for the MCPA certification by:
 ## Quick Start
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (LTS version)
-- [Goose](https://github.com/anthropics/goose) (you already have it!)
+- [Node.js](https://nodejs.org/) v18+ (v24+ recommended)
 
 ### Installation
 
@@ -31,15 +30,28 @@ cd mcpa-bot
 # 2. Install dependencies
 npm install
 
-# 3. Start the quiz server
-npm run start:quiz
+# 3. Start the server
+npm start
 
-# 4. Start the web interface
-npm run start:web
-
-# 5. Open browser
+# 4. Open browser
 http://localhost:3000
 ```
+
+---
+
+## Two Modes
+
+### 📝 Exam Mode (`/`)
+- Take quizzes without help
+- Delayed feedback (after submit)
+- Simulates real exam conditions
+- Results with per-topic scoring
+
+### 🎓 Training Mode (`/training.html`)
+- Split screen: quiz + live tutor
+- Instant feedback after each answer
+- Chat assistant explains concepts
+- Quick buttons: "Why is this the answer?" / "What concept?"
 
 ---
 
@@ -48,161 +60,128 @@ http://localhost:3000
 ```
 mcpa-bot/
 ├── src/
-│   ├── mcp-servers/        # MCP server implementations
-│   │   ├── quiz-server.js  # Quiz generation & grading
-│   │   └── knowledge-server.js  # RAG retrieval
-│   ├── loaders/            # Document loaders
-│   └── utils/              # Shared helpers
+│   ├── server.js              # Express server entry point
+│   ├── mcp/
+│   │   └── server.js          # MCP server (6 tools, 3 resources, 2 prompts)
+│   ├── routes/
+│   │   ├── quiz.js            # Quiz API endpoints
+│   │   └── chat.js            # Teaching chat endpoints
+│   └── services/
+│       ├── questionService.js  # Question loading, scoring, preparation
+│       └── chatService.js      # Teaching assistant logic
+├── public/
+│   ├── index.html             # Exam mode quiz interface
+│   ├── training.html          # Training mode (quiz + chat)
+│   ├── css/style.css          # Styles
+│   └── js/
+│       ├── app.js             # Exam mode logic
+│       └── api.js             # API helpers
+├── test/
+│   ├── api.test.js            # API endpoint tests (37 tests)
+│   ├── data-integrity.test.js # Question bank validation (16 tests)
+│   └── mcp-server.test.js     # MCP server tests (20 tests)
 ├── data/
-│   ├── schemas/            # JSON schemas
-│   ├── questions/          # Question bank
-│   └── vectra/             # Vector DB storage (local)
-├── docs/                   # Learning materials
-│   ├── ARCHITECTURE.md     # Why things are built this way
-│   ├── DECISIONS.md        # Technical decisions log
-│   └── LEARNING.md         # Your personal learning journal
-├── public/                 # Frontend (HTML/CSS/JS)
-└── tests/                  # Test files
+│   ├── questions/             # 34 JSON files (471 questions)
+│   ├── results/               # Saved quiz results
+│   └── schemas/               # Question JSON schema
+├── docs/
+│   └── learning-notes/
+│       └── EXAM-CHEAT-SHEET.md # Comprehensive exam reference
+└── package.json
 ```
 
 ---
 
-## How to Use
+## API Endpoints
 
-### Take a Quiz
-1. Open the web interface
-2. Click "Start Quiz"
-3. Select chapter/topic
-4. Answer questions
-5. Review explanations
-6. Track your progress
-
-### Track Progress
-- Dashboard shows completion by chapter
-- Accuracy percentages by domain
-- Weak areas highlighted
-- Spaced repetition reminders
-
-### Study with RAG
-- Ask questions about MCP concepts
-- Get answers with source citations
-- Explore related topics
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/api/health` | Server status + question count |
+| GET | `/api/tags` | Available topics with counts |
+| POST | `/api/quiz/start` | Start quiz session |
+| POST | `/api/quiz/submit` | Submit answers + get results |
+| GET | `/api/questions/:id` | Get single question |
+| POST | `/api/chat` | Send message to tutor |
+| POST | `/api/chat/context` | Update tutor's question context |
+| POST | `/api/chat/action` | Quick action buttons |
+| GET | `/api/chat/history/:id` | Get chat history |
 
 ---
 
-## Learning Path
+## MCP Server
 
-**Start here:**
+The project includes an MCP server (`src/mcp/server.js`) that exposes teaching tools:
 
-1. **Read** `docs/ARCHITECTURE.md` - Understand the big picture
-2. **Review** `docs/DECISIONS.md` - See why choices were made
-3. **Complete** Phase 0 tasks in `TODO.md`
-4. **Build** Phase 1-6 incrementally
-5. **Document** your journey in `docs/LEARNING.md`
+### Tools
+| Tool | Purpose |
+|------|---------|
+| `search_concepts` | Search cheat sheet for keywords |
+| `explain_topic` | Get detailed topic explanation |
+| `get_questions_by_tag` | Find questions by topic |
+| `get_cheat_sheet_section` | List or retrieve cheat sheet sections |
+| `get_weak_areas` | Analyze past quiz results |
+| `get_similar_questions` | Find related questions |
+
+### Resources
+| Resource | Content |
+|----------|---------|
+| `mcpa://cheat-sheet` | Full exam cheat sheet |
+| `mcpa://exam-domains` | Domain weights and topics |
+| `mcpa://glossary` | MCP terms and definitions |
+
+### Prompts
+| Prompt | Purpose |
+|--------|---------|
+| `teach-concept` | Explain a concept with examples |
+| `compare` | Compare two topics |
+
+---
+
+## Running Tests
+
+```bash
+# All tests (73 tests)
+npm test
+
+# Individual suites
+npm run test:data    # Question bank validation
+npm run test:api     # API endpoint tests
+npm run test:mcp     # MCP server tests
+```
+
+---
+
+## MCPA Exam Domains
+
+| Domain | Weight |
+|--------|--------|
+| Interactions & Execution | 26% |
+| Security & Governance | 24% |
+| Use Cases & Ecosystem | 20% |
+| MCP Fundamentals | 16% |
+| Architecture & Components | 14% |
 
 ---
 
 ## What You'll Learn
 
-By building this, you'll understand:
-
-- **MCP Protocol** - How it works, why it exists
-- **RAG Systems** - Retrieval-Augmented Generation
-- **Vector Databases** - Vectra (local vector storage)
-- **MCP Servers** - Building your own
-- **Node.js** - Backend development
-- **System Design** - Architecture decisions
-- **Testing** - QA skills applied to code
+By using this bot, you'll master:
+- **MCP Protocol** — Architecture, tools, resources, prompts
+- **Security** — OAuth 2.1, attack patterns, token validation
+- **Transport** — stdio vs Streamable HTTP
+- **JSON-RPC 2.0** — Message formats, error codes
+- **Ecosystem** — Inspector, Extensions, Registry
 
 ---
 
-## FAQ
+## Tech Stack
 
-**Q: Is this free?**
-A: Yes! Everything runs locally. No API costs.
-
-**Q: Do I need coding experience?**
-A: Basic Node.js helps, but you can learn as you go.
-
-**Q: How long will this take?**
-A: ~20-27 hours total, spread across many sessions.
-
-**Q: Can I use this to study for the real exam?**
-A: Absolutely! Questions are based on the MCPA curriculum.
-
-**Q: What if I get stuck?**
-A: Ask Goose! That's what it's for. Or check the docs.
+- **Backend:** Node.js + Express
+- **MCP Server:** `@modelcontextprotocol/sdk` v1.30.0
+- **Testing:** `node:test` (built-in)
+- **Frontend:** Vanilla HTML/CSS/JS
+- **Data:** JSON files (no database required)
 
 ---
 
-## Contributing
-
-This is your personal learning project! But if you want to improve it:
-
-1. Fork the repo
-2. Create a feature branch
-3. Make changes
-4. Add tests
-5. Submit a PR
-
----
-
-## Documentation
-
-- `ARCHITECTURE.md` - System design & why things work this way
-- `DECISIONS.md` - Technical choices & trade-offs
-- `LEARNING.md` - Your personal learning journal
-- `TODO.md` - Task breakdown with checkboxes
-
----
-
-## About MCPA
-
-The **Model Context Protocol Associate (MCPA)** certification validates your knowledge of:
-- MCP architecture & components
-- JSON-RPC 2.0 protocol
-- Server & client features
-- Security & authorization
-- Real-world use cases
-
-Learn more: [modelcontextprotocol.io](https://modelcontextprotocol.io)
-
----
-
-## Question Sources
-
-Questions in this training bot are based on official MCP documentation:
-
-| Source | URL | Used For |
-|--------|-----|----------|
-| **MCP Specification (2026-07-28)** | https://modelcontextprotocol.io/docs/2026-07-28/getting-started/intro | Architecture, server/client features, transports |
-| **JSON-RPC 2.0 Specification** | https://www.jsonrpc.org/specification | Protocol fundamentals, message formats, error codes |
-| **MCP Documentation** | https://modelcontextprotocol.io/docs/getting-started/intro | Getting started, tutorials, best practices |
-| **MCPA Certification** | https://training.linuxfoundation.org/certification/model-context-protocol-associate-mcpa/ | Exam domains, weighting, format |
-
-**Exam Domain Weighting:**
-- Interactions & Execution: 26%
-- Security & Governance: 24%
-- Use Cases & Ecosystem: 20%
-- MCP Fundamentals: 16%
-- Architecture & Components: 14%
-
----
-
-## Acknowledgments
-
-- **Anthropic** - For creating MCP and Goose
-- **AAIF** - For the MCPA certification
-- **You** - For taking the leap to learn!
-
----
-
-## Questions?
-
-Ask Goose! Or open an issue on GitHub.
-
----
-
-**Happy Learning!**
-
-*Built with Goose*
+**Happy Learning!** 🚀

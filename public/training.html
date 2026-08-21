@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCPA Training Mode — Quiz + Tutor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ===== Training Mode Split Layout ===== */
+    body { background: var(--bg-secondary); }
+
+    .training-layout {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 0;
+      height: calc(100vh - 80px); /* minus header */
+      overflow: hidden;
+    }
+
+    /* Left Panel — Quiz */
+    .quiz-panel {
+      overflow-y: auto;
+      padding: var(--spacing-lg) var(--spacing-xl);
+      border-right: 2px solid var(--border-color);
+      background: var(--bg-secondary);
+    }
+
+    .quiz-panel .question-card { margin-top: 0; }
+    .quiz-panel .quiz-navigation { position: sticky; bottom: 0; background: var(--bg-secondary); padding: var(--spacing-md) 0; }
+
+    /* Right Panel — Chat */
+    .chat-panel {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-primary);
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: var(--spacing-md) var(--spacing-lg);
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      flex-shrink: 0;
+    }
+
+    .chat-header h3 { margin: 0; font-size: var(--font-size-base); color: var(--text-light); }
+    .chat-header .chat-icon { font-size: 20px; }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--spacing-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+
+    .chat-message {
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-md);
+      max-width: 90%;
+      line-height: 1.5;
+      font-size: var(--font-size-small);
+      word-wrap: break-word;
+    }
+
+    .chat-message.user {
+      align-self: flex-end;
+      background: var(--primary-color);
+      color: var(--text-light);
+      border-bottom-right-radius: var(--radius-sm);
+    }
+
+    .chat-message.assistant {
+      align-self: flex-start;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border-bottom-left-radius: var(--radius-sm);
+    }
+
+    .chat-message strong { font-weight: 700; }
+    .chat-message code { background: rgba(0,0,0,0.08); padding: 1px 4px; border-radius: 3px; font-size: 13px; }
+
+    /* Quick Actions */
+    .chat-actions {
+      padding: var(--spacing-sm) var(--spacing-md);
+      display: flex;
+      gap: var(--spacing-sm);
+      flex-wrap: wrap;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      flex-shrink: 0;
+    }
+
+    .chat-action-btn {
+      padding: var(--spacing-xs) var(--spacing-md);
+      font-size: 12px;
+      font-family: var(--font-primary);
+      border: 1px solid var(--primary-color);
+      background: var(--bg-primary);
+      color: var(--primary-color);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .chat-action-btn:hover { background: var(--primary-color); color: var(--text-light); }
+    .chat-action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Chat Input */
+    .chat-input-area {
+      padding: var(--spacing-md);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: var(--spacing-sm);
+      background: var(--bg-primary);
+      flex-shrink: 0;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-family: var(--font-primary);
+      font-size: var(--font-size-small);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      resize: none;
+      min-height: 40px;
+      max-height: 80px;
+    }
+
+    .chat-input:focus { outline: none; border-color: var(--primary-color); }
+
+    .chat-send-btn {
+      padding: var(--spacing-sm) var(--spacing-md);
+      background: var(--primary-color);
+      color: var(--text-light);
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-family: var(--font-primary);
+      font-weight: 600;
+      transition: background var(--transition-fast);
+    }
+
+    .chat-send-btn:hover { background: var(--primary-dark); }
+    .chat-send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Answer Feedback Banner */
+    .answer-feedback {
+      padding: var(--spacing-md);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--spacing-md);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      animation: fadeIn var(--transition-normal) ease;
+    }
+
+    .answer-feedback.correct { background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; }
+    .answer-feedback.incorrect { background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A; }
+
+    .answer-feedback .feedback-icon { font-size: 20px; }
+    .answer-feedback .feedback-text { flex: 1; }
+    .answer-feedback .correct-answer { font-weight: 700; }
+
+    /* Option Correct/Incorrect colors (training mode) */
+    .option-item.correct { background: #E8F5E9; border-color: #4CAF50; }
+    .option-item.correct .option-letter { background: #4CAF50; }
+    .option-item.incorrect { background: #FFEBEE; border-color: #F44336; }
+    .option-item.incorrect .option-letter { background: #F44336; }
+    .option-item.selected.correct { background: #C8E6C9; border-color: #2E7D32; }
+    .option-item.selected.incorrect { background: #FFCDD2; border-color: #C62828; }
+
+    /* Responsive: stack on small screens */
+    @media (max-width: 900px) {
+      .training-layout { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+      .quiz-panel { border-right: none; border-bottom: 2px solid var(--border-color); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <h1 class="header-title">MCPA Training Mode</h1>
+        <p class="header-subtitle">Quiz + Live Tutor — Learn as you practice</p>
+      </div>
+      <a href="/" class="btn btn-sm" style="background:rgba(255,255,255,0.2); color:#fff; border:1px solid rgba(255,255,255,0.4);">← Back to Exam Mode</a>
+    </div>
+  </header>
+
+  <!-- Split Layout -->
+  <div class="training-layout" id="training-layout">
+    <!-- LEFT: Quiz Panel -->
+    <div class="quiz-panel" id="quiz-panel">
+      <!-- Tag Selection (shown first) -->
+      <div id="tag-selection" class="card fade-in">
+        <div class="card-header">
+          <h2 class="card-title">Select Topics</h2>
+        </div>
+        <p>Choose topics for your training session. The tutor will help you understand each answer.</p>
+        <div class="tags-container" id="tags-container"></div>
+        <div class="tags-actions">
+          <button id="select-all-btn" class="btn btn-sm btn-outline">Select All</button>
+          <button id="deselect-all-btn" class="btn btn-sm btn-outline">Deselect All</button>
+        </div>
+        <div class="selected-count" id="selected-count">0 tags selected</div>
+        <div class="form-group" style="margin-top: var(--spacing-lg);">
+          <label class="form-label" for="question-count">Number of Questions</label>
+          <select id="question-count" class="form-select">
+            <option value="20">Up to 20</option>
+            <option value="50">Up to 50</option>
+            <option value="all" selected>All available</option>
+          </select>
+        </div>
+        <button id="start-quiz-btn" class="btn btn-primary btn-lg" disabled>Start Training</button>
+      </div>
+
+      <!-- Quiz Questions (hidden initially) -->
+      <div id="quiz-area" class="hidden">
+        <div class="quiz-header">
+          <div class="quiz-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+            <span class="progress-text" id="progress-text">Question 1 of 10</span>
+          </div>
+        </div>
+
+        <!-- Answer Feedback (shown immediately after answering) -->
+        <div id="answer-feedback" class="hidden"></div>
+
+        <!-- Question -->
+        <div class="question-card">
+          <div class="question-meta" id="question-meta"></div>
+          <div class="question-text" id="question-text"></div>
+          <div class="options-container" id="options-container"></div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="quiz-navigation">
+          <div class="quiz-nav-left">
+            <button id="prev-btn" class="btn btn-secondary" disabled>← Previous</button>
+          </div>
+          <div class="quiz-nav-right">
+            <button id="next-btn" class="btn btn-primary" disabled>Next →</button>
+            <button id="submit-btn" class="btn btn-success btn-lg hidden">Submit Training</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary (hidden initially) -->
+      <div id="summary-area" class="hidden">
+        <div class="card summary-card fade-in">
+          <h2>Training Complete! 🎓</h2>
+          <div class="score-display">
+            <div class="score-circle">
+              <span class="score-percentage" id="score-percentage">0%</span>
+              <span class="score-label">Score</span>
+            </div>
+            <div class="score-details">
+              <p>You answered <strong id="score-correct">0</strong> out of <strong id="score-total">0</strong> correctly</p>
+            </div>
+          </div>
+          <div class="tag-breakdown" id="tag-breakdown"></div>
+          <div style="margin-top: var(--spacing-xl);">
+            <button onclick="location.reload()" class="btn btn-primary btn-lg">Train Again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Chat Panel -->
+    <div class="chat-panel" id="chat-panel">
+      <div class="chat-header">
+        <span class="chat-icon">💬</span>
+        <h3>Teaching Assistant</h3>
+      </div>
+
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-message assistant">
+          👋 Hi! I'm your MCPA tutor. Answer questions on the left and I'll help you understand the concepts. You can also ask me anything about MCP!
+        </div>
+      </div>
+
+      <div class="chat-actions" id="chat-actions">
+        <button class="chat-action-btn" id="btn-explain" disabled data-action="explain_answer">💡 Why is this the answer?</button>
+        <button class="chat-action-btn" id="btn-concept" disabled data-action="identify_concept">🔍 What concept is this?</button>
+      </div>
+
+      <div class="chat-input-area">
+        <textarea class="chat-input" id="chat-input" placeholder="Ask about any MCP concept..." rows="1"></textarea>
+        <button class="chat-send-btn" id="chat-send-btn">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== Training Mode App =====
+    const API = '';  // same origin
+
+    // State
+    let sessionId = null;
+    let chatSessionId = 'training_' + Date.now();
+    let questions = [];
+    let currentIndex = 0;
+    let userAnswers = {};
+    let answeredQuestions = {}; // track which questions have been answered (for instant feedback)
+
+    // DOM refs
+    const $tags = document.getElementById('tags-container');
+    const $selectedCount = document.getElementById('selected-count');
+    const $questionCount = document.getElementById('question-count');
+    const $startBtn = document.getElementById('start-quiz-btn');
+    const $tagSelection = document.getElementById('tag-selection');
+    const $quizArea = document.getElementById('quiz-area');
+    const $summaryArea = document.getElementById('summary-area');
+    const $questionText = document.getElementById('question-text');
+    const $questionMeta = document.getElementById('question-meta');
+    const $optionsContainer = document.getElementById('options-container');
+    const $progressFill = document.getElementById('progress-fill');
+    const $progressText = document.getElementById('progress-text');
+    const $prevBtn = document.getElementById('prev-btn');
+    const $nextBtn = document.getElementById('next-btn');
+    const $submitBtn = document.getElementById('submit-btn');
+    const $answerFeedback = document.getElementById('answer-feedback');
+    const $chatMessages = document.getElementById('chat-messages');
+    const $chatInput = document.getElementById('chat-input');
+    const $chatSendBtn = document.getElementById('chat-send-btn');
+    const $btnExplain = document.getElementById('btn-explain');
+    const $btnConcept = document.getElementById('btn-concept');
+
+    // ===== Init: Load Tags =====
+    async function init() {
+      try {
+        const res = await fetch(`${API}/api/tags`);
+        const data = await res.json();
+        renderTags(data.tags);
+      } catch (e) {
+        $tags.innerHTML = '<p style="color:red;">Failed to load tags. Is the server running?</p>';
+      }
+    }
+
+    function renderTags(tags) {
+      // Sort by count descending
+      tags.sort((a, b) => b.count - a.count);
+      $tags.innerHTML = tags.map(t => `
+        <div class="tag-item" data-tag="${t.name}">
+          <input type="checkbox" id="tag-${t.name}" value="${t.name}">
+          <label for="tag-${t.name}">${t.name} (${t.count})</label>
+        </div>
+      `).join('');
+
+      // Click handlers
+      $tags.querySelectorAll('.tag-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          if (e.target.tagName === 'INPUT') return;
+          const cb = item.querySelector('input');
+          cb.checked = !cb.checked;
+          item.classList.toggle('selected', cb.checked);
+          updateSelectedCount();
+        });
+        const cb = item.querySelector('input');
+        cb.addEventListener('change', () => {
+          item.classList.toggle('selected', cb.checked);
+          updateSelectedCount();
+        });
+      });
+    }
+
+    function updateSelectedCount() {
+      const count = $tags.querySelectorAll('input:checked').length;
+      $selectedCount.textContent = `${count} tag${count !== 1 ? 's' : ''} selected`;
+      $startBtn.disabled = count === 0;
+    }
+
+    document.getElementById('select-all-btn').addEventListener('click', () => {
+      $tags.querySelectorAll('input').forEach(cb => { cb.checked = true; cb.closest('.tag-item').classList.add('selected'); });
+      updateSelectedCount();
+    });
+
+    document.getElementById('deselect-all-btn').addEventListener('click', () => {
+      $tags.querySelectorAll('input').forEach(cb => { cb.checked = false; cb.closest('.tag-item').classList.remove('selected'); });
+      updateSelectedCount();
+    });
+
+    // ===== Start Quiz =====
+    $startBtn.addEventListener('click', async () => {
+      const selectedTags = Array.from($tags.querySelectorAll('input:checked')).map(cb => cb.value);
+      if (selectedTags.length === 0) return;
+
+      const count = $questionCount.value;
+      $startBtn.disabled = true;
+      $startBtn.textContent = 'Starting...';
+
+      try {
+        const res = await fetch(`${API}/api/quiz/start`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tags: selectedTags, count: count === 'all' ? 0 : parseInt(count) })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to start quiz');
+
+        sessionId = data.sessionId;
+        questions = data.questions;
+        currentIndex = 0;
+        userAnswers = {};
+        answeredQuestions = {};
+
+        $tagSelection.classList.add('hidden');
+        $quizArea.classList.remove('hidden');
+        renderQuestion();
+        addChatMessage('assistant', `Quiz started with ${questions.length} questions. Answer each one and I'll help you understand!`);
+      } catch (e) {
+        alert('Error: ' + e.message);
+        $startBtn.disabled = false;
+        $startBtn.textContent = 'Start Training';
+      }
+    });
+
+    // ===== Render Question =====
+    function renderQuestion() {
+      const q = questions[currentIndex];
+      const total = questions.length;
+      const answered = answeredQuestions[q.id];
+
+      // Progress
+      $progressFill.style.width = `${((currentIndex + 1) / total) * 100}%`;
+      $progressText.textContent = `Question ${currentIndex + 1} of ${total}`;
+
+      // Meta
+      $questionMeta.innerHTML = '';
+      if (q.difficulty) {
+        const diff = q.difficulty.toLowerCase();
+        $questionMeta.innerHTML += `<span class="question-badge badge-difficulty-${diff}">${q.difficulty}</span>`;
+      }
+      if (q.type) {
+        const type = q.type.includes('multi') ? 'multi' : 'mcq';
+        $questionMeta.innerHTML += `<span class="question-badge badge-type-${type}">${type === 'multi' ? 'Multi-Select' : 'Single Select'}</span>`;
+      }
+
+      // Question text
+      $questionText.textContent = q.question;
+
+      // Options
+      $optionsContainer.innerHTML = q.options.map(opt => {
+        let classes = 'option-item';
+        if (answered) {
+          // After answering: show correct/incorrect
+          const isCorrect = q.correctAnswers.includes(opt.letter);
+          const userSelected = isUserSelected(q.id, opt.letter);
+          if (isCorrect) classes += ' correct';
+          if (userSelected && !isCorrect) classes += ' incorrect';
+        } else if (isUserSelected(q.id, opt.letter)) {
+          classes += ' selected';
+        }
+
+        const inputType = q.type && q.type.includes('multi') ? 'checkbox' : 'radio';
+        const checked = isUserSelected(q.id, opt.letter) ? 'checked' : '';
+
+        return `
+          <div class="${classes}" data-letter="${opt.letter}" ${answered ? '' : `onclick="selectOption('${q.id}', '${opt.letter}', '${inputType}')"`}>
+            <input type="${inputType}" name="q-${q.id}" value="${opt.letter}" ${checked} ${answered ? 'disabled' : ''}>
+            <span class="option-letter">${opt.letter}</span>
+            <span class="option-text">${opt.text}</span>
+          </div>
+        `;
+      }).join('');
+
+      // Answer feedback (if already answered)
+      if (answered) {
+        showFeedback(q, userAnswers[q.id]);
+        $nextBtn.disabled = false;
+      } else {
+        $answerFeedback.classList.add('hidden');
+        $nextBtn.disabled = true;
+      }
+
+      // Navigation
+      $prevBtn.disabled = currentIndex === 0;
+      if (currentIndex === total - 1) {
+        $nextBtn.classList.add('hidden');
+        $submitBtn.classList.remove('hidden');
+        $submitBtn.disabled = !answered;
+      } else {
+        $nextBtn.classList.remove('hidden');
+        $submitBtn.classList.add('hidden');
+      }
+
+      // Update chat context
+      updateChatContext(q);
+    }
+
+    function isUserSelected(questionId, letter) {
+      const answer = userAnswers[questionId];
+      if (!answer) return false;
+      if (Array.isArray(answer)) return answer.includes(letter);
+      return answer === letter;
+    }
+
+    // ===== Select Option (with instant feedback) =====
+    window.selectOption = function(questionId, letter, inputType) {
+      if (answeredQuestions[questionId]) return; // already answered
+
+      if (inputType === 'checkbox') {
+        if (!userAnswers[questionId]) userAnswers[questionId] = [];
+        const idx = userAnswers[questionId].indexOf(letter);
+        if (idx >= 0) userAnswers[questionId].splice(idx, 1);
+        else userAnswers[questionId].push(letter);
+      } else {
+        userAnswers[questionId] = letter;
+      }
+
+      // Mark as answered immediately
+      answeredQuestions[questionId] = true;
+
+      // Find the question and check correctness
+      const q = questions.find(q => q.id === questionId);
+      if (!q) return;
+
+      const userAnswer = userAnswers[questionId];
+      const correctAnswers = q.correctAnswers.sort().join(',');
+      const userAnswerStr = Array.isArray(userAnswer) ? userAnswer.sort().join(',') : (userAnswer || '');
+      const isCorrect = correctAnswers === userAnswerStr;
+
+      // Show feedback
+      showFeedback(q, userAnswer, isCorrect);
+
+      // Enable chat action buttons
+      $btnExplain.disabled = false;
+      $btnConcept.disabled = false;
+
+      // Send context to chat
+      sendAnswerContext(q, userAnswer, q.correctAnswers.join(', '), isCorrect);
+
+      // Enable next button
+      $nextBtn.disabled = false;
+      $submitBtn.disabled = false;
+
+      // Re-render to show correct/incorrect colors
+      renderQuestion();
+    };
+
+    function showFeedback(q, userAnswer, isCorrect) {
+      if (isCorrect === undefined) {
+        // Recalculate
+        const correctAnswers = q.correctAnswers.sort().join(',');
+        const userAnswerStr = Array.isArray(userAnswer) ? userAnswer.sort().join(',') : (userAnswer || '');
+        isCorrect = correctAnswers === userAnswerStr;
+      }
+
+      const correctText = q.correctAnswers.join(', ');
+      $answerFeedback.className = `answer-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+      $answerFeedback.innerHTML = `
+        <span class="feedback-icon">${isCorrect ? '✅' : '❌'}</span>
+        <span class="feedback-text">
+          ${isCorrect
+            ? '<strong>Correct!</strong> Well done.'
+            : `<strong>Not quite.</strong> The correct answer is <span class="correct-answer">${correctText}</span>.`
+          }
+        </span>
+      `;
+      $answerFeedback.classList.remove('hidden');
+    }
+
+    // ===== Navigation =====
+    $prevBtn.addEventListener('click', () => {
+      if (currentIndex > 0) { currentIndex--; renderQuestion(); }
+    });
+
+    $nextBtn.addEventListener('click', () => {
+      if (currentIndex < questions.length - 1) { currentIndex++; renderQuestion(); }
+    });
+
+    $submitBtn.addEventListener('click', async () => {
+      if (!confirm('Submit your training session?')) return;
+      try {
+        const res = await fetch(`${API}/api/quiz/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId, answers: userAnswers })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        showSummary(data);
+      } catch (e) {
+        alert('Submit error: ' + e.message);
+      }
+    });
+
+    // ===== Summary =====
+    function showSummary(data) {
+      $quizArea.classList.add('hidden');
+      $summaryArea.classList.remove('hidden');
+
+      document.getElementById('score-percentage').textContent = data.percentage + '%';
+      document.getElementById('score-correct').textContent = data.score;
+      document.getElementById('score-total').textContent = data.total;
+
+      // Tag breakdown
+      const tagStats = {};
+      for (const r of data.results) {
+        for (const tag of (r.tags || [])) {
+          if (!tagStats[tag]) tagStats[tag] = { correct: 0, total: 0 };
+          tagStats[tag].total++;
+          if (r.isCorrect) tagStats[tag].correct++;
+        }
+      }
+
+      const sorted = Object.entries(tagStats)
+        .map(([tag, s]) => ({ tag, pct: Math.round((s.correct / s.total) * 100), ...s }))
+        .sort((a, b) => a.pct - b.pct);
+
+      const $breakdown = document.getElementById('tag-breakdown');
+      if (sorted.length > 0) {
+        $breakdown.innerHTML = `
+          <h3>Performance by Topic</h3>
+          <div class="tag-breakdown-list">
+            ${sorted.map(t => {
+              const color = t.pct >= 75 ? '#4CAF50' : t.pct >= 50 ? '#FF9800' : '#F44336';
+              return `
+                <div class="tag-breakdown-item">
+                  <div class="tag-breakdown-header">
+                    <span class="tag-breakdown-name">${t.tag}</span>
+                    <span class="tag-breakdown-score">${t.correct}/${t.total} (${t.pct}%)</span>
+                  </div>
+                  <div class="tag-breakdown-bar">
+                    <div class="tag-breakdown-fill" style="width:${t.pct}%; background:${color};"></div>
+                  </div>
+                </div>`;
+            }).join('')}
+          </div>
+        `;
+      }
+
+      addChatMessage('assistant', `🎉 Training complete! You scored **${data.percentage}%**. Ask me about any topics you struggled with!`);
+    }
+
+    // ===== Chat =====
+    function addChatMessage(role, text) {
+      const div = document.createElement('div');
+      div.className = `chat-message ${role}`;
+      // Simple markdown-ish rendering
+      div.innerHTML = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/`(.*?)`/g, '<code>$1</code>')
+        .replace(/\n/g, '<br>');
+      $chatMessages.appendChild(div);
+      $chatMessages.scrollTop = $chatMessages.scrollHeight;
+    }
+
+    async function sendChatMessage(message) {
+      if (!message.trim()) return;
+      addChatMessage('user', message);
+      $chatInput.value = '';
+      $chatSendBtn.disabled = true;
+
+      try {
+        const res = await fetch(`${API}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: chatSessionId, message })
+        });
+        const data = await res.json();
+        addChatMessage('assistant', data.response);
+      } catch (e) {
+        addChatMessage('assistant', '⚠️ Sorry, I encountered an error. Please try again.');
+      }
+      $chatSendBtn.disabled = false;
+    }
+
+    async function sendChatAction(action) {
+      $btnExplain.disabled = true;
+      $btnConcept.disabled = true;
+
+      try {
+        const res = await fetch(`${API}/api/chat/action`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: chatSessionId, action })
+        });
+        const data = await res.json();
+        addChatMessage('assistant', data.response);
+      } catch (e) {
+        addChatMessage('assistant', '⚠️ Sorry, I encountered an error.');
+      }
+      $btnExplain.disabled = false;
+      $btnConcept.disabled = false;
+    }
+
+    async function updateChatContext(question) {
+      try {
+        await fetch(`${API}/api/chat/context`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: chatSessionId,
+            questionId: question.id
+          })
+        });
+      } catch (e) { /* silent */ }
+    }
+
+    async function sendAnswerContext(question, userAnswer, correctAnswer, isCorrect) {
+      try {
+        await fetch(`${API}/api/chat/context`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: chatSessionId,
+            questionId: question.id,
+            userAnswer: Array.isArray(userAnswer) ? userAnswer.join(', ') : userAnswer,
+            correctAnswer,
+            isCorrect
+          })
+        });
+      } catch (e) { /* silent */ }
+    }
+
+    // Chat event listeners
+    $chatSendBtn.addEventListener('click', () => sendChatMessage($chatInput.value));
+    $chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage($chatInput.value); }
+    });
+
+    $btnExplain.addEventListener('click', () => sendChatAction('explain_answer'));
+    $btnConcept.addEventListener('click', () => sendChatAction('identify_concept'));
+
+    // Auto-resize textarea
+    $chatInput.addEventListener('input', () => {
+      $chatInput.style.height = 'auto';
+      $chatInput.style.height = Math.min($chatInput.scrollHeight, 80) + 'px';
+    });
+
+    // ===== Boot =====
+    init();
+  </script>
+</body>
+</html>

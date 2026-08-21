@@ -9,9 +9,10 @@
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Feedback Timing** | Delayed (at end) | Realistic exam simulation |
-| **Answer Randomization** | Always randomize | Prevents memorization |
-| **Wrong Answer Explanations** | On demand (click/hover) | Cleaner UI, user controls detail |
+| **Feedback Timing (Exam)** | Delayed (at end) | Realistic exam simulation |
+| **Feedback Timing (Training)** | Instant (per question) | Learning science: immediate correction |
+| **Letter Assignment** | By position (not shuffle) | 300+ questions, no memorization concern |
+| **Wrong Answer Explanations** | Chat assistant + on-demand | Interactive learning |
 | **Multi-select Input** | Radio for single, checkboxes for multi | Match question type |
 | **Submit Button** | Only on last page | Keep UI clean |
 | **Skip/Reorder** | Extra feature: skip question, move to end | Ensure no unanswered questions |
@@ -85,15 +86,13 @@
 ### Frontend Structure
 ```
 public/
-├── index.html              ← Main page
-├── quiz.html               ← Quiz session page
-├── summary.html            ← Results page
+├── index.html              ← Exam mode (quiz only)
+├── training.html           ← Training mode (quiz + chat)
 ├── css/
-│   └── style.css           ← Styling
+│   └── style.css           ← Shared styling
 └── js/
-    ├── app.js              ← Main logic
-    ├── quiz.js             ← Quiz engine
-    └── api.js              ← API calls
+    ├── app.js              ← Exam mode logic
+    └── api.js              ← API helpers
 ```
 
 ### Backend Structure
@@ -113,7 +112,11 @@ src/
 | GET | `/api/tags` | Get available tags | - | `{ tags: [...] }` |
 | POST | `/api/quiz/start` | Start quiz session | `{ tags: [...], count: 20 }` | `{ sessionId, questions: [...] }` |
 | POST | `/api/quiz/submit` | Submit answers | `{ sessionId, answers: {...} }` | `{ score, results: [...] }` |
-| GET | `/api/questions/:id` | Get single question | - | `{ question: {...} }` |
+| GET | `/api/questions/:id` | Get single question |
+| POST | `/api/chat` | Send message to tutor |
+| POST | `/api/chat/context` | Update tutor's question context |
+| POST | `/api/chat/action` | Quick action buttons |
+| GET | `/api/chat/history/:id` | Get chat history | - | `{ question: {...} }` |
 
 ---
 

@@ -7,7 +7,11 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test test/*.test.js",
+    "test:data": "node --test test/data-integrity.test.js",
+    "test:api": "node --test test/api.test.js",
+    "test:mcp": "node --test test/mcp-server.test.js",
+    "start": "node src/server.js"
   },
   "repository": {
     "type": "git",
@@ -22,9 +26,12 @@
   },
   "homepage": "https://github.com/altlv/mcpa-training-bot#readme",
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "js-yaml": "^5.3.0",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^4.4.3"
   }
 }
+
