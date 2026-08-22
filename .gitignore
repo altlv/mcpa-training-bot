@@ -20,6 +20,7 @@ yarn-error.log*
 # Regenerable data
 data/results/       # Quiz results (user-specific)
 data/search-index.json  # BM25 index (rebuild with node scripts/build-index.js)
+test-results #e2e results
 
 # Environment variables
 .env
