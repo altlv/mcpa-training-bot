@@ -1,8 +1,4 @@
 # MCPA Exam Cheat Sheet
-## Fill this in as you study - Review before exam!
-
-> ✅ **Corrected 2026-08-22** against modelcontextprotocol.io spec 2026-07-28 (basic/index, basic/patterns/mrtr, basic/authorization, server/discover, changelog, caching, subscriptions, security considerations, Inspector docs, Tasks extension, Registry, Governance, SEP-2243) and aaif.io. Key fixes: MCP forbids `id: null`; SSRF mitigations are SHOULDs; HeaderMismatch renumbered -32001→-32020; server/discover mandatory for servers but optional for clients; expanded MRTR hard rules + new Traps 11–14; added -32001 InvalidProtocolVersion; corrected confused deputy scope.
-
 ---
 
 ## ⭐ EXAM DOMAIN WEIGHTS (study time allocator!)
