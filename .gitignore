@@ -17,6 +17,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Regenerable data
+data/results/       # Quiz results (user-specific)
+data/search-index.json  # BM25 index (rebuild with node scripts/build-index.js)
+
 # Environment variables
 .env
 .env.local
@@ -90,6 +94,7 @@ archive/
 # ✓ Schemas (data/schemas/)
 # ✓ Public assets (public/)
 # ✓ Tests (tests/)
+# ✓ Questions (data/questions/ — study material, worth versioning)
 # ✓ TODO.md
 # ✓ .gitignore itself
 # ================================
