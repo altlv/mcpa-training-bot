@@ -94,18 +94,24 @@ router.post('/quiz/start', (req, res) => {
     };
     quizSessions.set(sessionId, session);
 
-    // Return questions without correct answers
-    const questionsForClient = preparedQuestions.map(q => ({
-      id: q.id,
-      chapter: q.chapter,
-      chapterName: q.chapterName,
-      type: q.type,
-      difficulty: q.difficulty,
-      question: q.question,
-      options: q.options, // Already shuffled
-      tags: q.tags
-      // NOTE: correctAnswers are stored in session for scoring, not sent to client
-    }));
+    // Return questions — include correctAnswers only in training mode (for immediate feedback)
+    const mode = req.body.mode || 'exam';
+    const questionsForClient = preparedQuestions.map(q => {
+      const clientQ = {
+        id: q.id,
+        chapter: q.chapter,
+        chapterName: q.chapterName,
+        type: q.type,
+        difficulty: q.difficulty,
+        question: q.question,
+        options: q.options, // Already shuffled
+        tags: q.tags
+      };
+      if (mode === 'training') {
+        clientQ.correctAnswers = q.correctAnswers;
+      }
+      return clientQ;
+    });
 
     res.json({
       sessionId: sessionId,

@@ -1,0 +1,406 @@
+{
+  "sessionId": "quiz_1787428588142_h5lku7dfn",
+  "timestamp": "2026-08-22T20:06:17.774Z",
+  "tags": [
+    "agent-skills",
+    "deployment",
+    "agent-skills",
+    "deployment",
+    "mcpb",
+    "agent-skills",
+    "deployment",
+    "agent-skills",
+    "mcpb",
+    "distribution",
+    "agent-skills",
+    "tooling",
+    "agent-skills",
+    "scenario",
+    "workflow",
+    "aaif",
+    "agentgateway",
+    "infrastructure",
+    "aaif",
+    "agents-md",
+    "standards",
+    "fundamentals",
+    "scope",
+    "fundamentals",
+    "ecosystem",
+    "fundamentals",
+    "use-cases",
+    "fundamentals",
+    "design",
+    "mxn-problem",
+    "fundamentals",
+    "spec",
+    "standardization",
+    "fundamentals",
+    "primitives",
+    "fundamentals",
+    "governance",
+    "seps",
+    "fundamentals",
+    "mxn-problem",
+    "fundamentals",
+    "mxn-problem",
+    "standardization",
+    "fundamentals",
+    "lsp",
+    "history",
+    "fundamentals",
+    "standardization",
+    "spec",
+    "fundamentals",
+    "project-structure",
+    "seps",
+    "fundamentals",
+    "seps",
+    "governance",
+    "fundamentals",
+    "mxn-problem",
+    "scenario"
+  ],
+  "totalQuestions": 22,
+  "score": 14,
+  "percentage": 64,
+  "results": [
+    {
+      "questionId": "ch5-m3",
+      "question": "Which deployment paths does the build-mcp-server agent skill choose between? (Select all that apply.)",
+      "tags": [
+        "agent-skills",
+        "deployment"
+      ],
+      "isCorrect": false,
+      "yourAnswer": [
+        "C"
+      ],
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "questionId": "ch5-m8",
+      "question": "Which statements about the MCP server-development agent skills are correct? (Select all that apply.)",
+      "tags": [
+        "agent-skills",
+        "deployment",
+        "mcpb"
+      ],
+      "isCorrect": true,
+      "yourAnswer": [
+        "A",
+        "B",
+        "C"
+      ],
+      "correctAnswer": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "questionId": "ch5-q7",
+      "question": "In the 'Build with Agent Skills' guide, which deployment path is the default recommendation for a server wrapping a cloud API?",
+      "tags": [
+        "agent-skills",
+        "deployment"
+      ],
+      "isCorrect": true,
+      "yourAnswer": "B",
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch5-q8",
+      "question": "What problem do MCP Bundles (MCPB) solve?",
+      "tags": [
+        "agent-skills",
+        "mcpb",
+        "distribution"
+      ],
+      "isCorrect": true,
+      "yourAnswer": "B",
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch5-q9",
+      "question": "The reference mcp-server-dev plugin provides three composing skills. Which option lists them correctly?",
+      "tags": [
+        "agent-skills",
+        "tooling"
+      ],
+      "isCorrect": false,
+      "yourAnswer": "C",
+      "correctAnswer": "A"
+    },
+    {
+      "questionId": "ch5-q15",
+      "question": "SCENARIO: You ask an agent with the build-mcp-server skill installed to 'help me build an MCP server for our CRM'. What does the skill do before writing any code?",
+      "tags": [
+        "agent-skills",
+        "scenario",
+        "workflow"
+      ],
+      "isCorrect": true,
+      "yourAnswer": "B",
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch17-q5",
+      "question": "What is agentgateway?",
+      "tags": [
+        "aaif",
+        "agentgateway",
+        "infrastructure"
+      ],
+      "isCorrect": true,
+      "yourAnswer": "A",
+      "correctAnswer": "A"
+    },
+    {
+      "questionId": "ch17-q4",
+      "question": "What is AGENTS.md?",
+      "tags": [
+        "aaif",
+        "agents-md",
+        "standards"
+      ],
+      "isCorrect": true,
+      "yourAnswer": "B",
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch1-m1",
+      "question": "Which of the following are part of the Model Context Protocol's official project scope? (Select all that apply.)",
+      "tags": [
+        "fundamentals",
+        "scope"
+      ],
+      "isCorrect": true,
+      "yourAnswer": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ],
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ]
+    },
+    {
+      "questionId": "ch1-m2",
+      "question": "According to the intro docs, which stakeholders gain the listed benefit from MCP? (Select all that apply.)",
+      "tags": [
+        "fundamentals",
+        "ecosystem"
+      ],
+      "isCorrect": false,
+      "yourAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "correctAnswer": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "questionId": "ch1-m3",
+      "question": "Which of the following are examples the documentation gives of what MCP can enable? (Select all that apply.)",
+      "tags": [
+        "fundamentals",
+        "use-cases"
+      ],
+      "isCorrect": true,
+      "yourAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "questionId": "ch1-m4",
+      "question": "Which statements about MCP's design philosophy are true? (Select all that apply.)",
+      "tags": [
+        "fundamentals",
+        "design",
+        "mxn-problem"
+      ],
+      "isCorrect": false,
+      "yourAnswer": [
+        "D"
+      ],
+      "correctAnswer": [
+        "A",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "questionId": "ch1-m5",
+      "question": "Per the specification overview, MCP provides a standardized way for applications to... (Select all that apply.)",
+      "tags": [
+        "fundamentals",
+        "spec",
+        "standardization"
+      ],
+      "isCorrect": true,
+      "yourAnswer": [
+        "A",
+        "B",
+        "C"
+      ],
+      "correctAnswer": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "questionId": "ch1-m6",
+      "question": "Which are core server primitives defined by the MCP specification? (Select all that apply.)",
+      "tags": [
+        "fundamentals",
+        "primitives"
+      ],
+      "isCorrect": false,
+      "yourAnswer": [
+        "E"
+      ],
+      "correctAnswer": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "questionId": "ch1-m7",
+      "question": "Which statements about MCP's governance artifacts are correct? (Select all that apply.)",
+      "tags": [
+        "fundamentals",
+        "governance",
+        "seps"
+      ],
+      "isCorrect": false,
+      "yourAnswer": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "correctAnswer": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "questionId": "ch1-m8",
+      "question": "MCP reduces integration effort because... (Select all that apply.)",
+      "tags": [
+        "fundamentals",
+        "mxn-problem"
+      ],
+      "isCorrect": false,
+      "yourAnswer": [
+        "B",
+        "C"
+      ],
+      "correctAnswer": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "questionId": "ch1-q16",
+      "question": "What is the 'M×N integration problem' that MCP solves?",
+      "tags": [
+        "fundamentals",
+        "mxn-problem",
+        "standardization"
+      ],
+      "isCorrect": true,
+      "yourAnswer": "B",
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch1-q17",
+      "question": "MCP explicitly takes inspiration from which earlier protocol, and what is the parallel?",
+      "tags": [
+        "fundamentals",
+        "lsp",
+        "history"
+      ],
+      "isCorrect": true,
+      "yourAnswer": "B",
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch1-q18",
+      "question": "According to the specification overview, MCP provides a standardized way for applications to do which three things?",
+      "tags": [
+        "fundamentals",
+        "standardization",
+        "spec"
+      ],
+      "isCorrect": true,
+      "yourAnswer": "A",
+      "correctAnswer": "A"
+    },
+    {
+      "questionId": "ch1-q19",
+      "question": "Which top-level areas make up the MCP project and its documentation site?",
+      "tags": [
+        "fundamentals",
+        "project-structure",
+        "seps"
+      ],
+      "isCorrect": false,
+      "yourAnswer": "A",
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch1-q20",
+      "question": "What is a Specification Enhancement Proposal (SEP)?",
+      "tags": [
+        "fundamentals",
+        "seps",
+        "governance"
+      ],
+      "isCorrect": true,
+      "yourAnswer": "B",
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch1-q21",
+      "question": "SCENARIO: A team of 5 AI products needs to integrate with 8 internal systems. Roughly how many integrations are needed without MCP versus with MCP?",
+      "tags": [
+        "fundamentals",
+        "mxn-problem",
+        "scenario"
+      ],
+      "isCorrect": true,
+      "yourAnswer": "A",
+      "correctAnswer": "A"
+    }
+  ]
+}

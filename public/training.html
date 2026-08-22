@@ -187,7 +187,45 @@
       .training-layout { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
       .quiz-panel { border-right: none; border-bottom: 2px solid var(--border-color); }
     }
-  </style>
+  
+    /* ===== Feedback Modal ===== */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.15s ease;
+    }
+    .modal-card {
+      background: var(--bg-primary, #fff);
+      border-radius: var(--radius-lg, 16px);
+      padding: 2rem 2.5rem;
+      max-width: 480px; width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: slideUp 0.2s ease;
+    }
+    .modal-card.correct { border-top: 4px solid #4CAF50; }
+    .modal-card.incorrect { border-top: 4px solid #F44336; }
+    .modal-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+    .modal-title { font-size: 1.3rem; margin-bottom: 0.5rem; font-weight: 700; }
+    .modal-title.correct { color: #2E7D32; }
+    .modal-title.incorrect { color: #C62828; }
+    .modal-correct-answer { 
+      background: #E8F5E9; padding: 0.6rem 1rem; border-radius: 8px;
+      margin: 0.8rem 0; font-size: 0.95rem; text-align: left;
+    }
+    .modal-correct-answer strong { color: #2E7D32; }
+    .modal-explanation {
+      background: #F5F5F5; padding: 0.8rem 1rem; border-radius: 8px;
+      margin: 0.8rem 0; font-size: 0.9rem; text-align: left; line-height: 1.5;
+    }
+    .modal-actions { margin-top: 1.2rem; display: flex; gap: 0.8rem; justify-content: center; }
+    .modal-actions .btn { min-width: 140px; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+</style>
 </head>
 <body>
   <!-- Header -->
@@ -307,6 +345,21 @@
     </div>
   </div>
 
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="modal-overlay hidden">
+      <div class="modal-card" id="modal-card">
+        <div class="modal-icon" id="modal-icon"></div>
+        <div class="modal-title" id="modal-title"></div>
+        <div id="modal-correct-answer" class="modal-correct-answer hidden"></div>
+        <div id="modal-explanation" class="modal-explanation hidden"></div>
+        <div class="modal-actions">
+          <button id="modal-dismiss" class="btn btn-secondary" style="display:none">✕ Close</button>
+          <button id="modal-next" class="btn btn-primary">Next →</button>
+        </div>
+      </div>
+    </div>
+
   <script>
     // ===== Training Mode App =====
     const API = '';  // same origin
@@ -354,8 +407,8 @@
     }
 
     function renderTags(tags) {
-      // Sort by count descending
-      tags.sort((a, b) => b.count - a.count);
+      // Sort alphabetically
+      tags.sort((a, b) => a.name.localeCompare(b.name));
       $tags.innerHTML = tags.map(t => `
         <div class="tag-item" data-tag="${t.name}">
           <input type="checkbox" id="tag-${t.name}" value="${t.name}">
@@ -366,7 +419,8 @@
       // Click handlers
       $tags.querySelectorAll('.tag-item').forEach(item => {
         item.addEventListener('click', (e) => {
-          if (e.target.tagName === 'INPUT') return;
+          // Don't re-toggle if click came from input or label (label already toggles via 'for' attr)
+          if (e.target.tagName === 'INPUT' || e.target.tagName === 'LABEL') return;
           const cb = item.querySelector('input');
           cb.checked = !cb.checked;
           item.classList.toggle('selected', cb.checked);
@@ -409,7 +463,7 @@
         const res = await fetch(`${API}/api/quiz/start`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tags: selectedTags, count: count === 'all' ? 0 : parseInt(count) })
+          body: JSON.stringify({ tags: selectedTags, count: count === 'all' ? 0 : parseInt(count), mode: 'training' })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to start quiz');
@@ -458,9 +512,10 @@
       // Options
       $optionsContainer.innerHTML = q.options.map(opt => {
         let classes = 'option-item';
+        const ca = Array.isArray(q.correctAnswers) ? q.correctAnswers : q.correctAnswers ? [q.correctAnswers] : [];
         if (answered) {
           // After answering: show correct/incorrect
-          const isCorrect = q.correctAnswers.includes(opt.letter);
+          const isCorrect = ca.includes(opt.letter);
           const userSelected = isUserSelected(q.id, opt.letter);
           if (isCorrect) classes += ' correct';
           if (userSelected && !isCorrect) classes += ' incorrect';
@@ -472,7 +527,7 @@
         const checked = isUserSelected(q.id, opt.letter) ? 'checked' : '';
 
         return `
-          <div class="${classes}" data-letter="${opt.letter}" ${answered ? '' : `onclick="selectOption('${q.id}', '${opt.letter}', '${inputType}')"`}>
+          <div class="${classes}" data-letter="${opt.letter}" data-qid="${q.id}" data-input="${inputType}">
             <input type="${inputType}" name="q-${q.id}" value="${opt.letter}" ${checked} ${answered ? 'disabled' : ''}>
             <span class="option-letter">${opt.letter}</span>
             <span class="option-text">${opt.text}</span>
@@ -486,7 +541,9 @@
         $nextBtn.disabled = false;
       } else {
         $answerFeedback.classList.add('hidden');
-        $nextBtn.disabled = true;
+        // Multi-select with selections: keep Next enabled
+        const hasSelections = Array.isArray(userAnswers[q.id]) && userAnswers[q.id].length > 0;
+        $nextBtn.disabled = !hasSelections;
       }
 
       // Navigation
@@ -494,7 +551,8 @@
       if (currentIndex === total - 1) {
         $nextBtn.classList.add('hidden');
         $submitBtn.classList.remove('hidden');
-        $submitBtn.disabled = !answered;
+        const hasMultiSelections = Array.isArray(userAnswers[q.id]) && userAnswers[q.id].length > 0;
+        $submitBtn.disabled = !answered && !hasMultiSelections;
       } else {
         $nextBtn.classList.remove('hidden');
         $submitBtn.classList.add('hidden');
@@ -511,58 +569,58 @@
       return answer === letter;
     }
 
-    // ===== Select Option (with instant feedback) =====
+    // ===== Select Option =====
     window.selectOption = function(questionId, letter, inputType) {
       if (answeredQuestions[questionId]) return; // already answered
 
       if (inputType === 'checkbox') {
+        // Multi-select: toggle selection, don't auto-verify
         if (!userAnswers[questionId]) userAnswers[questionId] = [];
         const idx = userAnswers[questionId].indexOf(letter);
         if (idx >= 0) userAnswers[questionId].splice(idx, 1);
         else userAnswers[questionId].push(letter);
-      } else {
-        userAnswers[questionId] = letter;
+
+        // Update checkbox DOM directly
+        const cb = document.querySelector('input[name="q-' + questionId + '"][value="' + letter + '"]');
+        if (cb) cb.checked = userAnswers[questionId].includes(letter);
+
+        // Enable Next if at least 1 option selected, disable if 0
+        $nextBtn.disabled = userAnswers[questionId].length === 0;
+        $submitBtn.disabled = userAnswers[questionId].length === 0;
+        return;
       }
 
-      // Mark as answered immediately
+      // Single-select: verify immediately
+      userAnswers[questionId] = letter;
       answeredQuestions[questionId] = true;
 
-      // Find the question and check correctness
       const q = questions.find(q => q.id === questionId);
       if (!q) return;
 
-      const userAnswer = userAnswers[questionId];
-      const correctAnswers = q.correctAnswers.sort().join(',');
-      const userAnswerStr = Array.isArray(userAnswer) ? userAnswer.sort().join(',') : (userAnswer || '');
-      const isCorrect = correctAnswers === userAnswerStr;
+      // Compute correctness
+      const ca = Array.isArray(q.correctAnswers) ? q.correctAnswers : q.correctAnswers ? [q.correctAnswers] : [];
+      const isCorrect = ca.length > 0 && ca.includes(letter);
 
-      // Show feedback
-      showFeedback(q, userAnswer, isCorrect);
-
-      // Enable chat action buttons
+      showFeedback(q, userAnswers[questionId], isCorrect);
       $btnExplain.disabled = false;
       $btnConcept.disabled = false;
+      sendAnswerContext(q, userAnswers[questionId], ca.join(', '), isCorrect);
 
-      // Send context to chat
-      sendAnswerContext(q, userAnswer, q.correctAnswers.join(', '), isCorrect);
-
-      // Enable next button
-      $nextBtn.disabled = false;
-      $submitBtn.disabled = false;
-
-      // Re-render to show correct/incorrect colors
-      renderQuestion();
+      // Show feedback modal for single-select
+      showFeedbackModal(q, userAnswers[questionId], isCorrect);
     };
 
     function showFeedback(q, userAnswer, isCorrect) {
+      // Ensure correctAnswers is always an array
+      const ca = Array.isArray(q.correctAnswers) ? q.correctAnswers : q.correctAnswers ? [q.correctAnswers] : [];
       if (isCorrect === undefined) {
         // Recalculate
-        const correctAnswers = q.correctAnswers.sort().join(',');
-        const userAnswerStr = Array.isArray(userAnswer) ? userAnswer.sort().join(',') : (userAnswer || '');
+        const correctAnswers = [...ca].sort().join(',');
+        const userAnswerStr = Array.isArray(userAnswer) ? [...userAnswer].sort().join(',') : (userAnswer || '');
         isCorrect = correctAnswers === userAnswerStr;
       }
 
-      const correctText = q.correctAnswers.join(', ');
+      const correctText = ca.join(', ');
       const explanationHtml = q.explanation
         ? `<div class="explanation"><strong>📖 Explanation:</strong> ${q.explanation}</div>`
         : '';
@@ -580,12 +638,136 @@
       $answerFeedback.classList.remove('hidden');
     }
 
+    // ===== Feedback Modal =====
+    const $modal = document.getElementById('feedback-modal');
+    const $modalCard = document.getElementById('modal-card');
+    const $modalIcon = document.getElementById('modal-icon');
+    const $modalTitle = document.getElementById('modal-title');
+    const $modalCorrectAnswer = document.getElementById('modal-correct-answer');
+    const $modalExplanation = document.getElementById('modal-explanation');
+    const $modalNext = document.getElementById('modal-next');
+    const $modalDismiss = document.getElementById('modal-dismiss');
+
+    function showFeedbackModal(q, userAnswer, isCorrect) {
+      // Ensure correctAnswers is always an array
+      const ca = Array.isArray(q.correctAnswers) ? q.correctAnswers : q.correctAnswers ? [q.correctAnswers] : [];
+      if (isCorrect === undefined) {
+        const correctStr = [...ca].sort().join(',');
+        const userStr = Array.isArray(userAnswer) ? [...userAnswer].sort().join(',') : (userAnswer || '');
+        isCorrect = correctStr === userStr;
+      }
+      $modalCard.className = 'modal-card ' + (isCorrect ? 'correct' : 'incorrect');
+      $modalIcon.textContent = isCorrect ? '✅' : '❌';
+      $modalTitle.textContent = isCorrect ? 'Correct!' : 'Not quite.';
+      $modalTitle.className = 'modal-title ' + (isCorrect ? 'correct' : 'incorrect');
+
+      if (isCorrect) {
+        $modalCorrectAnswer.classList.add('hidden');
+      } else {
+        const correctText = ca.join(', ');
+        const correctLabels = q.options
+          .filter(o => ca.includes(o.letter))
+          .map(o => o.letter + '. ' + o.text).join('\n');
+        $modalCorrectAnswer.innerHTML = '<strong>Correct answer:</strong> ' + correctText + (correctLabels ? '<br><small>' + correctLabels + '</small>' : '');
+        $modalCorrectAnswer.classList.remove('hidden');
+      }
+
+      if (q.explanation) {
+        $modalExplanation.innerHTML = '<strong>📖</strong> ' + q.explanation;
+        $modalExplanation.classList.remove('hidden');
+      } else {
+        $modalExplanation.classList.add('hidden');
+      }
+
+      // Show "Close" only for multi-select (user might want to change selections)
+      const isMulti = q.type && q.type.includes('multi');
+      $modalDismiss.style.display = isMulti ? 'inline-flex' : 'none';
+      // If single-select, "Next" advances. If multi-select, "Next" is the submit-to-advance.
+      $modalNext.textContent = (currentIndex >= questions.length - 1) ? 'See Results' : 'Next →';
+
+      $modal.classList.remove('hidden');
+    }
+
+    function hideFeedbackModal() {
+      $modal.classList.add('hidden');
+    }
+
+    // Modal "Next" button
+    $modalNext.addEventListener('click', () => {
+      hideFeedbackModal();
+      // For multi-select, mark as answered on modal Next
+      const q = questions[currentIndex];
+      if (q && !answeredQuestions[q.id] && Array.isArray(userAnswers[q.id]) && userAnswers[q.id].length > 0) {
+        answeredQuestions[q.id] = true;
+        showFeedback(q, userAnswers[q.id]);
+        $btnExplain.disabled = false;
+        $btnConcept.disabled = false;
+        sendAnswerContext(q, userAnswers[q.id], (Array.isArray(q.correctAnswers) ? q.correctAnswers : []).join(', '), true);
+      }
+      // Last question: show submit button
+      if (currentIndex >= questions.length - 1) {
+        renderQuestion();
+        return;
+      }
+      // Advance to next question
+      currentIndex++;
+      renderQuestion();
+    });
+
+    // Modal "Close" button (multi-select: stay on question to change selections)
+    $modalDismiss.addEventListener('click', () => {
+      hideFeedbackModal();
+      // Reset answered state so user can change selection
+      const q = questions[currentIndex];
+      if (q) {
+        answeredQuestions[q.id] = false;
+        $nextBtn.disabled = userAnswers[q.id] && userAnswers[q.id].length > 0 ? false : true;
+        renderQuestion();
+      }
+    });
+
+    // Click outside modal to dismiss (same as Close)
+    $modal.addEventListener('click', (e) => {
+      if (e.target === $modal) $modalDismiss.click();
+    });
+
+
+
+    // ===== Event Delegation for Options =====
+    document.getElementById('options-container').addEventListener('click', function(e) {
+      const item = e.target.closest('.option-item');
+      if (!item) return;
+      const letter = item.getAttribute('data-letter');
+      const qid = item.getAttribute('data-qid');
+      const inputType = item.getAttribute('data-input');
+      if (letter && qid && inputType) {
+        window.selectOption(qid, letter, inputType);
+      }
+    });
+
     // ===== Navigation =====
     $prevBtn.addEventListener('click', () => {
       if (currentIndex > 0) { currentIndex--; renderQuestion(); }
     });
 
     $nextBtn.addEventListener('click', () => {
+      // Multi-select: show feedback modal, then advance on modal Next
+      const q = questions[currentIndex];
+      if (q && !answeredQuestions[q.id] && Array.isArray(userAnswers[q.id]) && userAnswers[q.id].length > 0) {
+        answeredQuestions[q.id] = true;
+        const userAnswer = [...userAnswers[q.id]].sort().join(',');
+        const correctAnswers = (Array.isArray(q.correctAnswers) ? q.correctAnswers : []).sort().join(',');
+        const isCorrect = correctAnswers === userAnswer;
+        showFeedback(q, userAnswers[q.id], isCorrect);
+        $btnExplain.disabled = false;
+        $btnConcept.disabled = false;
+        sendAnswerContext(q, userAnswers[q.id], (Array.isArray(q.correctAnswers) ? q.correctAnswers : []).join(', '), isCorrect);
+        renderQuestion();
+        // Show modal — modal Next button handles advancement
+        showFeedbackModal(q, userAnswers[q.id], isCorrect);
+        return;
+      }
+      // Single-select with no answer or already answered: just advance
       if (currentIndex < questions.length - 1) { currentIndex++; renderQuestion(); }
     });
 
@@ -752,5 +934,6 @@
     // ===== Boot =====
     init();
   </script>
+
 </body>
 </html>

@@ -125,6 +125,8 @@ const App = {
    * @param {object[]} tags - Array of tag objects
    */
   renderTags(tags) {
+    // Sort tags alphabetically
+    tags = [...tags].sort((a, b) => a.name.localeCompare(b.name));
     if (!this.elements.tagsContainer) return;
     
     this.elements.tagsContainer.innerHTML = tags.map(tag => `
@@ -137,7 +139,7 @@ const App = {
     // Add click handlers
     this.elements.tagsContainer.querySelectorAll('.tag-item').forEach(item => {
       item.addEventListener('click', (e) => {
-        if (e.target.tagName !== 'INPUT') {
+        if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'LABEL') {
           const checkbox = item.querySelector('input[type="checkbox"]');
           checkbox.checked = !checkbox.checked;
         }
@@ -405,13 +407,13 @@ const App = {
    * Next question - requires an answer unless skipped
    */
   nextQuestion() {
-    // Check if current question has an answer
     const currentAnswer = QuizEngine.getCurrentAnswer();
     if (!currentAnswer) {
       this.showError('Please select an answer before proceeding. Use Skip to skip this question.');
       return;
     }
-    
+
+    // In exam mode, just advance (no feedback until summary)
     if (QuizEngine.nextQuestion()) {
       this.renderCurrentQuestion();
     }
@@ -748,6 +750,62 @@ const App = {
     QuizEngine.abandonQuiz();
     this.elements.resumeDialog?.classList.add('hidden');
   },
+
+  /**
+   * Show feedback modal after answering a question
+   */
+  showFeedbackModal(question, userAnswer) {
+    const modal = document.getElementById('feedback-modal');
+    const modalCard = document.getElementById('modal-card');
+    const modalIcon = document.getElementById('modal-icon');
+    const modalTitle = document.getElementById('modal-title');
+    const modalCorrect = document.getElementById('modal-correct-answer');
+    const modalExpl = document.getElementById('modal-explanation');
+    const modalNext = document.getElementById('modal-next');
+    if (!modal) return;
+
+    const correctAnswers = question.correctAnswers || [];
+    const userLetters = Array.isArray(userAnswer) ? userAnswer : [userAnswer];
+    const isCorrect = correctAnswers.length === userLetters.length &&
+      correctAnswers.every(a => userLetters.includes(a));
+
+    modalCard.className = 'modal-card ' + (isCorrect ? 'correct' : 'incorrect');
+    modalIcon.textContent = isCorrect ? '\u2705' : '\u274C';
+    modalTitle.textContent = isCorrect ? 'Correct!' : 'Not quite.';
+    modalTitle.className = 'modal-title ' + (isCorrect ? 'correct' : 'incorrect');
+
+    if (isCorrect) {
+      modalCorrect.classList.add('hidden');
+    } else {
+      const labels = question.options
+        .filter(o => correctAnswers.includes(o.letter))
+        .map(o => o.letter + '. ' + o.text).join('<br>');
+      modalCorrect.innerHTML = '<strong>Correct answer:</strong> ' + correctAnswers.join(', ') + '<br><small>' + labels + '</small>';
+      modalCorrect.classList.remove('hidden');
+    }
+
+    if (question.explanation) {
+      modalExpl.innerHTML = '<strong>\uD83D\uDCA1</strong> ' + question.explanation;
+      modalExpl.classList.remove('hidden');
+    } else {
+      modalExpl.classList.add('hidden');
+    }
+
+    // 'Next \u2192' button text
+    const isLast = QuizEngine.isLastQuestion();
+    modalNext.textContent = isLast ? 'Submit Quiz' : 'Next \u2192';
+    modalNext.onclick = () => {
+      modal.classList.add('hidden');
+      if (isLast) {
+        this.submitQuiz();
+      } else {
+        this.nextQuestion();
+      }
+    };
+
+    modal.classList.remove('hidden');
+  },
+
 };
 
 // Initialize app when DOM is ready

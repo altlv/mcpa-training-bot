@@ -1,0 +1,46 @@
+{
+  "sessionId": "quiz_1787429793239_6s5wdk03s",
+  "timestamp": "2026-08-22T20:16:33.239Z",
+  "tags": [
+    "control-model",
+    "tools",
+    "approval",
+    "security",
+    "client-features",
+    "elicitation",
+    "security"
+  ],
+  "totalQuestions": 2,
+  "score": 0,
+  "percentage": 0,
+  "results": [
+    {
+      "questionId": "ch3-q27",
+      "question": "When the model decides to call a tool, what happens before execution?",
+      "tags": [
+        "control-model",
+        "tools",
+        "approval",
+        "security"
+      ],
+      "isCorrect": false,
+      "correctAnswer": "C"
+    },
+    {
+      "questionId": "ch4-m3",
+      "question": "For URL-mode elicitation, which client behaviors does the specification require or describe? (Select all that apply.)",
+      "tags": [
+        "client-features",
+        "elicitation",
+        "security"
+      ],
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ]
+    }
+  ]
+}
