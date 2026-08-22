@@ -27,6 +27,11 @@ const cheatSheetContent = fs.readFileSync(cheatSheetPath, 'utf8');
 const questionService = require('../services/questionService');
 questionService.loadQuestions();
 
+// Load BM25 search index
+const { SearchIndex } = require('../services/searchIndex');
+const searchIndex = new SearchIndex(path.join(__dirname, '../..'));
+searchIndex.load();
+
 // Load quiz results history
 const resultsDir = path.join(__dirname, '../../data/results');
 if (!fs.existsSync(resultsDir)) {
@@ -250,6 +255,57 @@ server.tool(
 // ==================== MORE TOOLS ====================
 
 /**
+ * Tool: search_knowledge
+ * BM25 search across questions + cheat sheet + learning notes
+ */
+server.tool(
+  'search_knowledge',
+  'Search the full knowledge base (questions, cheat sheet, learning notes) using BM25 keyword search. Returns ranked results with scores.',
+  {
+    query: z.string().describe('Search query (e.g., "MRTR retry id", "OAuth scope challenge", "tools vs resources")'),
+    type: z.string().optional().describe('Filter by content type: "question", "cheat-sheet", "learning-note" (optional)'),
+    top_k: z.number().optional().describe('Max results to return (default 5, max 20)')
+  },
+  async ({ query, type, top_k }) => {
+    const k = Math.min(top_k || 5, 20);
+    const filter = type ? { type } : {};
+    const results = searchIndex.search(query, k, filter);
+
+    if (results.length === 0) {
+      return {
+        content: [{ type: 'text', text: `No results found for "${query}". Try different keywords.` }]
+      };
+    }
+
+    const formatted = results.map((r, i) => {
+      const doc = r.doc;
+      const meta = doc.meta || {};
+      let text = `**#${i + 1}** [${doc.type}] score=${r.score.toFixed(2)}\n`;
+
+      if (doc.type === 'question') {
+        text += `Q: ${meta.question}\n`;
+        if (meta.options) {
+          text += meta.options.map(o => {
+            const isCorrect = meta.answer === o.letter || (Array.isArray(meta.answer) && meta.answer.includes(o.letter));
+            return `  ${isCorrect ? '✓' : ' '} ${o.letter}) ${o.text}`;
+          }).join('\n') + '\n';
+        }
+        if (meta.tags) text += `Tags: ${meta.tags.join(', ')}\n`;
+      } else {
+        text += `Section: ${meta.section || meta.source}\n`;
+        const preview = doc.chunk.substring(0, 250).replace(/\n/g, ' ').replace(/#+\s*/g, '');
+        text += `Preview: ${preview}...\n`;
+      }
+      return text;
+    }).join('\n');
+
+    return {
+      content: [{ type: 'text', text: `**${results.length} results for "${query}":**\n\n${formatted}` }]
+    };
+  }
+);
+
+/**
  * Tool: get_weak_areas
  * Analyze quiz results and return weak topics
  */
@@ -455,6 +511,32 @@ server.resource(
     return {
       contents: [{ uri: 'mcpa://glossary', mimeType: 'text/markdown', text: glossary }]
     };
+  }
+);
+
+
+/**
+ * Tool: rebuild_index
+ * Rebuild the BM25 search index from all sources
+ */
+server.tool(
+  'rebuild_index',
+  'Rebuild the search index from all questions and learning materials. Call after adding/modifying questions or docs.',
+  {},
+  async () => {
+    try {
+      searchIndex.build();
+      searchIndex.save();
+      const stats = searchIndex.stats();
+      const breakdown = Object.entries(stats.types).map(([t, n]) => '  - ' + t + ': ' + n).join('\n');
+      return {
+        content: [{ type: 'text', text: 'Index rebuilt successfully!\n  Total documents: ' + stats.total + '\n' + breakdown }]
+      };
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: 'Error rebuilding index: ' + err.message }]
+      };
+    }
   }
 );
 

@@ -1,12 +1,4 @@
 {
-  "meta": {
-    "title": "MCP Question Bank — Chapter 11 (Multi-Select): JSON-RPC 2.0 Fundamentals",
-    "protocolVersion": "2026-07-28",
-    "chapter": 11,
-    "chapterName": "JSON-RPC 2.0 Fundamentals",
-    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
-    "questionCount": 8
-  },
   "questions": [
     {
       "id": "ch11-m1",
@@ -233,15 +225,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "The id must always be a String — numeric ids are not permitted"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "Every clause is verbatim from §4 and §5 of the spec — a legitimate all-of-the-above.",
       "tags": [
@@ -275,15 +266,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "-32099 Application-defined error (reserved for future MCP use)"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "The classic quartet (plus -32602 Invalid params) — all correct, so E is too.",
       "tags": [

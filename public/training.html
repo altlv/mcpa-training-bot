@@ -171,6 +171,8 @@
     .answer-feedback .feedback-icon { font-size: 20px; }
     .answer-feedback .feedback-text { flex: 1; }
     .answer-feedback .correct-answer { font-weight: 700; }
+    .answer-feedback .explanation { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 0.95em; line-height: 1.5; }
+    .answer-feedback .explanation strong { display: block; margin-bottom: 4px; }
 
     /* Option Correct/Incorrect colors (training mode) */
     .option-item.correct { background: #E8F5E9; border-color: #4CAF50; }
@@ -561,6 +563,9 @@
       }
 
       const correctText = q.correctAnswers.join(', ');
+      const explanationHtml = q.explanation
+        ? `<div class="explanation"><strong>📖 Explanation:</strong> ${q.explanation}</div>`
+        : '';
       $answerFeedback.className = `answer-feedback ${isCorrect ? 'correct' : 'incorrect'}`;
       $answerFeedback.innerHTML = `
         <span class="feedback-icon">${isCorrect ? '✅' : '❌'}</span>
@@ -570,6 +575,7 @@
             : `<strong>Not quite.</strong> The correct answer is <span class="correct-answer">${correctText}</span>.`
           }
         </span>
+        ${explanationHtml}
       `;
       $answerFeedback.classList.remove('hidden');
     }

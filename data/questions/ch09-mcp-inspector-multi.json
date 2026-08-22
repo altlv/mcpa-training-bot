@@ -1,12 +1,4 @@
 {
-  "meta": {
-    "title": "MCP Question Bank — Chapter 9 (Multi-Select): MCP Inspector",
-    "protocolVersion": "2026-07-28",
-    "chapter": 9,
-    "chapterName": "MCP Inspector",
-    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
-    "questionCount": 8
-  },
   "questions": [
     {
       "id": "ch9-m1",
@@ -197,15 +189,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "It must be installed globally via npm install -g before first use"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "All four launch facts are documented, so the all-of-the-above option is genuinely right.",
       "tags": [
@@ -279,15 +270,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "Built-in load testing to stress-test server capacity"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "Era negotiation, discover inspection, header visibility, and the Apps tab are all part of Inspector V2 — E is correct.",
       "tags": [

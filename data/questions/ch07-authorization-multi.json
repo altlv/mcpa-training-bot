@@ -1,12 +1,4 @@
 {
-  "meta": {
-    "title": "MCP Question Bank — Chapter 7 (Multi-Select): Authorization (OAuth 2.1)",
-    "protocolVersion": "2026-07-28",
-    "chapter": 7,
-    "chapterName": "Authorization (OAuth 2.1)",
-    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
-    "questionCount": 8
-  },
   "questions": [
     {
       "id": "ch7-m1",
@@ -194,15 +186,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "Maintain a persistent session using Mcp-Session-Id across all requests"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "SEP-2468, SEP-2352, SEP-837, and the OAuth 2.1 baseline respectively — all four are real MUSTs, so 'All of the above' stands.",
       "tags": [

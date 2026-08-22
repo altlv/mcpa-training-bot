@@ -1,7 +1,7 @@
 # MCPA Exam Cheat Sheet
 ## Fill this in as you study - Review before exam!
 
-> ✅ **Corrected 2026-08-15** against modelcontextprotocol.io spec 2026-07-28 (basic/index, basic/patterns/mrtr, server/discover, changelog, security best practices, Inspector docs, Tasks extension, SEP-2243) and aaif.io. Key fixes: MCP forbids `id: null`; SSRF mitigations are SHOULDs; HeaderMismatch renumbered -32001→-32020; server/discover mandatory for servers but optional for clients; expanded MRTR hard rules + new Traps 11–14.
+> ✅ **Corrected 2026-08-22** against modelcontextprotocol.io spec 2026-07-28 (basic/index, basic/patterns/mrtr, basic/authorization, server/discover, changelog, caching, subscriptions, security considerations, Inspector docs, Tasks extension, Registry, Governance, SEP-2243) and aaif.io. Key fixes: MCP forbids `id: null`; SSRF mitigations are SHOULDs; HeaderMismatch renumbered -32001→-32020; server/discover mandatory for servers but optional for clients; expanded MRTR hard rules + new Traps 11–14; added -32001 InvalidProtocolVersion; corrected confused deputy scope.
 
 ---
 
@@ -235,6 +235,7 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 ### MCP-specific Error Codes (NEW — MEMORIZE!)
 | Code | Name | Trigger |
 |------|------|---------|
+| `-32001` | InvalidProtocolVersion | Protocol version in `_meta` is invalid/malformed |
 | `-32020` | HeaderMismatch | HTTP headers disagree with body |
 | `-32021` | MissingRequiredClientCapability | Request `_meta` lacks a needed capability |
 | `-32022` | UnsupportedProtocolVersion | `data` field lists supported versions |
@@ -424,7 +425,7 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 ### Attack patterns (know the mitigation!)
 | Attack | Mitigation |
 |--------|------------|
-| **Confused deputy** | Per-client consent **before** the 3P flow (registry of approved client_ids per user; never trust a consent cookie from another client ID). Vulnerable combo: static client ID + DCR + consent cookie + no per-client consent. OAuth `state`: crypto-random, **set only AFTER consent approval**, single-use, short expiry, exact match at callback |
+| **Confused deputy** | **Proxy servers using static client IDs** MUST obtain user consent for each dynamically registered client before forwarding to third-party AS. Never trust a consent cookie from another client ID. OAuth `state`: crypto-random, **set only AFTER consent approval**, single-use, short expiry, exact match at callback |
 | **Token passthrough** | MUST NOT accept tokens not issued **to this server** (aud validation); never forward client tokens downstream |
 | **SSRF** | MUST consider + mitigate; individual mitigations are SHOULDs: HTTPS (http loopback-only in dev), block private/reserved ranges (10/8, 172.16/12, 192.168/16, 127/8, **169.254/16 incl. 169.254.169.254**, `fc00::/7`, `fe80::/10`), no manual IP parsing (octal/hex/IPv6-mapped tricks), validate redirect hops, egress proxies (e.g. Smokescreen), pin DNS vs TOCTOU rebinding. Attacker-controlled inputs: `resource_metadata` (WWW-Authenticate) · `authorization_servers` (PRM) · AS-metadata endpoints |
 | **State-handle hijacking** | Handle ≠ auth! Random handles, bind `user_id:handle`, authorize via token every request |
@@ -617,7 +618,7 @@ Publishing all scopes in `scopes_supported` · wildcard scopes (`*`, `all`) · b
 > "Server never calls you back — it hands you a form (input_required) and waits for the retry"
 
 ### For MCP error codes:
-> "20-21-22: Header, Capability, Version" (-32020/-32021/-32022)
+> "20-21-22: Header, Capability, Version" (-32020/-32021/-32022) + "01: Invalid Version" (-32001)
 
 ---
 
@@ -644,7 +645,7 @@ Publishing all scopes in `scopes_supported` · wildcard scopes (`*`, `all`) · b
 - Mcp-Session-Id, initialize, sticky routing → all removed in modern era
 
 ### Trap 6: Resumability
-- Broken SSE stream ≠ resume with Last-Event-ID → RE-ISSUE with new request ID
+- Broken SSE stream ≠ resume with Last-Event-ID → RE-ISSUE as new request **with new request ID** (spec MUST)
 
 ### Trap 7: list_changed vs TTL
 - Fresh TTL does NOT save a cache once list_changed arrives
@@ -710,7 +711,7 @@ Rate yourself 1-5 after studying each topic:
 4. **Control model** - Model→Tools, App→Resources, User→Prompts?
 5. **OAuth flow** - 401 → PRM → AS metadata → PKCE → aud validation?
 6. **401 vs 403 vs 400** - authenticate / step-up scope union / header mismatch?
-7. **Error codes** - -32601 = ? (Method not found) · -32020/21/22 = Header/Capability/Version?
+7. **Error codes** - -32601 = ? (Method not found) · -32001 = InvalidProtocolVersion · -32020/21/22 = Header/Capability/Version?
 8. **Deprecated trio** - Roots, Sampling, Logging (12-month window)?
 9. **Task terminal statuses** - completed, failed, cancelled?
 10. **Registry markers** - mcpName / mcp-name / OCI label / fileSha256?

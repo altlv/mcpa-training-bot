@@ -1,12 +1,4 @@
 {
-  "meta": {
-    "title": "MCP Question Bank — Chapter 15 (Multi-Select): Versioning, 2026-07-28 Changelog & Feature Lifecycle",
-    "protocolVersion": "2026-07-28",
-    "chapter": 15,
-    "chapterName": "Versioning, 2026-07-28 Changelog & Feature Lifecycle",
-    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
-    "questionCount": 8
-  },
   "questions": [
     {
       "id": "ch15-m1",
@@ -235,15 +227,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "The -32600 Invalid Request code was removed in 2026-07-28"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "All four renumberings are in the changelog, following the new allocation policy reserving -32020..-32099 for the spec.",
       "tags": [

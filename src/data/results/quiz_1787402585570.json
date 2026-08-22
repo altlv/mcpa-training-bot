@@ -1,0 +1,49 @@
+{
+  "sessionId": "quiz_1787402585569_40z0f8w6k",
+  "timestamp": "2026-08-22T12:43:05.570Z",
+  "tags": [
+    "server-features",
+    "tools",
+    "schemas",
+    "server-features",
+    "tools",
+    "trust-safety"
+  ],
+  "totalQuestions": 2,
+  "score": 0,
+  "percentage": 0,
+  "results": [
+    {
+      "questionId": "ch3-m2",
+      "question": "Which fields appear in a tool definition returned by tools/list? (Select all that apply.)",
+      "tags": [
+        "server-features",
+        "tools",
+        "schemas"
+      ],
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "questionId": "ch3-m4",
+      "question": "Which human-oversight mechanisms do the docs suggest applications implement around tools? (Select all that apply.)",
+      "tags": [
+        "server-features",
+        "tools",
+        "trust-safety"
+      ],
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    }
+  ]
+}

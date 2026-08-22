@@ -1,12 +1,4 @@
 {
-  "meta": {
-    "title": "MCP Question Bank — Chapter 1 (Multi-Select): MCP Fundamentals",
-    "protocolVersion": "2026-07-28",
-    "chapter": 1,
-    "chapterName": "MCP Fundamentals",
-    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
-    "questionCount": 8
-  },
   "questions": [
     {
       "id": "ch1-m1",

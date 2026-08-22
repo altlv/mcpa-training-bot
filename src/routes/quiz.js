@@ -81,10 +81,7 @@ router.post('/quiz/start', (req, res) => {
       });
     }
 
-    // Shuffle questions
-    questions = questionService.shuffleArray(questions);
-
-    // Prepare questions for quiz (shuffle options, mark correct)
+    // Prepare questions for quiz (standardize answers)
     const preparedQuestions = questionService.prepareQuizQuestions(questions);
 
     // Create session

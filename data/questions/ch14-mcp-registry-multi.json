@@ -1,12 +1,4 @@
 {
-  "meta": {
-    "title": "MCP Question Bank — Chapter 14 (Multi-Select): The MCP Registry",
-    "protocolVersion": "2026-07-28",
-    "chapter": 14,
-    "chapterName": "The MCP Registry",
-    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
-    "questionCount": 8
-  },
   "questions": [
     {
       "id": "ch14-m1",
@@ -195,15 +187,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "mcp-publisher verify — checks the server.json is valid before init"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "All four commands behave as described — E is genuinely correct.",
       "tags": [
@@ -237,15 +228,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "io.github.* namespaces allow any remote URL regardless of verification"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "GitHub namespaces bind to accounts, domain namespaces bind to DNS/HTTP proof, and the remote-URL restriction applies only to domain namespaces. All true.",
       "tags": [

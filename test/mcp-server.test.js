@@ -93,14 +93,15 @@ describe('MCP Server', () => {
   });
 
   describe('Tools', () => {
-    it('should list exactly 6 tools with correct names', async () => {
+    it('should list exactly 8 tools with correct names', async () => {
       const res = await client.send('tools/list');
       const tools = res.result?.tools || [];
-      assert.strictEqual(tools.length, 6, `Expected 6 tools, got ${tools.length}`);
+      assert.strictEqual(tools.length, 8, `Expected 8 tools, got ${tools.length}`);
       
       const expectedTools = [
         'search_concepts', 'explain_topic', 'get_questions_by_tag',
-        'get_cheat_sheet_section', 'get_weak_areas', 'get_similar_questions'
+        'get_cheat_sheet_section', 'search_knowledge', 'rebuild_index',
+        'get_weak_areas', 'get_similar_questions'
       ];
       const names = tools.map(t => t.name);
       for (const name of expectedTools) {

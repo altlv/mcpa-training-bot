@@ -1,12 +1,4 @@
 {
-  "meta": {
-    "title": "MCP Question Bank — Chapter 6 (Multi-Select): Client Best Practices",
-    "protocolVersion": "2026-07-28",
-    "chapter": 6,
-    "chapterName": "Client Best Practices",
-    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
-    "questionCount": 8
-  },
   "questions": [
     {
       "id": "ch6-m1",
@@ -234,15 +226,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "The sandbox may make direct HTTP calls if the host approves them upfront"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "All four are the documented pillars of safe programmatic tool calling, so E is genuinely correct.",
       "tags": [

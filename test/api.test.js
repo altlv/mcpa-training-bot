@@ -3,11 +3,38 @@
  * Tests quiz API endpoints with meaningful assertions
  */
 
-const { describe, it, before } = require('node:test');
+const { describe, it, before, after } = require('node:test');
 const assert = require('node:assert');
 const http = require('http');
+const { spawn } = require('child_process');
+const path = require('path');
 
 const BASE = 'http://localhost:3000';
+let serverProcess = null;
+
+function waitForServer(timeout = 15000) {
+  return new Promise((resolve, reject) => {
+    const start = Date.now();
+    const check = () => {
+      http.get(BASE + '/api/health', (res) => {
+        let data = '';
+        res.on('data', (chunk) => data += chunk);
+        res.on('end', () => {
+          try { JSON.parse(data); resolve(); }
+          catch { retry(); }
+        });
+      }).on('error', retry);
+    };
+    const retry = () => {
+      if (Date.now() - start > timeout) {
+        reject(new Error('Server did not start within ' + timeout + 'ms'));
+      } else {
+        setTimeout(check, 200);
+      }
+    };
+    check();
+  });
+}
 
 function request(method, urlPath, body = null) {
   return new Promise((resolve, reject) => {
@@ -42,6 +69,31 @@ async function startQuiz(tags, count) {
 }
 
 describe('Quiz API', () => {
+
+  before(async () => {
+    // Start server if not already running
+    try {
+      await new Promise((resolve, reject) => {
+        http.get(BASE + '/api/health', (res) => {
+          res.resume();
+          resolve();
+        }).on('error', reject);
+      });
+      // Server already running
+    } catch {
+      serverProcess = spawn('node', [path.join(__dirname, '../src/server.js')], {
+        stdio: ['ignore', 'pipe', 'pipe']
+      });
+      await waitForServer();
+    }
+  });
+
+  after(() => {
+    if (serverProcess) {
+      serverProcess.kill('SIGTERM');
+      serverProcess = null;
+    }
+  });
 
   describe('GET /api/health', () => {
     it('should return status ok with question count', async () => {
@@ -157,11 +209,22 @@ describe('Quiz API', () => {
     it('should score 0% with all wrong answers', async () => {
       const quiz = await startQuiz(['security'], 2);
 
+      // Use questionService to find correct answers, then pick wrong ones
+      const questionService = require('../src/services/questionService');
+      questionService.loadQuestions();
+      const raw = questionService.getQuestionsByTags(['security'], 2);
+      const prepared = questionService.prepareQuizQuestions(raw);
+
       const answers = {};
       for (const q of quiz.questions) {
-        // Pick the last option (guaranteed wrong if there are 4+ options)
-        const wrongOpt = q.options[q.options.length - 1];
-        answers[q.id] = wrongOpt.letter;
+        const p = prepared.find(x => x.id === q.id);
+        if (p && p.correctAnswers && p.correctAnswers.length > 0) {
+          // Find an option that is NOT in the correct answers
+          const wrongOpt = q.options.find(o => !p.correctAnswers.includes(o.letter));
+          answers[q.id] = wrongOpt ? wrongOpt.letter : q.options[q.options.length - 1].letter;
+        } else {
+          answers[q.id] = q.options[q.options.length - 1].letter;
+        }
       }
 
       const res = await request('POST', '/api/quiz/submit', {

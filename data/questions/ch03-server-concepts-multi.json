@@ -1,12 +1,4 @@
 {
-  "meta": {
-    "title": "MCP Question Bank — Chapter 3 (Multi-Select): Server Features (Tools, Resources, Prompts)",
-    "protocolVersion": "2026-07-28",
-    "chapter": 3,
-    "chapterName": "Server Features (Tools, Resources, Prompts)",
-    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
-    "questionCount": 13
-  },
   "questions": [
     {
       "id": "ch3-m1",
@@ -234,15 +226,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "sessionToken — required for subsequent resource reads"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "Resources carry uri, name/title, description, and mimeType, and since SEP-2549 the list result itself is a CacheableResult with ttlMs and cacheScope. Everything listed is true.",
       "tags": [
@@ -276,15 +267,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "The server MUST reject any result without a resultType field as a protocol error"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "All four are accurate: resultType is mandatory (SEP-2322), input_required drives MRTR, execution failures use isError inside the result, and 'task' is reserved for io.modelcontextprotocol/tasks.",
       "tags": [

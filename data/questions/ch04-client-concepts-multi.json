@@ -1,12 +1,4 @@
 {
-  "meta": {
-    "title": "MCP Question Bank — Chapter 4 (Multi-Select): Client Features (Elicitation, Roots, Sampling)",
-    "protocolVersion": "2026-07-28",
-    "chapter": 4,
-    "chapterName": "Client Features (Elicitation, Roots, Sampling)",
-    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
-    "questionCount": 8
-  },
   "questions": [
     {
       "id": "ch4-m1",
@@ -194,15 +186,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "The client MUST send a new tools/call for each inputRequest in parallel"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "That is the complete MRTR loop (SEP-2322): interim result → client gathers input → retry with inputResponses + requestState. All statements hold.",
       "tags": [

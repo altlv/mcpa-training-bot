@@ -1,12 +1,4 @@
 {
-  "meta": {
-    "title": "MCP Question Bank — Chapter 16 (Multi-Select): Community, Governance & Security Policy",
-    "protocolVersion": "2026-07-28",
-    "chapter": 16,
-    "chapterName": "Community, Governance & Security Policy",
-    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
-    "questionCount": 4
-  },
   "questions": [
     {
       "id": "ch16-m1",
@@ -72,15 +64,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "The MCP project requires contributors to sign a CLA transferring copyright"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "All four facts come straight from the governance page's General Project Policies — a legitimate 'All of the above'.",
       "tags": [
@@ -152,15 +143,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "Security reports may be filed as public GitHub issues for transparency"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "The full disclosure pipeline as documented — every statement holds, so E is correct too.",
       "tags": [

@@ -1,12 +1,4 @@
 {
-  "meta": {
-    "title": "MCP Question Bank — Chapter 17 (Multi-Select): AAIF & the Agentic Ecosystem",
-    "protocolVersion": "2026-07-28",
-    "chapter": 17,
-    "chapterName": "AAIF & the Agentic Ecosystem",
-    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
-    "questionCount": 4
-  },
   "questions": [
     {
       "id": "ch17-m1",
@@ -72,15 +64,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "The AAIF was founded by a single company and later opened to others"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "All four facts come from the founding announcement — a legitimate 'All of the above'.",
       "tags": [

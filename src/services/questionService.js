@@ -40,6 +40,11 @@ class QuestionService {
             q.type = 'multi_select';
           }
           
+          // Standardize: single `answer` → `answers` array
+          if (!q.answers || !Array.isArray(q.answers)) {
+            q.answers = q.answer ? [q.answer] : [];
+          }
+          
           this.questions.push(q);
           
           // Collect unique tags
@@ -128,46 +133,18 @@ class QuestionService {
   }
 
   /**
-   * Shuffle array (Fisher-Yates algorithm)
-   */
-  shuffleArray(array) {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  }
-
-  /**
-   * Prepare questions for quiz (re-assign letters, mark correct)
-   * No shuffle — with 300+ questions, memorization isn't a concern
+   * Prepare questions for quiz (standardize answers, strip explanations)
+   * Options are already A,B,C,D in JSON — no re-assignment needed
    */
   prepareQuizQuestions(questions) {
     return questions.map(q => {
-      // Re-assign letters A, B, C... based on position
-      const optionsWithNewLetters = q.options.map((opt, index) => ({
-        letter: String.fromCharCode(65 + index),
-        text: opt.text
-      }));
-      
-      // Determine correct answers by matching text content
-      let correctTexts = [];
+      // Standardize: convert single `answer` to `answers` array
+      let correctLetters = [];
       if (q.answers && Array.isArray(q.answers)) {
-        correctTexts = q.answers.map(letter => {
-          const opt = q.options.find(o => o.letter === letter);
-          return opt ? opt.text : null;
-        }).filter(Boolean);
+        correctLetters = [...q.answers];
       } else if (q.answer) {
-        const opt = q.options.find(o => o.letter === q.answer);
-        correctTexts = opt ? [opt.text] : [];
+        correctLetters = [q.answer];
       }
-
-      // Find new letters for correct answers AFTER re-lettering
-      const correctLetters = correctTexts.map(text => {
-        const opt = optionsWithNewLetters.find(o => o.text === text);
-        return opt ? opt.letter : null;
-      }).filter(Boolean);
 
       return {
         id: q.id,
@@ -176,7 +153,7 @@ class QuestionService {
         type: q.type,
         difficulty: q.difficulty,
         question: q.question,
-        options: optionsWithNewLetters,
+        options: q.options.map(o => ({ letter: o.letter, text: o.text })),
         correctAnswers: correctLetters,
         explanation: q.explanation,
         tags: q.tags

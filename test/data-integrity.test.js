@@ -238,4 +238,136 @@ describe('Question Bank Data Integrity', () => {
       assert.strictEqual(errors.length, 0, `Short questions:\n${errors.join('\n')}`);
     });
   });
+
+  describe('Explanation Quality', () => {
+    let allQuestions = [];
+
+    before(() => {
+      const files = fs.readdirSync(QUESTIONS_DIR).filter(f => f.endsWith('.json'));
+      for (const file of files) {
+        const data = JSON.parse(fs.readFileSync(path.join(QUESTIONS_DIR, file), 'utf8'));
+        if (Array.isArray(data)) {
+          allQuestions.push(...data);
+        } else if (data.questions && Array.isArray(data.questions)) {
+          allQuestions.push(...data.questions);
+        }
+      }
+    });
+
+    it('every question has explanation >= 20 characters', () => {
+      const errors = [];
+      for (const q of allQuestions) {
+        if (!q.explanation || q.explanation.trim().length < 20) {
+          const len = q.explanation ? q.explanation.trim().length : 0;
+          errors.push(`${q.id}: explanation too short (${len} chars): "${(q.explanation || '').substring(0, 50)}"`);
+        }
+      }
+      assert.strictEqual(errors.length, 0, `Short explanations:\n${errors.join('\n')}`);
+    });
+
+    it('no explanation is just "placeholder" or "TODO"', () => {
+      const placeholderPattern = /^(placeholder|todo|fixme|tbd|n\/a|lorem|test)\s*$/i;
+      const errors = [];
+      for (const q of allQuestions) {
+        if (q.explanation && placeholderPattern.test(q.explanation.trim())) {
+          errors.push(`${q.id}: explanation is placeholder: "${q.explanation}"`);
+        }
+      }
+      assert.strictEqual(errors.length, 0, `Placeholder explanations:\n${errors.join('\n')}`);
+    });
+
+    it('explanation mentions the correct answer concept (basic check)', () => {
+      const errors = [];
+      for (const q of allQuestions) {
+        if (!q.explanation) continue;
+
+        // Get the correct answer option text
+        let correctText = '';
+        if (q.answer && q.options) {
+          const opt = q.options.find(o => o.letter === q.answer);
+          correctText = opt ? opt.text : '';
+        } else if (q.answers && q.options) {
+          correctText = q.answers
+            .map(a => { const opt = q.options.find(o => o.letter === a); return opt ? opt.text : ''; })
+            .filter(Boolean)
+            .join(' ');
+        }
+
+        if (!correctText) continue;
+
+        // Extract meaningful words (>3 chars) from the correct answer
+        const answerWords = correctText.toLowerCase()
+          .replace(/[^\w\s]/g, ' ')
+          .split(/\s+/)
+          .filter(w => w.length > 3);
+
+        if (answerWords.length === 0) continue;
+
+        // Check if at least one significant word from the answer appears in the explanation
+        const explanationLower = q.explanation.toLowerCase();
+        const matches = answerWords.filter(w => explanationLower.includes(w));
+
+        // Relaxed: at least 1 word match OR explanation references tags
+        if (matches.length === 0) {
+          // Check if explanation mentions any of the question tags as fallback
+          const tagMatches = (q.tags || []).filter(t =>
+            t.length > 3 && explanationLower.includes(t.toLowerCase())
+          );
+          if (tagMatches.length === 0) {
+            errors.push(`${q.id}: explanation may not reference correct answer concept (${answerWords.slice(0, 3).join(', ')}). Explanation: "${q.explanation.substring(0, 80)}..."`);
+          }
+        }
+      }
+      // Allow up to 5% of questions to fail this heuristic (it's a basic check, not definitive)
+      const maxFailures = Math.ceil(allQuestions.length * 0.05);
+      assert.ok(errors.length <= maxFailures,
+        `${errors.length} questions may have explanations not referencing the answer (max allowed: ${maxFailures}):\n${errors.slice(0, 10).join('\n')}`);
+    });
+  });
+
+  describe('Cross-File Option Text Dedup', () => {
+    let allQuestions = [];
+
+    before(() => {
+      const files = fs.readdirSync(QUESTIONS_DIR).filter(f => f.endsWith('.json'));
+      for (const file of files) {
+        const data = JSON.parse(fs.readFileSync(path.join(QUESTIONS_DIR, file), 'utf8'));
+        if (Array.isArray(data)) {
+          allQuestions.push(...data);
+        } else if (data.questions && Array.isArray(data.questions)) {
+          allQuestions.push(...data.questions);
+        }
+      }
+    });
+
+    it('no option text appears in 5+ different questions (excluding common phrases)', () => {
+      // Common phrases that are expected to repeat across questions
+      const COMMON = new Set([
+        'all of the above', 'none of the above', 'not applicable',
+        'depends on the implementation', 'not enough information',
+        'cannot be determined', 'varies by server'
+      ]);
+
+      const optionTextMap = new Map();
+      for (const q of allQuestions) {
+        if (!q.options) continue;
+        for (const opt of q.options) {
+          const text = opt.text.trim().toLowerCase();
+          if (!text || text.length < 10) continue;
+          if (COMMON.has(text)) continue;
+          if (!optionTextMap.has(text)) optionTextMap.set(text, new Set());
+          optionTextMap.get(text).add(q.id);
+        }
+      }
+
+      const dupes = [];
+      for (const [text, questionIds] of optionTextMap) {
+        if (questionIds.size >= 5) {
+          dupes.push(`"${text}" in ${questionIds.size} questions: ${[...questionIds].slice(0, 3).join(', ')}`);
+        }
+      }
+      assert.strictEqual(dupes.length, 0,
+        `Suspicious duplicate options:\n${dupes.join('\n')}`);
+    });
+  });
 });

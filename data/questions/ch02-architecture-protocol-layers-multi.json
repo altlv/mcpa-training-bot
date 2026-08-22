@@ -1,12 +1,4 @@
 {
-  "meta": {
-    "title": "MCP Question Bank — Chapter 2 (Multi-Select): Architecture & Components",
-    "protocolVersion": "2026-07-28",
-    "chapter": 2,
-    "chapterName": "Architecture & Components",
-    "format": "multi_select: questions use the 'answers' array (multiple correct options). Some include an 'All of the above' option that is only correct when every other option is.",
-    "questionCount": 8
-  },
   "questions": [
     {
       "id": "ch2-m1",
@@ -192,15 +184,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "The result always includes a sessionToken for subsequent requests"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "All four are part of the mandatory server/discover response in 2026-07-28 — here 'All of the above' is genuinely correct, so both the individual letters and E count.",
       "tags": [
@@ -275,15 +266,14 @@
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "Servers MUST persist session state between requests for continuity"
         }
       ],
       "answers": [
         "A",
         "B",
         "C",
-        "D",
-        "E"
+        "D"
       ],
       "explanation": "All four hold — self-contained requests are exactly what enables round-robin load balancing and serverless deployment. 'All of the above' is correct here.",
       "tags": [

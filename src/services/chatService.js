@@ -2,16 +2,21 @@
  * Chat Service
  * Teaching assistant that explains MCP concepts using cheat sheet + question data
  * 
- * No AI dependency — pure rule-based search + template responses
+ * No AI dependency — pure BM25 search + template responses
  */
 
 const fs = require('fs');
 const path = require('path');
 const questionService = require('./questionService');
+const { SearchIndex } = require('./searchIndex');
 
 // Load cheat sheet content
 const cheatSheetPath = path.join(__dirname, '../../docs/learning-notes/EXAM-CHEAT-SHEET.md');
 const cheatSheetContent = fs.readFileSync(cheatSheetPath, 'utf8');
+
+// Load BM25 search index
+const searchIndex = new SearchIndex(path.join(__dirname, '../..'));
+searchIndex.load();
 
 class ChatService {
   constructor() {
@@ -138,11 +143,18 @@ class ChatService {
       text += `**Explanation:** ${question.explanation}\n\n`;
     }
 
-    // Search cheat sheet for related content
+    // Search for related content using BM25
     const tags = question.tags || [];
-    const relatedSections = this.searchCheatSheet(tags.join(' '));
-    if (relatedSections.length > 0) {
-      text += `**Related concepts:**\n${relatedSections.slice(0, 2).map(s => `• ${s}`).join('\n')}`;
+    const searchQuery = tags.join(' ');
+    const relatedResults = searchIndex.search(searchQuery, 5);
+    if (relatedResults.length > 0) {
+      text += `**Related concepts:**\n`;
+      for (const hit of relatedResults.slice(0, 2)) {
+        if (hit.doc.type === 'cheat-sheet') {
+          const preview = hit.doc.chunk.substring(0, 200).replace(/\n/g, ' ').replace(/#+\s*/g, '');
+          text += `• ${hit.doc.meta.section}: ${preview}\n`;
+        }
+      }
     }
 
     return { text, references: tags };
@@ -175,17 +187,50 @@ class ChatService {
   }
 
   /**
-   * Search cheat sheet and explain based on user query
+   * Search cheat sheet and learning materials using BM25 index
    */
   searchAndExplain(query, ctx) {
-    const results = this.searchCheatSheet(query);
+    // Use BM25 search for high-quality results
+    const bm25Results = searchIndex.search(query, 8);
+
+    // Also do old-style cheat sheet search for broad coverage
+    const legacyResults = this.searchCheatSheetLegacy(query);
 
     let text = '';
-    if (results.length > 0) {
+    if (bm25Results.length > 0) {
       text = `**Here's what I found about "${query}":**\n\n`;
-      text += results.slice(0, 3).map(r => `• ${r}`).join('\n\n');
+
+      // Group by type for clean presentation
+      const cheatHits = bm25Results.filter(r => r.doc.type === 'cheat-sheet');
+      const questionHits = bm25Results.filter(r => r.doc.type === 'question');
+      const noteHits = bm25Results.filter(r => r.doc.type === 'learning-note');
+
+      // Cheat sheet / learning note sections
+      const conceptHits = [...cheatHits, ...noteHits];
+      if (conceptHits.length > 0) {
+        for (const hit of conceptHits.slice(0, 3)) {
+          const meta = hit.doc.meta;
+          const section = meta.section || meta.source;
+          const preview = hit.doc.chunk.substring(0, 300).replace(/\n/g, ' ').replace(/#+\s*/g, '');
+          text += `• **${section}**: ${preview}...\n\n`;
+        }
+      }
+
+      // Related questions (without answers for self-testing)
+      if (questionHits.length > 0) {
+        text += `**Related questions to test yourself:**\n\n`;
+        for (const hit of questionHits.slice(0, 3)) {
+          const meta = hit.doc.meta;
+          const opts = (meta.options || []).map(o => `  ${o.letter}) ${o.text}`).join('\n');
+          text += `📝 ${meta.question}\n${opts}\n\n`;
+        }
+      }
+    } else if (legacyResults.length > 0) {
+      // Fallback to legacy search
+      text = `**Here's what I found about "${query}":**\n\n`;
+      text += legacyResults.slice(0, 3).map(r => `• ${r}`).join('\n\n');
     } else {
-      text = `I couldn't find specific information about "${query}" in the cheat sheet. `;
+      text = `I couldn't find specific information about "${query}" in the knowledge base. `;
       text += `Try asking about:\n`;
       text += `• **OAuth 2.1** — authentication flow\n`;
       text += `• **Tools vs Resources** — control model\n`;
@@ -202,13 +247,13 @@ class ChatService {
       }
     }
 
-    return { text, references: results.slice(0, 2) };
+    return { text, references: bm25Results.slice(0, 3).map(r => r.doc.meta.section || r.doc.type) };
   }
 
   /**
-   * Search cheat sheet content for relevant lines
+   * Legacy cheat sheet search (line-by-line keyword match)
    */
-  searchCheatSheet(query) {
+  searchCheatSheetLegacy(query) {
     const lines = cheatSheetContent.split('\n');
     const queryTerms = query.toLowerCase().split(/\s+/).filter(t => t.length > 2);
     const results = [];
@@ -227,7 +272,6 @@ class ChatService {
       }
     }
 
-    // Deduplicate
     return [...new Set(results)].slice(0, 5);
   }
 
