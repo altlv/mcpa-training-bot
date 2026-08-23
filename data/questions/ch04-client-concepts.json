@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 4,
     "chapterName": "Client Concepts (Elicitation, Roots, Sampling)",
-    "questionCount": 27
+    "questionCount": 30
   },
   "questions": [
     {
@@ -855,6 +855,105 @@
       "tags": [
         "mrtr",
         "result-type"
+      ]
+    },
+    {
+      "id": "ch4-scenario-extra-1",
+      "chapter": 4,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "A modern client sends tools/call with protocolVersion in _meta but omits clientCapabilities entirely. The server returns -32602 with HTTP 400. Is that consistent with the study material?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "No; missing clientCapabilities must be -32021"
+        },
+        {
+          "letter": "B",
+          "text": "Yes; a required _meta field is missing, so the request itself is malformed"
+        },
+        {
+          "letter": "C",
+          "text": "No; it must be -32601"
+        },
+        {
+          "letter": "D",
+          "text": "Yes, but only for stdio"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Distinguish malformed metadata from an undeclared needed capability. Missing required _meta fields such as clientCapabilities => -32602/HTTP 400. If capabilities are present but a needed capability is undeclared => -32021.",
+      "tags": [
+        "client",
+        "meta",
+        "errors",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch4-scenario-extra-2",
+      "chapter": 4,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A client declares clientCapabilities, but not the capability needed for an input request the server wants to use. What should the tester expect rather than a generic malformed-request error?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "-32021 MissingRequiredClientCapability"
+        },
+        {
+          "letter": "B",
+          "text": "-32700 Parse error"
+        },
+        {
+          "letter": "C",
+          "text": "-32601 Method not found"
+        },
+        {
+          "letter": "D",
+          "text": "A successful complete result"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The request can be structurally valid while lacking a capability needed for the operation. That maps to -32021, with requiredCapabilities identifying what is missing.",
+      "tags": [
+        "client",
+        "capabilities",
+        "errors",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch4-scenario-extra-3",
+      "chapter": 4,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A client receives serverInfo in a result and uses the self-reported product name as proof that the server is trusted for authorization. What should a security test assert?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "This is correct if the name contains modelcontextprotocol"
+        },
+        {
+          "letter": "B",
+          "text": "serverInfo is display/logging metadata and must not be used as a security identity decision"
+        },
+        {
+          "letter": "C",
+          "text": "Trust it only on stdio"
+        },
+        {
+          "letter": "D",
+          "text": "Trust it if resultType is complete"
+        }
+      ],
+      "answer": "B",
+      "explanation": "serverInfo is self-reported informational metadata. It is useful for display/logging, not for authentication or authorization decisions.",
+      "tags": [
+        "client",
+        "server-info",
+        "security",
+        "tester-scenario"
       ]
     }
   ]

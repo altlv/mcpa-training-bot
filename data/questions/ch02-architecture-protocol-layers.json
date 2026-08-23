@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 2,
     "chapterName": "Architecture & Components",
-    "questionCount": 29
+    "questionCount": 32
   },
   "questions": [
     {
@@ -926,6 +926,102 @@
         "stateless-core",
         "meta",
         "server-info"
+      ]
+    },
+    {
+      "id": "ch2-scenario-extra-1",
+      "chapter": 2,
+      "type": "scenario",
+      "difficulty": "easy",
+      "question": "You are drawing a test architecture. One desktop host connects to a filesystem server and a CRM server at the same time. Which structure is correct?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "One client instance talks directly to both servers"
+        },
+        {
+          "letter": "B",
+          "text": "The host manages separate client instances, each communicating with one server"
+        },
+        {
+          "letter": "C",
+          "text": "Both servers must share one client process and one JSON-RPC id space"
+        },
+        {
+          "letter": "D",
+          "text": "A server creates a client for the host"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The host can manage many clients, but each MCP client communicates with exactly one server. Think: host has clients; each client talks to one server.",
+      "tags": [
+        "architecture",
+        "cardinality",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch2-scenario-extra-2",
+      "chapter": 2,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A defect is filed because TLS termination is implemented in the transport/gateway layer rather than inside JSON-RPC method handling. Is that inherently an MCP layering violation?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Yes; TLS belongs to the data layer"
+        },
+        {
+          "letter": "B",
+          "text": "No; transport concerns such as connections and transport-level auth belong to the transport layer"
+        },
+        {
+          "letter": "C",
+          "text": "Yes; all security must be implemented by tools/call"
+        },
+        {
+          "letter": "D",
+          "text": "No, because MCP has no transport layer"
+        }
+      ],
+      "answer": "B",
+      "explanation": "MCP separates the data layer (JSON-RPC semantics and MCP primitives) from the transport layer (connections, framing, transport-level security/auth concerns).",
+      "tags": [
+        "architecture",
+        "layers",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch2-scenario-extra-3",
+      "chapter": 2,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A remote MCP server accepts connections from many users. A tester assumes this means one MCP client object should be shared by all those users. What is wrong with the assumption?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Nothing; client objects are globally shared by definition"
+        },
+        {
+          "letter": "B",
+          "text": "Remote servers may serve many clients, but the client-to-server protocol relationship is still one client instance to one server"
+        },
+        {
+          "letter": "C",
+          "text": "Remote servers are limited to one client"
+        },
+        {
+          "letter": "D",
+          "text": "Only stdio can have clients"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Server multi-client capacity does not change the client cardinality rule: an MCP client instance communicates with one server.",
+      "tags": [
+        "architecture",
+        "cardinality",
+        "tester-scenario"
       ]
     }
   ]

@@ -10,6 +10,9 @@ const swaggerUi = require('swagger-ui-express');
 const questionService = require('./services/questionService');
 const quizRoutes = require('./routes/quiz');
 const chatRoutes = require('./routes/chat');
+const modelRoutes = require('./routes/models');
+const specRoutes = require('./routes/specs');
+const modelConfig = require('./services/modelConfig');
 
 // Create Express application
 const app = express();
@@ -35,9 +38,19 @@ console.log('🚀 Starting MCPA Training Bot...\n');
 const stats = questionService.loadQuestions();
 console.log(`📊 Database: ${stats.totalQuestions} questions, ${stats.totalTags} tags\n`);
 
+// Log model configuration
+const modelInfo = modelConfig.getConfigSummary();
+console.log(`🤖 Active AI provider: ${modelInfo.activeProvider} (${modelInfo.activeModel})`);
+for (const p of modelInfo.providers) {
+  console.log(`   ${p.name}: ${p.keyDefined ? '✅ key defined' : '❌ no key'} → ${p.model}`);
+}
+console.log('');
+
 // Routes
 app.use('/api', quizRoutes); // Mount quiz routes
 app.use('/api/chat', chatRoutes); // Mount chat routes
+app.use('/api/models', modelRoutes); // Mount model configuration routes
+app.use('/api/specs', specRoutes); // Mount specification content routes
 
 // Root route
 app.get('/', (req, res) => {

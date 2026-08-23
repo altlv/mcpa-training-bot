@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 9,
     "chapterName": "MCP Inspector",
-    "questionCount": 24
+    "questionCount": 27
   },
   "questions": [
     {
@@ -774,6 +774,103 @@
         "inspector",
         "security",
         "environment-variables"
+      ]
+    },
+    {
+      "id": "ch9-scenario-extra-1",
+      "chapter": 9,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A tester launches MCP Inspector with --config pointing to a file that does not exist and expects Inspector to create it with sample servers. What should actually happen?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "It should create and seed it"
+        },
+        {
+          "letter": "B",
+          "text": "--config is read-only and should error if the file is missing; --catalog is the writable/seeding mode"
+        },
+        {
+          "letter": "C",
+          "text": "It should silently switch to --catalog"
+        },
+        {
+          "letter": "D",
+          "text": "It should create an OAuth token instead"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The cheat sheet distinguishes writable --catalog from read-only --config. --config is never written/seeded and errors when the file is absent.",
+      "tags": [
+        "inspector",
+        "config",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch9-scenario-extra-2",
+      "chapter": 9,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A CI job uses Inspector against a server requiring OAuth, but interactive browser login is impossible. Which option is designed to make this fail fast instead of hanging for interaction?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "--stored-auth-only"
+        },
+        {
+          "letter": "B",
+          "text": "--bind-all"
+        },
+        {
+          "letter": "C",
+          "text": "--seed-oauth"
+        },
+        {
+          "letter": "D",
+          "text": "--last-event-id"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The study material calls out --stored-auth-only for CI so the run fails quickly if stored authentication is unavailable.",
+      "tags": [
+        "inspector",
+        "ci",
+        "oauth",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch9-scenario-extra-3",
+      "chapter": 9,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A security review finds Inspector configured with both DANGEROUSLY_OMIT_AUTH and DANGEROUSLY_BIND_ALL_INTERFACES. What is the correct test disposition?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Accept; the two settings cancel each other out"
+        },
+        {
+          "letter": "B",
+          "text": "Reject the configuration; the material explicitly warns never to combine them"
+        },
+        {
+          "letter": "C",
+          "text": "Accept only on port 6274"
+        },
+        {
+          "letter": "D",
+          "text": "Convert the server to stdio automatically"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Disabling auth while binding broadly can expose the Inspector interface. The cheat sheet explicitly says never combine these dangerous settings.",
+      "tags": [
+        "inspector",
+        "security",
+        "tester-scenario"
       ]
     }
   ]

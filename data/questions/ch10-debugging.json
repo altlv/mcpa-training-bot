@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 10,
     "chapterName": "Debugging",
-    "questionCount": 15
+    "questionCount": 18
   },
   "questions": [
     {
@@ -486,6 +486,102 @@
         "debugging",
         "workflow",
         "inspector"
+      ]
+    },
+    {
+      "id": "ch10-scenario-extra-1",
+      "chapter": 10,
+      "type": "scenario",
+      "difficulty": "easy",
+      "question": "A server launched through stdio immediately disconnects. Which debugging sequence is most aligned with the study guide?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Change OAuth scopes, then clear DNS, then retrain the model"
+        },
+        {
+          "letter": "B",
+          "text": "Check client logs, verify the server process, test it standalone in Inspector, then check version/capability compatibility"
+        },
+        {
+          "letter": "C",
+          "text": "Delete all tools and retry"
+        },
+        {
+          "letter": "D",
+          "text": "Switch to legacy HTTP+SSE first"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The guide's connection-failure checklist starts with logs/process state, then standalone Inspector testing, then server/discover/version-capability checks.",
+      "tags": [
+        "debugging",
+        "workflow",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch10-scenario-extra-2",
+      "chapter": 10,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A server works in Inspector but not in the desktop host. What does that evidence most strongly suggest?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The MCP server can never be at fault"
+        },
+        {
+          "letter": "B",
+          "text": "Focus next on host-specific launch configuration, environment, permissions, or compatibility rather than assuming basic server functionality is broken"
+        },
+        {
+          "letter": "C",
+          "text": "Inspector guarantees production security"
+        },
+        {
+          "letter": "D",
+          "text": "The server must use port 6274"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Passing standalone Inspector tests narrows the fault domain. It does not prove perfection, but it makes host-specific configuration/environment a high-value next area to investigate.",
+      "tags": [
+        "debugging",
+        "fault-isolation",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch10-scenario-extra-3",
+      "chapter": 10,
+      "type": "scenario",
+      "difficulty": "easy",
+      "question": "A tester sees readable log lines mixed into a captured stdio protocol transcript. What is the most diagnostic next check?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Whether the server is writing logs to stdout instead of stderr"
+        },
+        {
+          "letter": "B",
+          "text": "Whether the OAuth audience is plural"
+        },
+        {
+          "letter": "C",
+          "text": "Whether tasks/get is enabled"
+        },
+        {
+          "letter": "D",
+          "text": "Whether the Registry name uses reverse DNS"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Readable logs in the protocol stream strongly suggest stdout contamination. For stdio, logs belong on stderr.",
+      "tags": [
+        "debugging",
+        "stdio",
+        "tester-scenario"
       ]
     }
   ]

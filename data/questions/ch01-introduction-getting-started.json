@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 1,
     "chapterName": "MCP Fundamentals",
-    "questionCount": 21
+    "questionCount": 24
   },
   "questions": [
     {
@@ -667,6 +667,102 @@
         "fundamentals",
         "mxn-problem",
         "scenario"
+      ]
+    },
+    {
+      "id": "ch1-scenario-extra-1",
+      "chapter": 1,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A QA team supports 5 AI applications and 8 internal systems. Today each app has a custom connector to each system. They are evaluating MCP. Which change best captures the architectural benefit MCP is intended to provide?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Move model training to a shared GPU cluster"
+        },
+        {
+          "letter": "B",
+          "text": "Implement a common protocol boundary so apps and systems do not each need pairwise integrations"
+        },
+        {
+          "letter": "C",
+          "text": "Replace all eight systems with one database"
+        },
+        {
+          "letter": "D",
+          "text": "Require every AI app to use the same model"
+        }
+      ],
+      "answer": "B",
+      "explanation": "MCP standardizes the connection between AI applications and external tools/data. The key benefit is reducing pairwise M×N integration work toward M+N implementations; it does not standardize models or replace backend systems.",
+      "tags": [
+        "mcp-basics",
+        "integration",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch1-scenario-extra-2",
+      "chapter": 1,
+      "type": "scenario",
+      "difficulty": "easy",
+      "question": "During acceptance testing, a product manager says, 'MCP should guarantee that two different LLMs give identical answers when connected to the same server.' What is the best response?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Correct; deterministic model output is an MCP requirement"
+        },
+        {
+          "letter": "B",
+          "text": "Correct, but only over stdio"
+        },
+        {
+          "letter": "C",
+          "text": "Incorrect; MCP standardizes integration with tools/data, not model inference behavior"
+        },
+        {
+          "letter": "D",
+          "text": "Incorrect only when OAuth is enabled"
+        }
+      ],
+      "answer": "C",
+      "explanation": "MCP defines how AI applications connect to tools, data, and workflows. It does not define or guarantee the reasoning or determinism of the underlying model.",
+      "tags": [
+        "scope",
+        "mcp-basics",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch1-scenario-extra-3",
+      "chapter": 1,
+      "type": "scenario",
+      "difficulty": "easy",
+      "question": "A test plan says: 'Verify the MCP server can be reused by more than one compatible host without rewriting the server for each host.' Which MCP value is this primarily testing?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Portability and reduced vendor-specific integration"
+        },
+        {
+          "letter": "B",
+          "text": "SSE resumability"
+        },
+        {
+          "letter": "C",
+          "text": "Model training throughput"
+        },
+        {
+          "letter": "D",
+          "text": "Prompt determinism"
+        }
+      ],
+      "answer": "A",
+      "explanation": "A core ecosystem benefit is that a server implements MCP once and can be consumed by compatible MCP clients/hosts, reducing vendor-specific connectors.",
+      "tags": [
+        "portability",
+        "use-case",
+        "tester-scenario"
       ]
     }
   ]

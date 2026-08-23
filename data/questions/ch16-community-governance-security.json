@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 16,
     "chapterName": "Community, Governance & Security Policy",
-    "questionCount": 15
+    "questionCount": 18
   },
   "questions": [
     {
@@ -484,6 +484,102 @@
         "security-policy",
         "interest-groups",
         "charter"
+      ]
+    },
+    {
+      "id": "ch16-scenario-extra-1",
+      "chapter": 16,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A researcher discovers a suspected authentication bypass in an MCP SDK and opens a public GitHub issue with exploit details. Which process should a tester/security reviewer recommend instead?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Use the affected repository's private GitHub Security Advisory reporting path"
+        },
+        {
+          "letter": "B",
+          "text": "Post it in a public discussion for faster triage"
+        },
+        {
+          "letter": "C",
+          "text": "Submit it as an MCP Registry package"
+        },
+        {
+          "letter": "D",
+          "text": "Send it as a tools/call request"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Security vulnerabilities should be reported privately through GitHub Security Advisories on the affected repository, not public issues/discussions/PRs.",
+      "tags": [
+        "governance",
+        "security-policy",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch16-scenario-extra-2",
+      "chapter": 16,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "The same vulnerability affects several MCP SDKs. One SDK plans to publish its fix immediately while the others are still exposed. What coordination principle applies?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Cross-SDK maintainers should coordinate so fixes/advisories can ship together where appropriate"
+        },
+        {
+          "letter": "B",
+          "text": "Each SDK must keep vulnerabilities secret from other maintainers"
+        },
+        {
+          "letter": "C",
+          "text": "Only the first SDK can receive a CVE"
+        },
+        {
+          "letter": "D",
+          "text": "The Registry automatically patches all SDKs"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The security policy calls for coordination across SDKs so related fixes/advisories do not unnecessarily expose still-unpatched implementations.",
+      "tags": [
+        "security-policy",
+        "cross-sdk",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch16-scenario-extra-3",
+      "chapter": 16,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "A local stdio peer can intentionally send malformed input that crashes its peer, but there is no sandbox escape and the same code is not remotely reachable. Under the supplied policy summary, how is this categorized?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Always a critical in-scope remote vulnerability"
+        },
+        {
+          "letter": "B",
+          "text": "Peer-only stdio crash/hang/DoS is out of scope because stdio peers share a trust boundary; remote reachability or sandbox escape can bring it back in scope"
+        },
+        {
+          "letter": "C",
+          "text": "A Registry namespace violation"
+        },
+        {
+          "letter": "D",
+          "text": "An OAuth scope issue"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The supplied security-policy summary explicitly treats peer-only stdio crash/hang/DoS as out of scope, while remote exposure or sandbox escape changes the assessment.",
+      "tags": [
+        "security-policy",
+        "stdio",
+        "tester-scenario"
       ]
     }
   ]

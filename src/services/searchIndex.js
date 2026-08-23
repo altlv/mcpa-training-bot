@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 
 // ─── Tokenizer ───────────────────────────────────────────────────────
+const { SpecIndexer } = require('./specIndexer');
 
 const STOP_WORDS = new Set([
   'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
@@ -213,6 +214,7 @@ class SearchIndex {
     this.indexQuestions();
     this.indexCheatSheet();
     this.indexLearningNotes();
+    this.indexSpecs();  // Add specification content
     this.engine.finalize();
     return this;
   }
@@ -369,6 +371,33 @@ class SearchIndex {
       }
     }
     flush();
+  }
+
+  /**
+   * Index specification content (JSON-RPC, MCP)
+   */
+  indexSpecs() {
+    const indexer = new SpecIndexer(this.root);
+    const specIndex = indexer.loadIndex();
+    
+    if (!specIndex || !specIndex.chunks) {
+      console.log('ℹ️  No spec index found. Run: node scripts/build-spec-index.js');
+      return;
+    }
+    
+    for (const chunk of specIndex.chunks) {
+      this.engine.addDoc({
+        id: chunk.id,
+        type: 'spec',
+        chunk: chunk.chunk,
+        meta: {
+          ...chunk.meta,
+          sourceType: 'specification',
+        },
+      });
+    }
+    
+    console.log(`📖 Indexed ${specIndex.chunks.length} specification chunks`);
   }
 
   /**

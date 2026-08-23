@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 3,
     "chapterName": "Server Features (Tools, Resources, Prompts)",
-    "questionCount": 28
+    "questionCount": 31
   },
   "questions": [
     {
@@ -893,6 +893,102 @@
         "tools",
         "resources",
         "scenario"
+      ]
+    },
+    {
+      "id": "ch3-scenario-extra-1",
+      "chapter": 3,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A tool successfully runs but the downstream business API rejects the operation. The server returns a normal tools/call result with isError:true. A tester reports 'The server should have returned a JSON-RPC protocol error instead.' Which assessment is best?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The tester is right; all tool failures are protocol errors"
+        },
+        {
+          "letter": "B",
+          "text": "The implementation is reasonable: tool execution failures belong in the tool result, while protocol errors describe protocol/request failures"
+        },
+        {
+          "letter": "C",
+          "text": "The result must be a notification"
+        },
+        {
+          "letter": "D",
+          "text": "The server must retry forever"
+        }
+      ],
+      "answer": "B",
+      "explanation": "A tool can execute at the protocol level yet fail at the application/tool level. MCP represents that with isError:true in the tool result rather than turning every business failure into a JSON-RPC protocol error.",
+      "tags": [
+        "tools",
+        "errors",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch3-scenario-extra-2",
+      "chapter": 3,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A host automatically invokes a destructive tool whenever the model suggests it, with no UI visibility or approval policy. Which concern should a tester raise?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Tools are user-controlled and can never be model-selected"
+        },
+        {
+          "letter": "B",
+          "text": "Tool calls may cause side effects; the host should provide appropriate human oversight such as visibility/approval controls"
+        },
+        {
+          "letter": "C",
+          "text": "Resources must be converted to prompts first"
+        },
+        {
+          "letter": "D",
+          "text": "The tool name must start with rpc."
+        }
+      ],
+      "answer": "B",
+      "explanation": "Tools are model-controlled in the control model and may cause side effects. Human oversight mechanisms such as visibility, per-call approval, pre-approval settings, and logs are important safety controls.",
+      "tags": [
+        "tools",
+        "safety",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch3-scenario-extra-3",
+      "chapter": 3,
+      "type": "scenario",
+      "difficulty": "easy",
+      "question": "A product UI labels a read-only document exposed at file:///docs/readme.md as a 'tool'. What is the most useful testing correction?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Treat it as a resource because it is data identified by a URI"
+        },
+        {
+          "letter": "B",
+          "text": "Treat it as a prompt because users can read it"
+        },
+        {
+          "letter": "C",
+          "text": "Treat it as a tool because all server features are tools"
+        },
+        {
+          "letter": "D",
+          "text": "Treat it as OAuth metadata"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Resources represent data the application can read, commonly identified by URIs. Tools are callable functions/actions; prompts are reusable interaction templates.",
+      "tags": [
+        "resources",
+        "control-model",
+        "tester-scenario"
       ]
     }
   ]

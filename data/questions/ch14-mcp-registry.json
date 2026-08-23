@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 14,
     "chapterName": "The MCP Registry",
-    "questionCount": 15
+    "questionCount": 18
   },
   "questions": [
     {
@@ -484,6 +484,102 @@
         "registry",
         "openapi",
         "ecosystem"
+      ]
+    },
+    {
+      "id": "ch14-scenario-extra-1",
+      "chapter": 14,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A Registry entry points to an npm package. The package exists, but package.json has no ownership marker tying it to the MCP server name. What should a publication test verify?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The mcpName ownership marker"
+        },
+        {
+          "letter": "B",
+          "text": "An Mcp-Session-Id header"
+        },
+        {
+          "letter": "C",
+          "text": "A Last-Event-ID value"
+        },
+        {
+          "letter": "D",
+          "text": "A tasks/result method"
+        }
+      ],
+      "answer": "A",
+      "explanation": "For npm packages, the Registry ownership marker is mcpName in package.json.",
+      "tags": [
+        "registry",
+        "npm",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch14-scenario-extra-2",
+      "chapter": 14,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A company wants to publish com.acme/payments but cannot prove control of acme.com. What is the likely registry issue?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Reverse-DNS namespaces require the corresponding DNS/HTTP ownership challenge"
+        },
+        {
+          "letter": "B",
+          "text": "All com.* names are public and unverified"
+        },
+        {
+          "letter": "C",
+          "text": "Only GitHub usernames can be used in names"
+        },
+        {
+          "letter": "D",
+          "text": "The package must be MCPB"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Reverse-DNS names such as com.acme/* are tied to domain ownership verification.",
+      "tags": [
+        "registry",
+        "namespace",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch14-scenario-extra-3",
+      "chapter": 14,
+      "type": "scenario",
+      "difficulty": "easy",
+      "question": "A team asks the public MCP Registry to host the executable server code itself. What misconception should the tester clarify?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The Registry is metadata; code/packages live in package/container distribution systems such as npm, PyPI, or OCI registries"
+        },
+        {
+          "letter": "B",
+          "text": "The Registry only hosts model weights"
+        },
+        {
+          "letter": "C",
+          "text": "The Registry requires source code in every metadata record"
+        },
+        {
+          "letter": "D",
+          "text": "The Registry is an OAuth authorization server"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The MCP Registry is a metadata registry. It points to packages/artifacts hosted elsewhere rather than becoming the code host itself.",
+      "tags": [
+        "registry",
+        "metadata",
+        "tester-scenario"
       ]
     }
   ]

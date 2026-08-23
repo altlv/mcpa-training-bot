@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 7,
     "chapterName": "Authorization (OAuth 2.1)",
-    "questionCount": 18
+    "questionCount": 21
   },
   "questions": [
     {
@@ -577,6 +577,104 @@
         "scopes",
         "scenario",
         "discovery"
+      ]
+    },
+    {
+      "id": "ch7-scenario-extra-1",
+      "chapter": 7,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A remote MCP request has no access token. Which response should an OAuth test primarily expect?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "200 with an empty tool list"
+        },
+        {
+          "letter": "B",
+          "text": "401 with WWW-Authenticate information that leads the client toward protected-resource metadata"
+        },
+        {
+          "letter": "C",
+          "text": "403 insufficient_scope"
+        },
+        {
+          "letter": "D",
+          "text": "400 HeaderMismatch"
+        }
+      ],
+      "answer": "B",
+      "explanation": "401 means authentication is missing/invalid. The client uses the challenge to discover protected-resource metadata and continue the OAuth flow.",
+      "tags": [
+        "oauth",
+        "401",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch7-scenario-extra-2",
+      "chapter": 7,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "A client has a valid access token, but the requested operation needs an additional scope. Which outcome best matches the expected flow?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "401 and delete all credentials"
+        },
+        {
+          "letter": "B",
+          "text": "403 insufficient_scope, then request the union of existing and newly required scopes"
+        },
+        {
+          "letter": "C",
+          "text": "400 because scopes are HTTP headers"
+        },
+        {
+          "letter": "D",
+          "text": "-32700 parse error"
+        }
+      ],
+      "answer": "B",
+      "explanation": "A valid identity/token with insufficient permission is a 403 step-up case. The client should request the union of old and newly needed scopes rather than dropping existing ones.",
+      "tags": [
+        "oauth",
+        "403",
+        "scopes",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch7-scenario-extra-3",
+      "chapter": 7,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "Server A accepts an access token whose audience is Server B because both services use the same identity provider. Which security assertion should fail?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "None; same issuer makes tokens interchangeable"
+        },
+        {
+          "letter": "B",
+          "text": "Audience validation: a server must not accept tokens minted for another audience"
+        },
+        {
+          "letter": "C",
+          "text": "PKCE is optional for this reason"
+        },
+        {
+          "letter": "D",
+          "text": "Only refresh tokens have an audience"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Token passthrough/interchange is forbidden. The resource server must validate that the token audience is itself, in addition to signature, expiry, and issuer.",
+      "tags": [
+        "oauth",
+        "audience",
+        "token-passthrough",
+        "tester-scenario"
       ]
     }
   ]

@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 6,
     "chapterName": "Client Best Practices (Progressive Discovery & Code Mode)",
-    "questionCount": 15
+    "questionCount": 18
   },
   "questions": [
     {
@@ -481,6 +481,102 @@
         "client-best-practices",
         "code-mode",
         "schemas"
+      ]
+    },
+    {
+      "id": "ch6-scenario-extra-1",
+      "chapter": 6,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A host has 2,000 available tools and injects every full schema into every model turn. Context use and latency become poor. Which strategy should a tester expect a scalable client to consider?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Progressive tool discovery: catalog, inspect likely candidates, then execute"
+        },
+        {
+          "letter": "B",
+          "text": "Convert every tool into a resource"
+        },
+        {
+          "letter": "C",
+          "text": "Disable tool descriptions"
+        },
+        {
+          "letter": "D",
+          "text": "Use one OAuth token for all servers"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Progressive discovery keeps a lightweight catalog, retrieves detailed schemas only for likely tools, then executes. This reduces context pressure for large catalogs.",
+      "tags": [
+        "client-best-practices",
+        "tool-discovery",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch6-scenario-extra-2",
+      "chapter": 6,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A client caches a tool catalog. It receives notifications/tools/list_changed while the previous TTL has not expired. What behavior should the test expect?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Keep using the cache until TTL expiry"
+        },
+        {
+          "letter": "B",
+          "text": "Invalidate/refresh because list_changed overrides the unexpired TTL"
+        },
+        {
+          "letter": "C",
+          "text": "Ignore the notification because notifications never affect caches"
+        },
+        {
+          "letter": "D",
+          "text": "Restart the server"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The study material explicitly states that list_changed beats an unexpired TTL.",
+      "tags": [
+        "caching",
+        "notifications",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch6-scenario-extra-3",
+      "chapter": 6,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "Generated code in a sandbox calls tools through the host broker. The user approved running the script once. The implementation then treats that as blanket approval for every tool call the script makes. What is the concern?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "No concern; script approval equals all future tool approvals"
+        },
+        {
+          "letter": "B",
+          "text": "Code mode still requires per-call authorization; credentials also remain with the broker"
+        },
+        {
+          "letter": "C",
+          "text": "Sandbox code should receive raw OAuth refresh tokens"
+        },
+        {
+          "letter": "D",
+          "text": "Code mode requires direct network access"
+        }
+      ],
+      "answer": "B",
+      "explanation": "In code mode, tool calls still follow per-call authorization. Credentials remain with the broker and generated code should not get direct network credentials.",
+      "tags": [
+        "code-mode",
+        "authorization",
+        "tester-scenario"
       ]
     }
   ]

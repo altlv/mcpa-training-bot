@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 12,
     "chapterName": "Transports & Protocol Utilities",
-    "questionCount": 20
+    "questionCount": 23
   },
   "questions": [
     {
@@ -644,6 +644,103 @@
         "http-headers",
         "sep-2243",
         "encoding"
+      ]
+    },
+    {
+      "id": "ch12-scenario-extra-1",
+      "chapter": 12,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "A Streamable HTTP client sends a tools/call body, but the Mcp-Method header says resources/read. What should the gateway/server test expect?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Ignore the header and execute the body"
+        },
+        {
+          "letter": "B",
+          "text": "HTTP 400 plus HeaderMismatch (-32020)"
+        },
+        {
+          "letter": "C",
+          "text": "401 because headers are authentication"
+        },
+        {
+          "letter": "D",
+          "text": "A complete result with a warning"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The method header and JSON-RPC body must agree. A mismatch is a 400 HeaderMismatch (-32020).",
+      "tags": [
+        "transport",
+        "headers",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch12-scenario-extra-2",
+      "chapter": 12,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "An SSE response stream breaks halfway through a modern request. The client reconnects with Last-Event-ID and expects replay from the break point. What should be corrected?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Nothing; resumability is mandatory"
+        },
+        {
+          "letter": "B",
+          "text": "Modern resumability was removed; re-issue the lost request as a new request with a new JSON-RPC id"
+        },
+        {
+          "letter": "C",
+          "text": "Reuse the same id so the server resumes state"
+        },
+        {
+          "letter": "D",
+          "text": "Switch to HTTP GET"
+        }
+      ],
+      "answer": "B",
+      "explanation": "In the modern stateless model, Last-Event-ID resumability is removed. A lost request is re-issued independently with a new id.",
+      "tags": [
+        "transport",
+        "sse",
+        "stateless",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch12-scenario-extra-3",
+      "chapter": 12,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A Streamable HTTP implementation exposes one POST endpoint and can return either a JSON response or an SSE stream for that POST. A tester rejects it because 'MCP requires a separate GET/SSE endpoint.' Which statement is correct?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The tester is applying the legacy HTTP+SSE model; modern Streamable HTTP uses the single POST endpoint model"
+        },
+        {
+          "letter": "B",
+          "text": "The tester is correct for all versions"
+        },
+        {
+          "letter": "C",
+          "text": "MCP requires WebSockets instead"
+        },
+        {
+          "letter": "D",
+          "text": "stdio also requires GET"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The two-endpoint GET/SSE + POST design is legacy/deprecated. Streamable HTTP uses POST for client messages and may stream the POST response with SSE.",
+      "tags": [
+        "transport",
+        "streamable-http",
+        "tester-scenario"
       ]
     }
   ]

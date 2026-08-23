@@ -225,6 +225,39 @@
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
+
+    /* Model Selector */
+    .model-selector {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .model-select {
+      padding: 4px 8px;
+      font-size: 12px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      cursor: pointer;
+      max-width: 200px;
+    }
+    .model-select option {
+      background: #333;
+      color: #fff;
+    }
+    .model-status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .model-status-dot.available { background: #4CAF50; }
+    .model-status-dot.rate-limited { background: #FF9800; }
+    .model-status-dot.error { background: #F44336; }
+    .model-status-dot.missing { background: #9E9E9E; }
 </style>
 </head>
 <body>
@@ -249,6 +282,7 @@
           <h2 class="card-title">Select Topics</h2>
         </div>
         <p>Choose topics for your training session. The tutor will help you understand each answer.</p>
+        <input type="text" id="tag-search" class="tag-search" placeholder="Search tags..." autocomplete="off">
         <div class="tags-container" id="tags-container"></div>
         <div class="tags-actions">
           <button id="select-all-btn" class="btn btn-sm btn-outline">Select All</button>
@@ -325,6 +359,12 @@
       <div class="chat-header">
         <span class="chat-icon">💬</span>
         <h3>Teaching Assistant</h3>
+        <div class="model-selector" id="model-selector">
+          <select id="model-select" class="model-select">
+            <option value="" disabled selected>Loading models...</option>
+          </select>
+          <span class="model-status-dot" id="model-status-dot" title="Checking..."></span>
+        </div>
       </div>
 
       <div class="chat-messages" id="chat-messages">
@@ -401,9 +441,11 @@
         const res = await fetch(`${API}/api/tags`);
         const data = await res.json();
         renderTags(data.tags);
+        setupTagSearch();
       } catch (e) {
         $tags.innerHTML = '<p style="color:red;">Failed to load tags. Is the server running?</p>';
       }
+      loadModelStatus();
     }
 
     function renderTags(tags) {
@@ -430,6 +472,19 @@
         cb.addEventListener('change', () => {
           item.classList.toggle('selected', cb.checked);
           updateSelectedCount();
+        });
+      });
+    }
+
+    // ===== Tag Search Filter =====
+    const $tagSearch = document.getElementById('tag-search');
+    function setupTagSearch() {
+      if (!$tagSearch) return;
+      $tagSearch.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        $tags.querySelectorAll('.tag-item').forEach(item => {
+          const tagName = (item.getAttribute('data-tag') || '').toLowerCase();
+          item.style.display = (!query || tagName.includes(query)) ? '' : 'none';
         });
       });
     }
@@ -929,6 +984,48 @@
     $chatInput.addEventListener('input', () => {
       $chatInput.style.height = 'auto';
       $chatInput.style.height = Math.min($chatInput.scrollHeight, 80) + 'px';
+    });
+
+    // ===== Model Status =====
+    async function loadModelStatus() {
+      var select = document.getElementById('model-select');
+      var dot = document.getElementById('model-status-dot');
+      if (!select) return;
+      try {
+        var res = await fetch(API + '/api/models/status');
+        var data = await res.json();
+        select.innerHTML = '';
+        for (var name in data.providers) {
+          var info = data.providers[name];
+          var opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = info.icon + ' ' + info.name + ' \u2014 ' + info.model;
+          opt.disabled = info.status === 'missing';
+          if (info.isActive) opt.selected = true;
+          select.appendChild(opt);
+        }
+        var activeInfo = data.providers[data.activeProvider];
+        if (!activeInfo) {
+          dot.className = "model-status-dot missing";
+          dot.title = "No provider configured";
+          return;
+        }
+        if (activeInfo) {
+          dot.className = 'model-status-dot ' + activeInfo.status;
+          dot.title = activeInfo.status === 'available'
+            ? activeInfo.providerName + ' \u2014 ' + activeInfo.model
+            : (activeInfo.error || activeInfo.status);
+        }
+      } catch (e) {
+        select.innerHTML = '<option value="" disabled>Failed to load</option>';
+        dot.className = 'model-status-dot error';
+        dot.title = 'Could not reach server';
+      }
+    }
+    document.getElementById('model-select').addEventListener('change', function(e) {
+      fetch(API + '/api/models/validate/' + e.target.value, { method: 'POST' })
+        .then(function() { loadModelStatus(); })
+        .catch(function(e) { console.error('Failed to switch provider:', e); });
     });
 
     // ===== Boot =====

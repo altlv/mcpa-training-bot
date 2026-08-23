@@ -5,7 +5,7 @@
     "chapter": 11,
     "chapterName": "JSON-RPC 2.0 Fundamentals",
     "source": "https://www.jsonrpc.org/specification",
-    "questionCount": 20
+    "questionCount": 23
   },
   "questions": [
     {
@@ -635,6 +635,102 @@
       "tags": [
         "error-codes",
         "versioning"
+      ]
+    },
+    {
+      "id": "ch11-scenario-extra-1",
+      "chapter": 11,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A JSON-RPC notification includes \"id\": 7 and the receiver sends a response. Which issue should the tester identify first?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "No issue; notifications require IDs"
+        },
+        {
+          "letter": "B",
+          "text": "A notification must have no id and must not receive a response; with an id it is request-shaped"
+        },
+        {
+          "letter": "C",
+          "text": "The id must be null instead"
+        },
+        {
+          "letter": "D",
+          "text": "The method must start with rpc."
+        }
+      ],
+      "answer": "B",
+      "explanation": "Notifications have no id and receivers do not reply. MCP also forbids null request IDs, so id:null is not a workaround.",
+      "tags": [
+        "json-rpc",
+        "notifications",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch11-scenario-extra-2",
+      "chapter": 11,
+      "type": "scenario",
+      "difficulty": "easy",
+      "question": "A response object contains both result and error for the same id. What should a protocol conformance test conclude?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Valid if resultType is complete"
+        },
+        {
+          "letter": "B",
+          "text": "Invalid: a JSON-RPC response has result XOR error, never both"
+        },
+        {
+          "letter": "C",
+          "text": "Valid only over SSE"
+        },
+        {
+          "letter": "D",
+          "text": "Valid if the error code is -32603"
+        }
+      ],
+      "answer": "B",
+      "explanation": "JSON-RPC responses are mutually exclusive: success uses result, failure uses error.",
+      "tags": [
+        "json-rpc",
+        "responses",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch11-scenario-extra-3",
+      "chapter": 11,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "Two requests are outstanding with IDs 10 and 11. Responses arrive in the opposite order. The client reports a failure because it expected FIFO ordering. What is the bug?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The server; responses must preserve request order"
+        },
+        {
+          "letter": "B",
+          "text": "The client; it should correlate responses by id rather than arrival order"
+        },
+        {
+          "letter": "C",
+          "text": "Both IDs should be null"
+        },
+        {
+          "letter": "D",
+          "text": "Batching is required"
+        }
+      ],
+      "answer": "B",
+      "explanation": "JSON-RPC correlation is by id. Responses, including batch responses, can arrive in a different order from requests.",
+      "tags": [
+        "json-rpc",
+        "ids",
+        "tester-scenario"
       ]
     }
   ]

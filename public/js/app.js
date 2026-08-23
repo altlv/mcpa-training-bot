@@ -49,6 +49,7 @@ const App = {
     
     // Tag selection
     this.elements.tagsContainer = document.getElementById('tags-container');
+    this.elements.tagSearch = document.getElementById('tag-search');
     this.elements.selectAllBtn = document.getElementById('select-all-btn');
     this.elements.deselectAllBtn = document.getElementById('deselect-all-btn');
     this.elements.questionCount = document.getElementById('question-count');
@@ -113,6 +114,7 @@ const App = {
       this.showLoading('Loading tags...');
       const data = await API.getTags();
       this.renderTags(data.tags);
+    this.setupTagSearch();
       this.hideLoading();
     } catch (error) {
       this.showError('Failed to load tags. Please refresh the page.');
@@ -150,6 +152,21 @@ const App = {
     });
   },
   
+  /**
+   * Setup tag search filter
+   */
+  setupTagSearch() {
+    if (!this.elements.tagSearch || !this.elements.tagsContainer) return;
+    this.elements.tagSearch.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      const tagItems = this.elements.tagsContainer.querySelectorAll('.tag-item');
+      tagItems.forEach(item => {
+        const tagName = (item.getAttribute('data-tag') || '').toLowerCase();
+        item.style.display = (!query || tagName.includes(query)) ? '' : 'none';
+      });
+    });
+  },
+
   /**
    * Get selected tags
    * @returns {string[]} Array of selected tag names

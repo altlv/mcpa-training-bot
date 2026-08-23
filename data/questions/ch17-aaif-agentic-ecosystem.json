@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 17,
     "chapterName": "AAIF & the Agentic Ecosystem",
-    "questionCount": 10
+    "questionCount": 13
   },
   "questions": [
     {
@@ -324,6 +324,102 @@
         "aaif",
         "governance",
         "trap"
+      ]
+    },
+    {
+      "id": "ch17-scenario-extra-1",
+      "chapter": 17,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A gateway wants to apply a per-tool rate limit without parsing every JSON body. Which modern MCP feature is most directly useful?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Mcp-Method and Mcp-Name headers"
+        },
+        {
+          "letter": "B",
+          "text": "Mcp-Session-Id"
+        },
+        {
+          "letter": "C",
+          "text": "Last-Event-ID"
+        },
+        {
+          "letter": "D",
+          "text": "notifications/initialized"
+        }
+      ],
+      "answer": "A",
+      "explanation": "The modern headers expose method and target information to gateways/WAFs for routing, metering, and policy without body parsing.",
+      "tags": [
+        "agentgateway",
+        "headers",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch17-scenario-extra-2",
+      "chapter": 17,
+      "type": "scenario",
+      "difficulty": "easy",
+      "question": "A repository contains AGENTS.md. A tester assumes it is an MCP authorization policy that grants tools/call permissions. What is the correction?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Correct; AGENTS.md is the OAuth scope file"
+        },
+        {
+          "letter": "B",
+          "text": "AGENTS.md provides project-specific guidance to coding agents; it is not an authorization configuration"
+        },
+        {
+          "letter": "C",
+          "text": "AGENTS.md is the MCP Registry database"
+        },
+        {
+          "letter": "D",
+          "text": "AGENTS.md replaces server/discover"
+        }
+      ],
+      "answer": "B",
+      "explanation": "AGENTS.md is an agent configuration/instruction standard for repository guidance, not an MCP authorization mechanism.",
+      "tags": [
+        "agents-md",
+        "aaif",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch17-scenario-extra-3",
+      "chapter": 17,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A change to MCP is proposed informally in chat and a team treats it as part of the specification immediately. Which governance concept should the tester remember?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Specification changes go through the SEP/PR governance process; informal discussion alone is not the specification"
+        },
+        {
+          "letter": "B",
+          "text": "Any maintainer chat message changes the protocol"
+        },
+        {
+          "letter": "C",
+          "text": "Only vendors can propose changes"
+        },
+        {
+          "letter": "D",
+          "text": "Registry publication changes the core protocol"
+        }
+      ],
+      "answer": "A",
+      "explanation": "MCP changes are governed through Specification Enhancement Proposals and the project process. Discussion can inform a proposal but does not itself amend the spec.",
+      "tags": [
+        "governance",
+        "sep",
+        "tester-scenario"
       ]
     }
   ]

@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 8,
     "chapterName": "Security & Trust",
-    "questionCount": 27
+    "questionCount": 30
   },
   "questions": [
     {
@@ -867,6 +867,103 @@
         "attack-patterns",
         "scopes",
         "step-up"
+      ]
+    },
+    {
+      "id": "ch8-scenario-extra-1",
+      "chapter": 8,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "A server follows a resource_metadata URL supplied through an authentication challenge. The URL resolves to 169.254.169.254. What security test should catch this?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Prompt injection"
+        },
+        {
+          "letter": "B",
+          "text": "SSRF protection blocking link-local/metadata-service addresses"
+        },
+        {
+          "letter": "C",
+          "text": "JSON-RPC batch ordering"
+        },
+        {
+          "letter": "D",
+          "text": "Tool-name collision"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Authentication metadata locations can be attacker-controlled. SSRF defenses should block private/reserved/link-local destinations such as 169.254.169.254 and validate redirects/DNS behavior.",
+      "tags": [
+        "security",
+        "ssrf",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch8-scenario-extra-2",
+      "chapter": 8,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "A server receives a requestState value from an MRTR retry, decodes it, and trusts an embedded user ID without integrity protection. What is the core problem?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "requestState is guaranteed trustworthy because the server originally created it"
+        },
+        {
+          "letter": "B",
+          "text": "requestState returns through the client and must be treated as attacker-controlled; protect sensitive state with integrity/authenticity controls"
+        },
+        {
+          "letter": "C",
+          "text": "requestState must always be JSON"
+        },
+        {
+          "letter": "D",
+          "text": "The same JSON-RPC id should have been reused"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Even server-minted state is round-tripped through an untrusted client. If it affects authorization/business logic, it needs integrity protection and replay defenses.",
+      "tags": [
+        "security",
+        "mrtr",
+        "request-state",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch8-scenario-extra-3",
+      "chapter": 8,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "An installer link would launch a local MCP server with a shell command. The UI hides the command and starts immediately after one click. Which requirement is most relevant?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "One-click configs should show the full command, flag risk, require explicit approval, and be cancellable"
+        },
+        {
+          "letter": "B",
+          "text": "All local commands are trusted by definition"
+        },
+        {
+          "letter": "C",
+          "text": "The command should be placed in stdout"
+        },
+        {
+          "letter": "D",
+          "text": "Only remote servers need user consent"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Malicious one-click configuration is a known risk. The user should see what will execute, receive a danger signal, explicitly approve, and be able to cancel.",
+      "tags": [
+        "security",
+        "local-install",
+        "tester-scenario"
       ]
     }
   ]

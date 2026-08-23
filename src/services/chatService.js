@@ -2,7 +2,8 @@
  * Chat Service
  * Teaching assistant that explains MCP concepts using cheat sheet + question data
  * 
- * No AI dependency — pure BM25 search + template responses
+ * Hybrid approach: AI-powered responses when a provider key is available,
+ * falling back to BM25 search + template responses otherwise.
  */
 
 const fs = require('fs');
@@ -17,6 +18,51 @@ const cheatSheetContent = fs.readFileSync(cheatSheetPath, 'utf8');
 // Load BM25 search index
 const searchIndex = new SearchIndex(path.join(__dirname, '../..'));
 searchIndex.load();
+
+// Lazy-load model config and OpenAI client
+let modelConfig = null;
+let aiClient = null;
+
+function ensureModelConfig() {
+  if (!modelConfig) {
+    try {
+      modelConfig = require('./modelConfig');
+    } catch (_) { /* model config not available */ }
+  }
+  return modelConfig;
+}
+
+function getAIClient() {
+  const config = ensureModelConfig();
+  if (!config) return null;
+  try {
+    if (!aiClient) {
+      aiClient = config.createClient();
+    }
+    return aiClient;
+  } catch (_) {
+    return null;
+  }
+}
+
+// System prompt for the AI teaching assistant
+const SYSTEM_PROMPT = `You are a friendly, knowledgeable MCPA (Model Context Protocol Associate) exam tutor.
+
+Your role:
+- Help students understand MCP (Model Context Protocol) concepts
+- Explain why answers are correct or incorrect
+- Provide clear, concise explanations suitable for exam preparation
+- Reference official MCP specification concepts when relevant
+- Be encouraging but accurate
+
+Key MCP domains:
+- Security & Governance (24%) — OAuth 2.1, authentication, authorization, attack patterns
+- Interactions & Execution (26%) — Tools, Resources, Prompts, control model
+- MCP Fundamentals (16%) — Protocol basics, capabilities, lifecycle
+- Architecture & Components (14%) — Transport (stdio, Streamable HTTP), server/client architecture
+- Use Cases & Ecosystem (20%) — Inspector, registry, extensions, real-world applications
+
+Keep responses concise (2-4 paragraphs max) unless the student asks for more detail.`;
 
 class ChatService {
   constructor() {
@@ -73,32 +119,132 @@ class ChatService {
     // Add user message to history
     this.addMessage(sessionId, 'user', userMessage);
 
-    let response;
+    // Try AI-powered response first
+    const aiResponse = await this.tryAIResponse(sessionId, userMessage, ctx);
+    if (aiResponse) {
+      this.addMessage(sessionId, 'assistant', aiResponse.text);
+      return {
+        response: aiResponse.text,
+        references: aiResponse.references || [],
+        messageCount: this.getSession(sessionId).messages.length
+      };
+    }
 
-    // Route based on message type / content
+    // Fall back to BM25 search + templates
+    let response;
     const msgLower = userMessage.toLowerCase().trim();
 
     if (ctx.questionId && (msgLower.includes('why') || msgLower.includes('correct') || msgLower.includes('answer'))) {
-      // User is asking about the correct answer
       response = this.explainAnswer(ctx);
     } else if (msgLower.includes('concept') || msgLower.includes('what is') || msgLower.includes('what are') || msgLower.includes('test')) {
-      // User is asking about the concept being tested
       response = this.identifyConcept(ctx);
     } else if (msgLower.includes('explain') || msgLower.includes('tell me') || msgLower.includes('how')) {
-      // General explanation request — search cheat sheet
       response = this.searchAndExplain(userMessage, ctx);
     } else {
-      // Default: search cheat sheet for the user's query
       response = this.searchAndExplain(userMessage, ctx);
     }
 
-    // Add assistant response to history
     this.addMessage(sessionId, 'assistant', response.text);
 
     return {
       response: response.text,
       references: response.references || [],
       messageCount: this.getSession(sessionId).messages.length
+    };
+  }
+
+  /**
+   * Try to get an AI-powered response from the configured provider.
+   * Returns null if no AI is available (falls back to BM25).
+   * Uses a timeout to avoid hanging when the provider is unreachable.
+   */
+  async tryAIResponse(sessionId, userMessage, ctx) {
+    const ai = getAIClient();
+    if (!ai) return null;
+
+    try {
+      // Build context-enriched messages
+      const messages = [{ role: 'system', content: SYSTEM_PROMPT }];
+
+      // Add question context if available
+      if (ctx.questionId) {
+        const question = questionService.getQuestionById(ctx.questionId);
+        if (question) {
+          const contextBlock = [
+            `Current question: ${question.question}`,
+            `Options: ${question.options.map(o => `${o.letter}) ${o.text}`).join(', ')}`,
+            `Correct answer: ${Array.isArray(question.correctAnswers) ? question.correctAnswers.join(', ') : question.correctAnswers}`,
+            `Tags: ${(question.tags || []).join(', ')}`,
+            question.explanation ? `Explanation: ${question.explanation}` : '',
+          ].filter(Boolean).join('\n');
+
+          messages.push({ role: 'system', content: `Question context:\n${contextBlock}` });
+
+          // Add answer context if provided
+          if (ctx.userAnswer !== undefined) {
+            const answerCtx = [
+              `Student's answer: ${ctx.userAnswer}`,
+              `Correct answer: ${ctx.correctAnswer}`,
+              ctx.isCorrect === true ? 'Student answered correctly.' : 'Student answered incorrectly.',
+            ].join('\n');
+            messages.push({ role: 'system', content: answerCtx });
+          }
+        }
+      }
+
+      // Add recent chat history for continuity
+      const history = this.getHistory(sessionId);
+      for (const msg of history.slice(-6)) { // last 3 exchanges
+        messages.push({ role: msg.role === 'user' ? 'user' : 'assistant', content: msg.content });
+      }
+
+      // Add current user message
+      messages.push({ role: 'user', content: userMessage });
+
+      // Use a timeout to avoid hanging when the provider is unreachable
+      const TIMEOUT_MS = 8000;
+      const responsePromise = ai.client.chat.completions.create({
+        model: ai.model,
+        messages,
+        max_tokens: 500,
+        temperature: 0.7,
+      });
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('AI request timed out')), TIMEOUT_MS)
+      );
+
+      const response = await Promise.race([responsePromise, timeoutPromise]);
+
+      const text = response.choices?.[0]?.message?.content;
+      if (!text) return null;
+
+      // Extract references from context
+      const references = ctx.questionId
+        ? (questionService.getQuestionById(ctx.questionId)?.tags || [])
+        : [];
+
+      return { text, references };
+    } catch (error) {
+      console.error('AI response error (falling back to BM25):', error.message);
+      // Reset client so next request tries again (provider might recover)
+      aiClient = null;
+      return null;
+    }
+  }
+
+  /**
+   * Get the current AI provider status (for frontend display)
+   */
+  getProviderInfo() {
+    const config = ensureModelConfig();
+    if (!config) return { available: false, provider: 'none', model: null };
+    const provider = config.getActiveProvider();
+    return {
+      available: true,
+      provider,
+      model: config.getModelForProvider(provider),
+      providerName: config.PROVIDERS[provider]?.name || provider,
     };
   }
 
@@ -175,7 +321,7 @@ class ChatService {
     let text = `**This question tests:** ${tags.join(', ')}\n\n`;
 
     // Get relevant cheat sheet section
-    const sections = this.searchCheatSheet(tags.join(' '));
+    const sections = this.searchCheatSheetLegacy(tags.join(' '));
     if (sections.length > 0) {
       text += `**Key points to remember:**\n${sections.slice(0, 3).map(s => `• ${s}`).join('\n')}\n\n`;
     }
@@ -187,11 +333,11 @@ class ChatService {
   }
 
   /**
-   * Search cheat sheet and learning materials using BM25 index
+   * Search cheat sheet, learning materials, and specs using BM25 index
    */
   searchAndExplain(query, ctx) {
     // Use BM25 search for high-quality results
-    const bm25Results = searchIndex.search(query, 8);
+    const bm25Results = searchIndex.search(query, 10);
 
     // Also do old-style cheat sheet search for broad coverage
     const legacyResults = this.searchCheatSheetLegacy(query);
@@ -201,28 +347,45 @@ class ChatService {
       text = `**Here's what I found about "${query}":**\n\n`;
 
       // Group by type for clean presentation
+      const specHits = bm25Results.filter(r => r.doc.type === 'spec');
       const cheatHits = bm25Results.filter(r => r.doc.type === 'cheat-sheet');
       const questionHits = bm25Results.filter(r => r.doc.type === 'question');
       const noteHits = bm25Results.filter(r => r.doc.type === 'learning-note');
 
+      // Specification content (highest priority for unexpected questions)
+      if (specHits.length > 0) {
+        text += `**📖 From Official Specifications:**\n\n`;
+        for (const hit of specHits.slice(0, 3)) {
+          const meta = hit.doc.meta;
+          const preview = hit.doc.chunk.substring(0, 400).replace(/\n/g, ' ').replace(/#+\s*/g, '');
+          text += `• **${meta.sourceName || meta.source}** — ${meta.section}\n`;
+          text += `  ${preview}...\n`;
+          if (meta.url) {
+            text += `  🔗 [Read more](${meta.url})\n`;
+          }
+          text += '\n';
+        }
+      }
+
       // Cheat sheet / learning note sections
       const conceptHits = [...cheatHits, ...noteHits];
       if (conceptHits.length > 0) {
-        for (const hit of conceptHits.slice(0, 3)) {
+        text += `**📋 From Study Materials:**\n\n`;
+        for (const hit of conceptHits.slice(0, 2)) {
           const meta = hit.doc.meta;
           const section = meta.section || meta.source;
-          const preview = hit.doc.chunk.substring(0, 300).replace(/\n/g, ' ').replace(/#+\s*/g, '');
+          const preview = hit.doc.chunk.substring(0, 250).replace(/\n/g, ' ').replace(/#+\s*/g, '');
           text += `• **${section}**: ${preview}...\n\n`;
         }
       }
 
       // Related questions (without answers for self-testing)
       if (questionHits.length > 0) {
-        text += `**Related questions to test yourself:**\n\n`;
-        for (const hit of questionHits.slice(0, 3)) {
+        text += `**📝 Related questions to test yourself:**\n\n`;
+        for (const hit of questionHits.slice(0, 2)) {
           const meta = hit.doc.meta;
           const opts = (meta.options || []).map(o => `  ${o.letter}) ${o.text}`).join('\n');
-          text += `📝 ${meta.question}\n${opts}\n\n`;
+          text += `${meta.question}\n${opts}\n\n`;
         }
       }
     } else if (legacyResults.length > 0) {
@@ -232,9 +395,9 @@ class ChatService {
     } else {
       text = `I couldn't find specific information about "${query}" in the knowledge base. `;
       text += `Try asking about:\n`;
+      text += `• **JSON-RPC 2.0** — request/response format\n`;
+      text += `• **MCP Protocol** — tools, resources, prompts\n`;
       text += `• **OAuth 2.1** — authentication flow\n`;
-      text += `• **Tools vs Resources** — control model\n`;
-      text += `• **MRTR** — multi-round-trip requests\n`;
       text += `• **Transport** — stdio vs Streamable HTTP\n`;
       text += `• **Security** — attack patterns and mitigations`;
     }

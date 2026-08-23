@@ -12,6 +12,7 @@ export class ExamPage {
     this.tagContainer = page.locator('#tags-container');
     this.tagItems = page.locator('#tags-container .tag-item');
     this.tagLabels = page.locator('#tags-container .tag-item label');
+    this.tagSearch = page.locator('#tag-search');
     this.selectAllBtn = page.locator('#select-all-btn');
     this.deselectAllBtn = page.locator('#deselect-all-btn');
     this.selectedCount = page.locator('#selected-count');

@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 15,
     "chapterName": "Versioning, 2026-07-28 Changelog & Feature Lifecycle",
-    "questionCount": 15
+    "questionCount": 18
   },
   "questions": [
     {
@@ -484,6 +484,102 @@
         "sdk-tiers",
         "scenario",
         "release"
+      ]
+    },
+    {
+      "id": "ch15-scenario-extra-1",
+      "chapter": 15,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A modern client sends initialize and waits for notifications/initialized before making any other request. The modern server never responds as expected. What is the key compatibility issue?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "initialize is part of the modern stateless flow"
+        },
+        {
+          "letter": "B",
+          "text": "The client is using the legacy handshake model; modern requests self-describe via _meta"
+        },
+        {
+          "letter": "C",
+          "text": "The server needs a session cookie"
+        },
+        {
+          "letter": "D",
+          "text": "The client should send ping first"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The modern era removes the initialize handshake. Requests carry protocol version and client capabilities in _meta instead.",
+      "tags": [
+        "versioning",
+        "legacy-modern",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch15-scenario-extra-2",
+      "chapter": 15,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A team reads that a feature is 'Deprecated' and removes support immediately, claiming deprecated means forbidden. What should a lifecycle test review say?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Correct; deprecated and removed are synonyms"
+        },
+        {
+          "letter": "B",
+          "text": "Deprecated features still work during the deprecation window; Removed means gone in the modern era"
+        },
+        {
+          "letter": "C",
+          "text": "Deprecated means experimental"
+        },
+        {
+          "letter": "D",
+          "text": "Only SDKs can deprecate features"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The lifecycle distinguishes Active, Deprecated, and Removed. Deprecated is a warning/migration period, not immediate removal.",
+      "tags": [
+        "lifecycle",
+        "deprecation",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch15-scenario-extra-3",
+      "chapter": 15,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "A dual-era server receives a legacy client. A tester expects protocol negotiation to automatically translate modern MRTR semantics into legacy server-initiated sampling. Is that expectation sound?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Yes; negotiation bridges all semantic differences"
+        },
+        {
+          "letter": "B",
+          "text": "No; negotiation detects/selects compatible protocol behavior but does not magically bridge eras"
+        },
+        {
+          "letter": "C",
+          "text": "Yes, but only on stdio"
+        },
+        {
+          "letter": "D",
+          "text": "Only the Registry performs translation"
+        }
+      ],
+      "answer": "B",
+      "explanation": "The cheat sheet's key warning is that negotiation detects mismatch/era; it does not itself bridge incompatible semantics.",
+      "tags": [
+        "versioning",
+        "compatibility",
+        "tester-scenario"
       ]
     }
   ]

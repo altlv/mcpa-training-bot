@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 5,
     "chapterName": "Building Servers (and Agent Skills)",
-    "questionCount": 20
+    "questionCount": 23
   },
   "questions": [
     {
@@ -644,6 +644,104 @@
         "build-client",
         "python-sdk",
         "async"
+      ]
+    },
+    {
+      "id": "ch5-scenario-extra-1",
+      "chapter": 5,
+      "type": "scenario",
+      "difficulty": "easy",
+      "question": "An MCP stdio server works when started manually from its project directory but fails when launched by the desktop client. The config uses relative paths. What should the tester try first?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Change the JSON-RPC version to 1.0"
+        },
+        {
+          "letter": "B",
+          "text": "Use absolute executable/script paths and fully restart the client"
+        },
+        {
+          "letter": "C",
+          "text": "Add a TCP port to the stdio config"
+        },
+        {
+          "letter": "D",
+          "text": "Enable Last-Event-ID"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Desktop clients may launch the process with a different working directory. Absolute paths remove that dependency; stdio does not use a TCP port.",
+      "tags": [
+        "building-servers",
+        "debugging",
+        "paths",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch5-scenario-extra-2",
+      "chapter": 5,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A local stdio server prints debug messages to stdout between JSON-RPC messages. Intermittent parse errors appear. What is the likely cause?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "stdout is the protocol channel and logging there corrupts framing; log to stderr"
+        },
+        {
+          "letter": "B",
+          "text": "The server needs OAuth"
+        },
+        {
+          "letter": "C",
+          "text": "The tool list must be alphabetized"
+        },
+        {
+          "letter": "D",
+          "text": "The client must use HTTP GET"
+        }
+      ],
+      "answer": "A",
+      "explanation": "For stdio, stdout is protocol-only. Human-readable logs should go to stderr so they do not become invalid protocol frames.",
+      "tags": [
+        "stdio",
+        "logging",
+        "debugging",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch5-scenario-extra-3",
+      "chapter": 5,
+      "type": "scenario",
+      "difficulty": "easy",
+      "question": "A developer adds a 'port': 8080 property to a local stdio server configuration and expects the client to connect there. What should the test review flag?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Nothing; port is mandatory for stdio"
+        },
+        {
+          "letter": "B",
+          "text": "stdio communicates through the launched process's stdin/stdout, not a TCP port"
+        },
+        {
+          "letter": "C",
+          "text": "Port 8080 is reserved for MCP"
+        },
+        {
+          "letter": "D",
+          "text": "The port should be 6274"
+        }
+      ],
+      "answer": "B",
+      "explanation": "stdio is process-based IPC over stdin/stdout. A TCP port belongs to network transports, not the stdio connection model.",
+      "tags": [
+        "stdio",
+        "configuration",
+        "tester-scenario"
       ]
     }
   ]

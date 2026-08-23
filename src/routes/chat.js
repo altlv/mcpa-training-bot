@@ -9,6 +9,20 @@ const chatService = require('../services/chatService');
 const questionService = require('../services/questionService');
 
 /**
+ * GET /api/chat/provider
+ * Get current AI provider info (safe — no keys exposed)
+ */
+router.get('/provider', (req, res) => {
+  try {
+    const info = chatService.getProviderInfo();
+    res.json(info);
+  } catch (error) {
+    console.error('Provider info error:', error);
+    res.json({ available: false, provider: 'none', model: null });
+  }
+});
+
+/**
  * POST /api/chat
  * Send a message to the teaching assistant
  * Body: { sessionId, message, questionContext? }

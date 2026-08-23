@@ -4,7 +4,7 @@
     "protocolVersion": "2026-07-28",
     "chapter": 13,
     "chapterName": "Extensions (MCP Apps, Tasks, Auth Extensions)",
-    "questionCount": 19
+    "questionCount": 22
   },
   "questions": [
     {
@@ -612,6 +612,104 @@
         "tasks",
         "input-required",
         "mrtr"
+      ]
+    },
+    {
+      "id": "ch13-scenario-extra-1",
+      "chapter": 13,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "A server returns resultType:'task' to a client that never declared the Tasks extension. What should a conformance test conclude?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Valid because extensions are server-controlled"
+        },
+        {
+          "letter": "B",
+          "text": "Violation: extensions are opt-in and both sides must declare support"
+        },
+        {
+          "letter": "C",
+          "text": "Valid if the task finishes quickly"
+        },
+        {
+          "letter": "D",
+          "text": "Valid only over stdio"
+        }
+      ],
+      "answer": "B",
+      "explanation": "Extensions are not default-on. A server must not use extension behavior with a client that has not opted in.",
+      "tags": [
+        "extensions",
+        "tasks",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch13-scenario-extra-2",
+      "chapter": 13,
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "A task enters input_required. The client answers by retrying the original tools/call request with inputResponses, just like core MRTR. What is wrong?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Nothing; Tasks and MRTR use the same continuation mechanism"
+        },
+        {
+          "letter": "B",
+          "text": "Tasks use tasks/update against the taskId; core MRTR retries the original request"
+        },
+        {
+          "letter": "C",
+          "text": "The client should call tasks/result"
+        },
+        {
+          "letter": "D",
+          "text": "The client should open an HTTP GET stream"
+        }
+      ],
+      "answer": "B",
+      "explanation": "This is an important distinction: core MRTR retries the original request; Tasks mid-flight input is supplied through tasks/update.",
+      "tags": [
+        "extensions",
+        "tasks",
+        "mrtr",
+        "tester-scenario"
+      ]
+    },
+    {
+      "id": "ch13-scenario-extra-3",
+      "chapter": 13,
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A test script polls a task continuously, ignoring pollIntervalMs returned by the server. Which behavior should be improved?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "Respect pollIntervalMs when polling tasks/get"
+        },
+        {
+          "letter": "B",
+          "text": "Replace tasks/get with tasks/list"
+        },
+        {
+          "letter": "C",
+          "text": "Reuse the original JSON-RPC id for every poll"
+        },
+        {
+          "letter": "D",
+          "text": "Disable extension negotiation"
+        }
+      ],
+      "answer": "A",
+      "explanation": "Tasks are polled with tasks/get and clients should respect the server's pollIntervalMs guidance to avoid excessive polling.",
+      "tags": [
+        "extensions",
+        "tasks",
+        "polling",
+        "tester-scenario"
       ]
     }
   ]

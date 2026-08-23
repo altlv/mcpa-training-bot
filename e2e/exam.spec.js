@@ -82,6 +82,50 @@ test.describe('Exam Mode — Tag Selection', () => {
 
     expect(errors).toHaveLength(0);
   });
+
+  test('tag search filters tags by name as you type', async ({ page }) => {
+    await mockExamQuiz(page);
+    const exam = new ExamPage(page);
+    await exam.goto();
+
+    const searchInput = page.locator('#tag-search');
+    await expect(searchInput).toBeVisible();
+
+    // All tags visible initially
+    const allCount = await exam.tagItems.count();
+    expect(allCount).toBeGreaterThan(0);
+
+    // Type a query that matches some tags
+    await searchInput.fill('sec');
+
+    // Only tags containing "sec" should be visible
+    const visibleAfterFilter = await exam.tagItems.evaluateAll((items) =>
+      items.filter((el) => el.style.display !== 'none').length
+    );
+    expect(visibleAfterFilter).toBeGreaterThan(0);
+    expect(visibleAfterFilter).toBeLessThan(allCount);
+
+    // Clear search — all tags reappear
+    await searchInput.fill('');
+    const allVisibleAgain = await exam.tagItems.evaluateAll((items) =>
+      items.filter((el) => el.style.display !== 'none').length
+    );
+    expect(allVisibleAgain).toBe(allCount);
+  });
+
+  test('tag search is case-insensitive', async ({ page }) => {
+    await mockExamQuiz(page);
+    const exam = new ExamPage(page);
+    await exam.goto();
+
+    const searchInput = page.locator('#tag-search');
+    await searchInput.fill('AUTH');
+
+    const visibleCount = await exam.tagItems.evaluateAll((items) =>
+      items.filter((el) => el.style.display !== 'none').length
+    );
+    expect(visibleCount).toBeGreaterThan(0);
+  });
 });
 
 // ─────────────────────────────────────────────────────────────
