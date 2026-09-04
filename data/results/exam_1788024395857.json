@@ -1,0 +1,784 @@
+{
+  "sessionId": "exam_1788024395856_0r3i38gtp",
+  "type": "practice-exam",
+  "timestamp": "2026-08-29T17:26:35.857Z",
+  "elapsedMinutes": 0,
+  "overtime": false,
+  "totalQuestions": 60,
+  "score": 0,
+  "percentage": 0,
+  "domainResults": [
+    {
+      "name": "Interactions & Execution",
+      "weight": "26%",
+      "correct": 0,
+      "total": 16,
+      "percentage": 0
+    },
+    {
+      "name": "Security & Governance",
+      "weight": "24%",
+      "correct": 0,
+      "total": 14,
+      "percentage": 0
+    },
+    {
+      "name": "Use Cases & Ecosystem",
+      "weight": "20%",
+      "correct": 0,
+      "total": 12,
+      "percentage": 0
+    },
+    {
+      "name": "MCP Fundamentals",
+      "weight": "16%",
+      "correct": 0,
+      "total": 10,
+      "percentage": 0
+    },
+    {
+      "name": "Architecture & Components",
+      "weight": "14%",
+      "correct": 0,
+      "total": 8,
+      "percentage": 0
+    }
+  ],
+  "questions": [
+    {
+      "questionId": "ch4-q22",
+      "tags": [
+        "mrtr",
+        "capabilities"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": "C"
+    },
+    {
+      "questionId": "ch5-m6",
+      "tags": [
+        "build-server",
+        "build-client",
+        "requirements"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "questionId": "ch2-q16",
+      "tags": [
+        "architecture",
+        "cardinality",
+        "participants",
+        "scenario"
+      ],
+      "examDomain": "architecture",
+      "isCorrect": false,
+      "correctAnswer": "A"
+    },
+    {
+      "questionId": "ch1-q14",
+      "tags": [
+        "mcp-basics",
+        "scenario",
+        "use-cases"
+      ],
+      "examDomain": "fundamentals",
+      "isCorrect": false,
+      "correctAnswer": "A"
+    },
+    {
+      "questionId": "ch13-scenario-extra-2",
+      "tags": [
+        "extensions",
+        "tasks",
+        "mrtr",
+        "tester-scenario"
+      ],
+      "examDomain": "ecosystem",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch1-q4",
+      "tags": [
+        "mcp-basics",
+        "scope"
+      ],
+      "examDomain": "fundamentals",
+      "isCorrect": false,
+      "correctAnswer": "C"
+    },
+    {
+      "questionId": "ch14-q8",
+      "tags": [
+        "registry",
+        "publishing",
+        "scenario",
+        "troubleshooting"
+      ],
+      "examDomain": "ecosystem",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch1-q8",
+      "tags": [
+        "mcp-basics",
+        "ecosystem"
+      ],
+      "examDomain": "fundamentals",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch9-q21",
+      "tags": [
+        "inspector",
+        "catalog",
+        "config"
+      ],
+      "examDomain": "ecosystem",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch16-q10",
+      "tags": [
+        "security-policy",
+        "cve",
+        "cna"
+      ],
+      "examDomain": "security",
+      "isCorrect": false,
+      "correctAnswer": "A"
+    },
+    {
+      "questionId": "ch3-q23",
+      "tags": [
+        "tools",
+        "naming",
+        "host"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": "C"
+    },
+    {
+      "questionId": "ch13-q10",
+      "tags": [
+        "extensions",
+        "tasks",
+        "scenario",
+        "capabilities"
+      ],
+      "examDomain": "ecosystem",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch14-m2",
+      "tags": [
+        "registry",
+        "verification",
+        "package-types"
+      ],
+      "examDomain": "ecosystem",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "questionId": "ch1-scenario-extra-2",
+      "tags": [
+        "scope",
+        "mcp-basics",
+        "tester-scenario"
+      ],
+      "examDomain": "fundamentals",
+      "isCorrect": false,
+      "correctAnswer": "C"
+    },
+    {
+      "questionId": "ch5-m2",
+      "tags": [
+        "build-server",
+        "troubleshooting",
+        "claude-desktop"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "questionId": "ch15-q13",
+      "tags": [
+        "changelog",
+        "transports",
+        "deprecations"
+      ],
+      "examDomain": "security",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch10-q1",
+      "tags": [
+        "debugging",
+        "inspector"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch15-m7",
+      "tags": [
+        "versioning",
+        "eras",
+        "compatibility"
+      ],
+      "examDomain": "security",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "questionId": "ch1-m7",
+      "tags": [
+        "fundamentals",
+        "governance",
+        "seps"
+      ],
+      "examDomain": "fundamentals",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "questionId": "ch14-m5",
+      "tags": [
+        "registry",
+        "cli",
+        "publishing"
+      ],
+      "examDomain": "ecosystem",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "questionId": "ch16-q13",
+      "tags": [
+        "security-policy",
+        "scope",
+        "scenario"
+      ],
+      "examDomain": "security",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch6-q6",
+      "tags": [
+        "client-best-practices",
+        "code-mode",
+        "error-handling"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch13-q9",
+      "tags": [
+        "extensions",
+        "tasks",
+        "lifecycle"
+      ],
+      "examDomain": "ecosystem",
+      "isCorrect": false,
+      "correctAnswer": "A"
+    },
+    {
+      "questionId": "ch10-q11",
+      "tags": [
+        "debugging",
+        "logging",
+        "levels"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch4-q12",
+      "tags": [
+        "client-concepts",
+        "elicitation",
+        "ux"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch4-m4",
+      "tags": [
+        "client-features",
+        "sampling"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "questionId": "ch4-q19",
+      "tags": [
+        "mrtr",
+        "request-state"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch3-m3",
+      "tags": [
+        "server-features",
+        "resources",
+        "templates"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ]
+    },
+    {
+      "questionId": "ch11-q15",
+      "tags": [
+        "json-rpc",
+        "scenario",
+        "notifications",
+        "mcp"
+      ],
+      "examDomain": "architecture",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch7-m2",
+      "tags": [
+        "authorization",
+        "flow",
+        "oauth"
+      ],
+      "examDomain": "security",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "questionId": "ch1-q11",
+      "tags": [
+        "mcp-basics",
+        "scope",
+        "design"
+      ],
+      "examDomain": "fundamentals",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch2-scenario-extra-3",
+      "tags": [
+        "architecture",
+        "cardinality",
+        "tester-scenario"
+      ],
+      "examDomain": "architecture",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch13-q14",
+      "tags": [
+        "extensions",
+        "auth",
+        "scenario"
+      ],
+      "examDomain": "ecosystem",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch8-scenario-extra-1",
+      "tags": [
+        "security",
+        "ssrf",
+        "tester-scenario"
+      ],
+      "examDomain": "security",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch1-q18",
+      "tags": [
+        "fundamentals",
+        "standardization",
+        "spec"
+      ],
+      "examDomain": "fundamentals",
+      "isCorrect": false,
+      "correctAnswer": "A"
+    },
+    {
+      "questionId": "ch14-scenario-extra-1",
+      "tags": [
+        "registry",
+        "npm",
+        "tester-scenario"
+      ],
+      "examDomain": "ecosystem",
+      "isCorrect": false,
+      "correctAnswer": "A"
+    },
+    {
+      "questionId": "ch7-m6",
+      "tags": [
+        "authorization",
+        "registration",
+        "cimd",
+        "dcr"
+      ],
+      "examDomain": "security",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    {
+      "questionId": "ch7-q11",
+      "tags": [
+        "authorization",
+        "oauth",
+        "pkce"
+      ],
+      "examDomain": "security",
+      "isCorrect": false,
+      "correctAnswer": "A"
+    },
+    {
+      "questionId": "ch16-q5",
+      "tags": [
+        "governance",
+        "process",
+        "scenario"
+      ],
+      "examDomain": "security",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch2-q2",
+      "tags": [
+        "architecture",
+        "participants"
+      ],
+      "examDomain": "architecture",
+      "isCorrect": false,
+      "correctAnswer": "A"
+    },
+    {
+      "questionId": "ch11-q1",
+      "tags": [
+        "json-rpc",
+        "basics"
+      ],
+      "examDomain": "architecture",
+      "isCorrect": false,
+      "correctAnswer": "A"
+    },
+    {
+      "questionId": "ch9-m1",
+      "tags": [
+        "inspector",
+        "overview"
+      ],
+      "examDomain": "ecosystem",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "questionId": "ch6-q12",
+      "tags": [
+        "client-best-practices",
+        "progressive-discovery",
+        "strategies"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": "A"
+    },
+    {
+      "questionId": "ch7-q15",
+      "tags": [
+        "authorization",
+        "challenges",
+        "discovery"
+      ],
+      "examDomain": "security",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch15-q1",
+      "tags": [
+        "versioning",
+        "scheme"
+      ],
+      "examDomain": "security",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch11-m2",
+      "tags": [
+        "json-rpc",
+        "response",
+        "errors"
+      ],
+      "examDomain": "architecture",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ]
+    },
+    {
+      "questionId": "ch12-q4",
+      "tags": [
+        "transports",
+        "headers",
+        "scenario",
+        "error-codes"
+      ],
+      "examDomain": "architecture",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch7-m3",
+      "tags": [
+        "authorization",
+        "rfcs"
+      ],
+      "examDomain": "security",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "questionId": "ch12-q2",
+      "tags": [
+        "transports",
+        "streamable-http"
+      ],
+      "examDomain": "architecture",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch14-m4",
+      "tags": [
+        "registry",
+        "trust",
+        "moderation"
+      ],
+      "examDomain": "ecosystem",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "questionId": "ch1-m1",
+      "tags": [
+        "fundamentals",
+        "scope"
+      ],
+      "examDomain": "fundamentals",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "E"
+      ]
+    },
+    {
+      "questionId": "ch14-m1",
+      "tags": [
+        "registry",
+        "package-types"
+      ],
+      "examDomain": "ecosystem",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "questionId": "ch10-scenario-extra-2",
+      "tags": [
+        "debugging",
+        "fault-isolation",
+        "tester-scenario"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch7-q9",
+      "tags": [
+        "authorization",
+        "basics"
+      ],
+      "examDomain": "security",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch4-q4",
+      "tags": [
+        "client-concepts",
+        "elicitation",
+        "security"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": "C"
+    },
+    {
+      "questionId": "ch1-m3",
+      "tags": [
+        "fundamentals",
+        "use-cases"
+      ],
+      "examDomain": "fundamentals",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    {
+      "questionId": "ch4-q9",
+      "tags": [
+        "client-concepts",
+        "elicitation",
+        "methods"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": "A"
+    },
+    {
+      "questionId": "ch4-q21",
+      "tags": [
+        "mrtr",
+        "input-required-result"
+      ],
+      "examDomain": "interactions",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch1-q5",
+      "tags": [
+        "mcp-basics",
+        "ecosystem"
+      ],
+      "examDomain": "fundamentals",
+      "isCorrect": false,
+      "correctAnswer": "B"
+    },
+    {
+      "questionId": "ch15-m2",
+      "tags": [
+        "changelog",
+        "major-changes"
+      ],
+      "examDomain": "security",
+      "isCorrect": false,
+      "correctAnswer": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    }
+  ]
+}

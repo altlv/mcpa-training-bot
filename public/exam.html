@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCPA Practice Exam — 60 Questions, 90 Minutes</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; background: #f5f5f5; color: #333; }
+
+    /* ── Landing screen ── */
+    .landing { max-width: 700px; margin: 60px auto; padding: 40px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.08); text-align: center; }
+    .landing h1 { font-size: 1.8em; margin-bottom: 8px; }
+    .landing .subtitle { color: #666; margin-bottom: 24px; }
+    .domain-table { width: 100%; border-collapse: collapse; margin: 20px 0; text-align: left; }
+    .domain-table th { background: #f0f0f0; padding: 8px 12px; font-size: .85em; }
+    .domain-table td { padding: 8px 12px; border-bottom: 1px solid #eee; font-size: .9em; }
+    .domain-table .pct { font-weight: 600; color: #1a73e8; }
+    .start-btn { background: #1a73e8; color: #fff; border: none; padding: 14px 40px; font-size: 1.1em; border-radius: 8px; cursor: pointer; margin-top: 20px; }
+    .start-btn:hover { background: #1557b0; }
+    .info-row { display: flex; justify-content: center; gap: 32px; margin: 16px 0; color: #555; font-size: .95em; }
+    .info-row span { display: flex; align-items: center; gap: 6px; }
+
+    /* ── Exam header bar ── */
+    .exam-header { position: sticky; top: 0; z-index: 100; background: #fff; border-bottom: 2px solid #e0e0e0; padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+    .exam-header .timer { font-size: 1.4em; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .timer.warning { color: #e65100; }
+    .timer.danger { color: #c62828; animation: pulse 1s infinite; }
+    @keyframes pulse { 50% { opacity: .6; } }
+    .exam-header .progress { color: #666; font-size: .9em; }
+    .submit-btn { background: #c62828; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: .95em; }
+    .submit-btn:hover { background: #a11b1b; }
+
+    /* ── Question card ── */
+    .exam-body { max-width: 800px; margin: 20px auto; padding: 0 16px; }
+    .question-card { background: #fff; border-radius: 10px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); border-left: 4px solid #1a73e8; }
+    .question-card.answered { border-left-color: #4caf50; }
+    .question-card .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .question-card .q-number { font-weight: 700; font-size: 1.05em; }
+    .question-card .q-meta { font-size: .8em; color: #888; }
+    .question-card .q-meta .domain-badge { background: #e3f2fd; color: #1565c0; padding: 2px 8px; border-radius: 4px; }
+    .question-card .q-meta .type-badge { background: #f3e5f5; color: #7b1fa2; padding: 2px 8px; border-radius: 4px; }
+    .question-card .q-text { font-size: 1em; line-height: 1.5; margin-bottom: 16px; }
+
+    .option { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; margin-bottom: 6px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all .15s; }
+    .option:hover { background: #f5f5f5; }
+    .option.selected { background: #e3f2fd; border-color: #1a73e8; }
+    .option input { margin-top: 3px; }
+    .option .opt-letter { font-weight: 700; min-width: 20px; }
+    .option .opt-text { flex: 1; }
+
+    /* ── Question navigator ── */
+    .navigator { position: fixed; right: 16px; top: 60px; width: 200px; background: #fff; border-radius: 10px; padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.1); max-height: calc(100vh - 80px); overflow-y: auto; display: none; }
+    .navigator.visible { display: block; }
+    .navigator h4 { margin: 0 0 10px; font-size: .9em; color: #666; }
+    .nav-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+    .nav-btn { width: 28px; height: 28px; border: 1px solid #ddd; border-radius: 4px; background: #fff; cursor: pointer; font-size: .75em; display: flex; align-items: center; justify-content: center; }
+    .nav-btn.answered { background: #4caf50; color: #fff; border-color: #4caf50; }
+    .nav-btn.current { border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,.3); }
+    .toggle-nav { position: fixed; right: 16px; bottom: 16px; background: #1a73e8; color: #fff; border: none; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 1.2em; box-shadow: 0 2px 8px rgba(0,0,0,.2); z-index: 101; }
+
+    /* ── Results screen ── */
+    .results { max-width: 700px; margin: 40px auto; padding: 0 16px; }
+    .results-card { background: #fff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,.08); text-align: center; margin-bottom: 20px; }
+    .results-card h1 { margin: 0 0 8px; }
+    .score-circle { width: 140px; height: 140px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 2.4em; font-weight: 700; margin: 16px 0; }
+    .score-circle.pass { background: #e8f5e9; color: #2e7d32; border: 4px solid #4caf50; }
+    .score-circle.fail { background: #fce4ec; color: #c62828; border: 4px solid #ef5350; }
+    .results-meta { color: #666; margin: 8px 0; }
+    .domain-breakdown { text-align: left; margin-top: 20px; }
+    .domain-bar { margin-bottom: 12px; }
+    .domain-bar .bar-header { display: flex; justify-content: space-between; font-size: .9em; margin-bottom: 4px; }
+    .domain-bar .bar-track { background: #eee; border-radius: 4px; height: 8px; overflow: hidden; }
+    .domain-bar .bar-fill { height: 100%; border-radius: 4px; transition: width .5s; }
+    .domain-bar .bar-fill.pass { background: #4caf50; }
+    .domain-bar .bar-fill.fail { background: #ef5350; }
+    .domain-bar .bar-fill.neutral { background: #ff9800; }
+    .results-actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
+    .results-actions button { padding: 10px 24px; border-radius: 6px; border: none; cursor: pointer; font-size: .95em; }
+    .btn-primary { background: #1a73e8; color: #fff; }
+    .btn-secondary { background: #eee; color: #333; }
+
+    /* ── Review list ── */
+    .review-card { background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.06); text-align: left; }
+    .review-card.correct { border-left: 4px solid #4caf50; }
+    .review-card.incorrect { border-left: 4px solid #ef5350; }
+    .review-card .rev-q { font-weight: 600; margin-bottom: 8px; }
+    .review-card .rev-answers { font-size: .9em; margin-bottom: 6px; }
+    .review-card .rev-answers .correct-ans { color: #2e7d32; font-weight: 600; }
+    .review-card .rev-answers .wrong-ans { color: #c62828; text-decoration: line-through; }
+    .review-card .rev-explain { font-size: .85em; color: #555; background: #f9f9f9; padding: 8px 12px; border-radius: 6px; margin-top: 8px; }
+
+    @media (max-width: 900px) { .navigator { display: none !important; } }
+  </style>
+</head>
+<body>
+
+  <!-- ── Landing Screen ── -->
+  <div id="landing" class="landing">
+    <h1>📝 MCPA Practice Exam</h1>
+    <p class="subtitle">Simulates the real certification exam conditions</p>
+    <div class="info-row">
+      <span>📋 <strong>60</strong> questions</span>
+      <span>⏱️ <strong>90</strong> minutes</span>
+      <span>🎯 <strong>80%</strong> to pass</span>
+    </div>
+    <table class="domain-table" id="domain-info">
+      <thead><tr><th>Domain</th><th>Weight</th><th>Questions</th><th>Pool</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button class="start-btn" onclick="startExam()">Start Practice Exam</button>
+  </div>
+
+  <!-- ── Exam Screen ── -->
+  <div id="exam-screen" style="display:none">
+    <div class="exam-header">
+      <div>
+        <span class="timer" id="timer">90:00</span>
+      </div>
+      <div class="progress" id="progress">0 / 60 answered</div>
+      <button class="submit-btn" onclick="submitExam()">Submit Exam</button>
+    </div>
+    <div class="exam-body" id="questions-container"></div>
+    <button class="toggle-nav" onclick="toggleNav()" title="Question navigator">☰</button>
+    <div class="navigator" id="navigator">
+      <h4>Questions</h4>
+      <div class="nav-grid" id="nav-grid"></div>
+    </div>
+  </div>
+
+  <!-- ── Results Screen ── -->
+  <div id="results-screen" style="display:none"></div>
+
+<script>
+const API = '';
+let examState = {
+  sessionId: null,
+  questions: [],
+  answers: {},
+  timeLimitMs: 0,
+  startedAt: null,
+  timerInterval: null
+};
+
+// ── Load domain info on landing ──
+(async function loadDomains() {
+  try {
+    const resp = await fetch(API + '/api/exam/domains');
+    const data = await resp.json();
+    const tbody = document.querySelector('#domain-info tbody');
+    data.domains.forEach(d => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + d.name + '</td><td class="pct">' + d.weight + '</td><td>' + d.targetQuestions + '</td><td>' + d.poolSize + ' available</td>';
+      tbody.appendChild(tr);
+    });
+  } catch (e) {
+    console.error('Failed to load domains:', e);
+  }
+})();
+
+// ── Start Exam ──
+async function startExam() {
+  try {
+    const resp = await fetch(API + '/api/exam/start', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+    const data = await resp.json();
+    
+    examState.sessionId = data.sessionId;
+    examState.questions = data.questions;
+    examState.answers = {};
+    examState.timeLimitMs = data.timeLimitMinutes * 60 * 1000;
+    examState.startedAt = Date.now();
+
+    document.getElementById('landing').style.display = 'none';
+    document.getElementById('exam-screen').style.display = 'block';
+    
+    renderQuestions();
+    renderNav();
+    startTimer();
+  } catch (e) {
+    alert('Failed to start exam: ' + e.message);
+  }
+}
+
+// ── Render Questions ──
+function renderQuestions() {
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  
+  examState.questions.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = 'q-' + q.id;
+    
+    const isMulti = q.type === 'multi_select';
+    
+    let optionsHtml = q.options.map(o => {
+      return '<label class="option" data-qid="' + q.id + '" data-letter="' + o.letter + '">' +
+        '<input type="' + (isMulti ? 'checkbox' : 'radio') + '" name="q_' + q.id + '" value="' + o.letter + '" onchange="selectAnswer(\'' + q.id + '\', \'' + o.letter + '\', ' + isMulti + ')">' +
+        '<span class="opt-letter">' + o.letter + '.</span>' +
+        '<span class="opt-text">' + o.text + '</span>' +
+      '</label>';
+    }).join('');
+
+    card.innerHTML =
+      '<div class="q-header">' +
+        '<span class="q-number">Q' + (i + 1) + '</span>' +
+        '<span class="q-meta">' +
+          '<span class="domain-badge">' + q.examDomainName + '</span> ' +
+          (isMulti ? '<span class="type-badge">Multi-select</span>' : '') +
+        '</span>' +
+      '</div>' +
+      '<div class="q-text">' + q.question + '</div>' +
+      '<div class="options">' + optionsHtml + '</div>';
+    
+    container.appendChild(card);
+  });
+}
+
+// ── Select Answer ──
+function selectAnswer(qid, letter, isMulti) {
+  if (isMulti) {
+    if (!examState.answers[qid]) examState.answers[qid] = [];
+    const idx = examState.answers[qid].indexOf(letter);
+    if (idx >= 0) examState.answers[qid].splice(idx, 1);
+    else examState.answers[qid].push(letter);
+    if (examState.answers[qid].length === 0) delete examState.answers[qid];
+  } else {
+    examState.answers[qid] = letter;
+  }
+  
+  // Update visual state
+  document.querySelectorAll('.option[data-qid="' + qid + '"]').forEach(opt => {
+    const l = opt.dataset.letter;
+    const ans = examState.answers[qid];
+    const selected = Array.isArray(ans) ? ans.includes(l) : ans === l;
+    opt.classList.toggle('selected', selected);
+  });
+  
+  // Update card border
+  const card = document.getElementById('q-' + qid);
+  if (card) card.classList.toggle('answered', !!examState.answers[qid]);
+  
+  updateProgress();
+  updateNav();
+}
+
+// ── Progress ──
+function updateProgress() {
+  const answered = Object.keys(examState.answers).length;
+  document.getElementById('progress').textContent = answered + ' / ' + examState.questions.length + ' answered';
+}
+
+// ── Timer ──
+function startTimer() {
+  examState.timerInterval = setInterval(updateTimer, 1000);
+  updateTimer();
+}
+
+function updateTimer() {
+  const elapsed = Date.now() - examState.startedAt;
+  const remaining = Math.max(0, examState.timeLimitMs - elapsed);
+  const minutes = Math.floor(remaining / 60000);
+  const seconds = Math.floor((remaining % 60000) / 1000);
+  
+  const timerEl = document.getElementById('timer');
+  timerEl.textContent = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+  
+  timerEl.className = 'timer';
+  if (remaining < 300000) timerEl.classList.add('danger'); // < 5 min
+  else if (remaining < 600000) timerEl.classList.add('warning'); // < 10 min
+  
+  if (remaining <= 0) {
+    clearInterval(examState.timerInterval);
+    submitExam();
+  }
+}
+
+// ── Navigator ──
+function renderNav() {
+  const grid = document.getElementById('nav-grid');
+  grid.innerHTML = '';
+  examState.questions.forEach((q, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-btn';
+    btn.textContent = i + 1;
+    btn.onclick = () => {
+      document.getElementById('q-' + q.id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    grid.appendChild(btn);
+  });
+}
+
+function updateNav() {
+  const btns = document.querySelectorAll('.nav-btn');
+  examState.questions.forEach((q, i) => {
+    if (btns[i]) {
+      btns[i].classList.toggle('answered', !!examState.answers[q.id]);
+    }
+  });
+}
+
+function toggleNav() {
+  document.getElementById('navigator').classList.toggle('visible');
+}
+
+// ── Submit ──
+async function submitExam() {
+  const unanswered = examState.questions.length - Object.keys(examState.answers).length;
+  if (unanswered > 0 && !confirm('You have ' + unanswered + ' unanswered question(s). Submit anyway?')) {
+    return;
+  }
+  
+  clearInterval(examState.timerInterval);
+  
+  try {
+    const resp = await fetch(API + '/api/exam/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId: examState.sessionId, answers: examState.answers })
+    });
+    const data = await resp.json();
+    showResults(data);
+  } catch (e) {
+    alert('Failed to submit exam: ' + e.message);
+  }
+}
+
+// ── Results ──
+function showResults(data) {
+  document.getElementById('exam-screen').style.display = 'none';
+  const screen = document.getElementById('results-screen');
+  screen.style.display = 'block';
+  
+  const passClass = data.passed ? 'pass' : 'fail';
+  const passText = data.passed ? '🎉 PASS!' : '❌ DID NOT PASS';
+  
+  let domainHtml = data.domainResults.map(d => {
+    const pct = d.percentage;
+    const barClass = pct >= 80 ? 'pass' : pct >= 60 ? 'neutral' : 'fail';
+    return '<div class="domain-bar">' +
+      '<div class="bar-header"><span>' + d.name + ' (' + d.weight + ')</span><span>' + d.correct + '/' + d.total + ' — ' + pct + '%</span></div>' +
+      '<div class="bar-track"><div class="bar-fill ' + barClass + '" style="width:' + pct + '%"></div></div>' +
+    '</div>';
+  }).join('');
+  
+  let reviewHtml = data.results.map((r, i) => {
+    const cls = r.isCorrect ? 'correct' : 'incorrect';
+    let yourAns = Array.isArray(r.yourAnswer) ? r.yourAnswer.join(', ') : (r.yourAnswer || '—');
+    let correctAns = Array.isArray(r.correctAnswer) ? r.correctAnswer.join(', ') : r.correctAnswer;
+    return '<div class="review-card ' + cls + '">' +
+      '<div class="rev-q">Q' + (i + 1) + ': ' + r.question + '</div>' +
+      '<div class="rev-answers">' +
+        'Your answer: <span class="' + (r.isCorrect ? 'correct-ans' : 'wrong-ans') + '">' + yourAns + '</span>' +
+        (r.isCorrect ? '' : ' — Correct: <span class="correct-ans">' + correctAns + '</span>') +
+      '</div>' +
+      '<div style="font-size:.8em;color:#888;margin-top:4px">' + r.examDomainName + '</div>' +
+      (r.isCorrect ? '' : '<div class="rev-explain">' + r.explanation + '</div>') +
+    '</div>';
+  }).join('');
+  
+  screen.innerHTML =
+    '<div class="results-card">' +
+      '<h1>Practice Exam Results</h1>' +
+      '<div class="score-circle ' + passClass + '">' + data.percentage + '%</div>' +
+      '<h2>' + passText + '</h2>' +
+      '<div class="results-meta">' + data.score + ' / ' + data.total + ' correct</div>' +
+      '<div class="results-meta">Time: ' + data.elapsedMinutes + ' / ' + data.timeLimitMinutes + ' min' +
+        (data.overtime ? ' ⚠️ Overtime' : '') + '</div>' +
+      '<div class="domain-breakdown"><h3>Domain Breakdown</h3>' + domainHtml + '</div>' +
+      '<div class="results-actions">' +
+        '<button class="btn-primary" onclick="location.reload()">Try Again</button>' +
+        '<button class="btn-secondary" onclick="document.getElementById(\'review-section\').style.display=\'block\';this.style.display=\'none\'">Review Answers</button>' +
+        '<button class="btn-secondary" onclick="window.location.href=\'/\'">Back to Exam Mode</button>' +
+      '</div>' +
+    '</div>' +
+    '<div id="review-section" style="display:none"><h2 style="text-align:center;margin-bottom:16px">Answer Review</h2>' + reviewHtml + '</div>';
+}
+</script>
+
+</body>
+</html>

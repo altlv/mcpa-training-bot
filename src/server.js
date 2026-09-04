@@ -12,6 +12,7 @@ const quizRoutes = require('./routes/quiz');
 const chatRoutes = require('./routes/chat');
 const modelRoutes = require('./routes/models');
 const specRoutes = require('./routes/specs');
+const examRoutes = require('./routes/exam');
 const modelConfig = require('./services/modelConfig');
 
 // Create Express application
@@ -51,20 +52,47 @@ app.use('/api', quizRoutes); // Mount quiz routes
 app.use('/api/chat', chatRoutes); // Mount chat routes
 app.use('/api/models', modelRoutes); // Mount model configuration routes
 app.use('/api/specs', specRoutes); // Mount specification content routes
+app.use('/api', examRoutes); // Mount practice exam routes
 
-// Root route
+// Root route — landing page linking to all modes
 app.get('/', (req, res) => {
-  res.json({
-    name: 'MCPA Training Bot API',
-    version: '1.0.0',
-    endpoints: {
-      health: '/api/health',
-      tags: '/api/tags',
-      startQuiz: 'POST /api/quiz/start',
-      submitQuiz: 'POST /api/quiz/submit',
-      getQuestion: 'GET /api/questions/:id'
-    }
-  });
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCPA Training Bot</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 80px auto; text-align: center; background: #f5f5f5; color: #333; }
+    h1 { font-size: 2em; margin-bottom: 8px; }
+    .subtitle { color: #666; margin-bottom: 32px; }
+    .modes { display: flex; flex-direction: column; gap: 16px; }
+    .mode-card { display: block; background: #fff; padding: 24px; border-radius: 12px; text-decoration: none; color: #333; box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: transform .15s, box-shadow .15s; }
+    .mode-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+    .mode-card h2 { margin: 0 0 6px; font-size: 1.2em; }
+    .mode-card p { margin: 0; color: #666; font-size: .9em; }
+    .mode-card .tag { display: inline-block; font-size: .75em; padding: 2px 8px; border-radius: 4px; margin-top: 8px; }
+    .tag.exam { background: #e3f2fd; color: #1565c0; }
+    .tag.training { background: #e8f5e9; color: #2e7d32; }
+  </style>
+</head>
+<body>
+  <h1>🎓 MCPA Training Bot</h1>
+  <p class="subtitle">Model Context Protocol Associate — Exam Prep</p>
+  <div class="modes">
+    <a href="/exam.html" class="mode-card">
+      <h2>📝 Practice Exam</h2>
+      <p>60 questions · 90 min timer · Domain-weighted · Pass = 80%</p>
+      <span class="tag exam">Simulates real exam</span>
+    </a>
+    <a href="/training.html" class="mode-card">
+      <h2>📚 Training Mode</h2>
+      <p>Study by topic · Instant feedback · AI tutor · Chat assistance</p>
+      <span class="tag training">Learn & practice</span>
+    </a>
+  </div>
+</body>
+</html>`);
 });
 
 // Start server

@@ -5,7 +5,7 @@
  * Follows the bionic project pattern: define main provider, override reasoning models.
  * 
  * Environment variables:
- *   CHAT_PROVIDER        — openai (default), openrouter, groq, xai, ollama
+ *   CHAT_PROVIDER        — openai (default), openrouter, groq, xai, mistral, ollama
  *   CHAT_MODEL           — override model for the active provider
  *   OPENAI_API_KEY       — OpenAI key (also used for embeddings)
  *   OPENAI_MODEL         — override OpenAI model (default: gpt-4o-mini)
@@ -17,6 +17,8 @@
  *   XAI_MODEL            — override xAI model
  *   OLLAMA_BASE_URL      — Ollama endpoint (default: http://localhost:11434/v1)
  *   OLLAMA_MODEL         — Ollama model name (default: llama3.2)
+ *   MISTRAL_API_KEY      — Mistral key
+ *   MISTRAL_MODEL        — override Mistral model
  */
 
 const path = require('path');
@@ -50,10 +52,10 @@ const PROVIDERS = {
     name: 'Groq',
     keyEnv: 'GROQ_API_KEY',
     modelEnv: 'GROQ_MODEL',
-    defaultModel: 'llama-3.3-70b-versatile',
+    defaultModel: 'llama-3.1-8b-instruct',
     baseUrl: 'https://api.groq.com/openai/v1',
     icon: '⚡',
-    description: 'Ultra-fast inference — great for quick responses',
+    description: 'Ultra-fast inference — cheapest cloud option',
   },
   xai: {
     name: 'xAI (Grok)',
@@ -63,6 +65,15 @@ const PROVIDERS = {
     baseUrl: 'https://api.x.ai/v1',
     icon: '🤖',
     description: 'Grok models by xAI',
+  },
+  mistral: {
+    name: 'Mistral',
+    keyEnv: 'MISTRAL_API_KEY',
+    modelEnv: 'MISTRAL_MODEL',
+    defaultModel: 'mistral-small-latest',
+    baseUrl: 'https://api.mistral.ai/v1',
+    icon: '🌊',
+    description: 'Mistral models — strong multilingual, efficient',
   },
   ollama: {
     name: 'Ollama (Local)',

@@ -98,4 +98,11 @@ archive/
 # ✓ Questions (data/questions/ — study material, worth versioning)
 # ✓ TODO.md
 # ✓ .gitignore itself
-# ================================
+# ================================  
+# Regenerable spec data  
+data/spec-index.json  
+data/specs/  
+  
+# Temp fix scripts  
+fix-*.js 
+src/data/ 
