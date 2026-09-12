@@ -1,10 +1,13 @@
 {
   "meta": {
-    "title": "MCP Question Bank — Chapter 14: The MCP Registry",
+    "title": "MCP Question Bank — Chapter 14: MCP Registry",
     "protocolVersion": "2026-07-28",
     "chapter": 14,
-    "chapterName": "The MCP Registry",
-    "questionCount": 18
+    "chapterName": "MCP Registry",
+    "examDomain": "Use Cases & Ecosystem",
+    "mode": "single_select",
+    "questionCount": 7,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
   },
   "questions": [
     {
@@ -12,575 +15,238 @@
       "chapter": 14,
       "type": "mcq",
       "difficulty": "easy",
-      "question": "What is the MCP Registry?",
+      "question": "What does the official MCP Registry actually store, and who is meant to consume it?",
       "options": [
         {
           "letter": "A",
-          "text": "A package host that stores server code and binaries"
+          "text": "Server metadata in server.json, consumed mainly by downstream aggregators"
         },
         {
           "letter": "B",
-          "text": "The official centralized metadata repository for publicly accessible MCP servers, with namespace management and a REST API for discovery"
+          "text": "Only remote server URLs, consumed by MCP clients at connection time"
         },
         {
           "letter": "C",
-          "text": "A paid marketplace run by Anthropic"
+          "text": "Signed attestations of server behaviour, consumed by security scanners"
         },
         {
           "letter": "D",
-          "text": "A DNS service for MCP domains"
+          "text": "Server binaries and container images, consumed directly by host applications"
         }
       ],
-      "answer": "B",
-      "explanation": "The Registry (registry.modelcontextprotocol.io, currently in preview) hosts standardized server metadata — not code. Packages themselves live on npm, PyPI, Docker Hub, etc.; the registry maps server names to those locations.",
+      "explanation": "The registry hosts metadata that points at packages on npm, PyPI, NuGet, crates.io, OCI registries or release assets. It is intended to be consumed by downstream aggregators and marketplaces, which host applications then consume.",
       "tags": [
         "registry",
-        "basics"
-      ]
+        "purpose"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "registry/about",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch14-q2",
       "chapter": 14,
       "type": "mcq",
-      "difficulty": "easy",
-      "question": "In what file format is a server's registry metadata described?",
+      "difficulty": "medium",
+      "question": "A team wants to publish under com.acme/*. What must they prove, and how?",
       "options": [
         {
           "letter": "A",
-          "text": "server.json — containing the unique name, package/remote location, execution instructions, and discovery data"
+          "text": "That the package is public on npm, by linking the package URL in server.json"
         },
         {
           "letter": "B",
-          "text": "registry.yaml"
+          "text": "Nothing: reverse-DNS names are advisory and the registry does not verify them"
         },
         {
           "letter": "C",
-          "text": "mcp.toml"
+          "text": "Ownership of the acme GitHub organization, proved through GitHub's OAuth device flow at publish time"
         },
         {
           "letter": "D",
-          "text": "manifest.xml"
+          "text": "Control of acme.com, through a DNS TXT record or a /.well-known/mcp-registry-auth file"
         }
       ],
-      "answer": "A",
-      "explanation": "server.json is the standardized format: it carries the reverse-DNS server name (e.g., io.github.user/server-name), where to find the server (npm identifier, remote URL), execution details (args, env vars), and description/discovery data.",
+      "explanation": "Domain-based namespaces use DNS or HTTP authentication, proving control of the domain with a signed key. GitHub OAuth covers io.github.<user or org>/* namespaces. Namespace authentication is what makes registry names meaningful.",
       "tags": [
         "registry",
-        "server-json"
-      ]
+        "namespaces"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "registry/authentication",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch14-q3",
       "chapter": 14,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "medium",
-      "question": "What naming format do registry server names follow, and why?",
+      "question": "You distribute your server as a container image and want to claim its registry name. Where does the claim go?",
       "options": [
         {
           "letter": "A",
-          "text": "Free-form strings chosen by the publisher"
+          "text": "In an annotation on the registry entry, signed with your publishing key"
         },
         {
           "letter": "B",
-          "text": "Reverse-DNS namespaces (io.github.username/server or com.example/server) tied to verified GitHub accounts or domains, so only the legitimate owner can publish under a namespace"
+          "text": "In the image entrypoint, which the registry executes once to read the name"
         },
         {
           "letter": "C",
-          "text": "UUIDs generated at publish time"
+          "text": "In an image label named io.modelcontextprotocol.server.name"
         },
         {
           "letter": "D",
-          "text": "Sequential numeric IDs"
+          "text": "In a README layer added to the image, in a mcp-name: line"
         }
       ],
-      "answer": "B",
-      "explanation": "Namespace authentication is the registry's core trust mechanism: io.github.* namespaces are verified via GitHub OAuth, and custom domains (com.example/*) via DNS or HTTP challenges.",
+      "explanation": "Each ecosystem has its own marker: an OCI image carries the io.modelcontextprotocol.server.name label, npm uses the mcpName field in package.json, and PyPI and NuGet use a mcp-name: line in the README. The registry never runs your artifact.",
       "tags": [
         "registry",
-        "namespaces",
-        "trust"
-      ]
+        "oci"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "registry.modelcontextprotocol.io/docs",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch14-q4",
       "chapter": 14,
       "type": "mcq",
       "difficulty": "medium",
-      "question": "Which command-line tool publishes servers to the official registry, and what are the key steps?",
+      "question": "A solo developer with no company domain wants to publish. Which namespace is open to them, and what proves the claim?",
       "options": [
         {
           "letter": "A",
-          "text": "npm publish --mcp"
+          "text": "io.github.<username>, proved by authenticating as that GitHub account"
         },
         {
           "letter": "B",
-          "text": "mcp-publisher: run init to generate a server.json template, login (e.g., 'mcp-publisher login github'), then publish"
+          "text": "any namespace they like, since names are first-come, first-served"
         },
         {
           "letter": "C",
-          "text": "git push registry main"
+          "text": "com.<username>, proved by a DNS TXT record on any domain they control"
         },
         {
           "letter": "D",
-          "text": "docker push registry.modelcontextprotocol.io"
+          "text": "dev.mcp.<username>, assigned by the registry when the account is created"
         }
       ],
-      "answer": "B",
-      "explanation": "The mcp-publisher CLI drives publishing: init scaffolds server.json with auto-detected values, login authenticates (GitHub OAuth for io.github.* namespaces), and publish submits — with --dry-run available for validation.",
+      "explanation": "Reverse-DNS namespaces need proof of the domain, but io.github.<username> is available to anyone who can authenticate as that GitHub identity. Names are not first-come, first-served: every namespace requires a proof of control.",
       "tags": [
         "registry",
-        "publishing",
-        "cli"
-      ]
+        "namespaces"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "registry.modelcontextprotocol.io/docs",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch14-q5",
       "chapter": 14,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "How does the registry verify you own the npm package referenced in your server.json?",
+      "difficulty": "hard",
+      "question": "A server is published to PyPI. Which proof of ownership does the registry check?",
       "options": [
         {
           "letter": "A",
-          "text": "It doesn't; npm packages are trusted implicitly"
+          "text": "An io.modelcontextprotocol.server.name label on the built artifact"
         },
         {
           "letter": "B",
-          "text": "It checks that the package.json contains an mcpName property exactly matching the server name from server.json"
+          "text": "An mcp-name: <server name> string in the package README"
         },
         {
           "letter": "C",
-          "text": "It requires a signed tarball"
+          "text": "A DNS TXT record on the publisher's domain"
         },
         {
           "letter": "D",
-          "text": "It emails the npm maintainer"
+          "text": "An mcpName field in the package metadata, matching server.json"
         }
       ],
-      "answer": "B",
-      "explanation": "Each package type has an ownership-verification marker: npm uses mcpName in package.json; PyPI and NuGet use an 'mcp-name: <server-name>' string in the README (which may be hidden in an HTML comment); all must match the server.json name.",
+      "explanation": "PyPI and NuGet use an mcp-name marker in the README, which may be an HTML comment. npm uses the mcpName field in package.json, Docker/OCI uses the io.modelcontextprotocol.server.name annotation, and DNS TXT records authenticate a namespace, not a package.",
       "tags": [
         "registry",
-        "package-types",
-        "verification"
-      ]
+        "ownership"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "registry/package-types",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch14-q6",
       "chapter": 14,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "How is ownership verified for Docker/OCI images published to the registry?",
+      "difficulty": "hard",
+      "question": "Why can a crates.io publisher not hide the mcp-name marker in an HTML comment, unlike on PyPI?",
       "options": [
         {
           "letter": "A",
-          "text": "Via an io.modelcontextprotocol.server.name annotation/LABEL on the image that must match the server.json name"
+          "text": "crates.io requires the marker in the crate description field, which is rendered without any HTML"
         },
         {
           "letter": "B",
-          "text": "By scanning the image for a LICENSE file"
+          "text": "crates.io strips HTML comments when rendering the README, so the token must be visible text"
         },
         {
           "letter": "C",
-          "text": "Docker images cannot be registered"
+          "text": "crates.io does not render READMEs at all, so the marker must go in Cargo.toml"
         },
         {
           "letter": "D",
-          "text": "By checking the image digest against npm"
+          "text": "Cargo packages are verified by signature instead, making the marker unnecessary"
         }
       ],
-      "answer": "A",
-      "explanation": "OCI packages (registryType: \"oci\", supporting Docker Hub, ghcr.io, *.pkg.dev, *.azurecr.io, mcr.microsoft.com) are verified via the io.modelcontextprotocol.server.name annotation, e.g., a Dockerfile LABEL matching the server name.",
+      "explanation": "PyPI and NuGet preserve HTML comments in their rendered README, but crates.io strips them during markdown-to-HTML conversion, so the validator never sees the token. Cargo authors must include mcp-name as visible markdown text.",
       "tags": [
         "registry",
-        "package-types",
-        "oci"
-      ]
+        "cargo"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "registry/package-types",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch14-q7",
       "chapter": 14,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "SCENARIO: You publish an MCPB package to the registry. Which two verification requirements apply to the artifact and its metadata?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The file must be under 10 MB and GPG-signed"
-        },
-        {
-          "letter": "B",
-          "text": "The artifact URL (identifier) must contain the string 'mcp', and server.json must include a fileSha256 hash — which MCP clients (not the registry) validate before installation"
-        },
-        {
-          "letter": "C",
-          "text": "It must be hosted on npm"
-        },
-        {
-          "letter": "D",
-          "text": "MCPB packages need no verification"
-        }
-      ],
-      "answer": "B",
-      "explanation": "MCPB packages must be hosted via GitHub or GitLab releases, the identifier URL must contain 'mcp' (e.g., via the .mcpb extension), and fileSha256 is required. The registry itself doesn't validate the hash; clients validate it for file integrity.",
-      "tags": [
-        "registry",
-        "mcpb",
-        "scenario",
-        "verification"
-      ]
-    },
-    {
-      "id": "ch14-q8",
-      "chapter": 14,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "SCENARIO: mcp-publisher fails with 'You do not have permission to publish this server' after GitHub login. What's the most likely mismatch?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Your npm token expired"
-        },
-        {
-          "letter": "B",
-          "text": "Your authentication method doesn't match the namespace: with GitHub auth, the server name must start with io.github.<your-username>/"
-        },
-        {
-          "letter": "C",
-          "text": "server.json is missing a description"
-        },
-        {
-          "letter": "D",
-          "text": "The registry is read-only on weekends"
-        }
-      ],
-      "answer": "B",
-      "explanation": "This documented error means the auth method and namespace format disagree — GitHub-authenticated publishers can only publish under io.github.<username>/ (or their org); custom com.example/* namespaces need DNS/HTTP verification instead.",
-      "tags": [
-        "registry",
-        "publishing",
-        "scenario",
-        "troubleshooting"
-      ]
-    },
-    {
-      "id": "ch14-q9",
-      "chapter": 14,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Can you publish a remote (hosted) MCP server to the registry without any installable package?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "No; a package is always required"
-        },
-        {
-          "letter": "B",
-          "text": "Yes — server.json supports a remotes field (with transport type and URL), which can also coexist with packages; for com.yourcompany/* namespaces, remote URLs must be on that company's domain or subdomains"
-        },
-        {
-          "letter": "C",
-          "text": "Only for SSE transports"
-        },
-        {
-          "letter": "D",
-          "text": "Only after a manual review"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Remote servers are first-class: the remotes array lists transport type and URL (plus optional required headers). Domain-namespace publishers face URL restrictions binding remotes to their verified domain; io.github.* namespaces have no URL restriction.",
-      "tags": [
-        "registry",
-        "remote-servers"
-      ]
-    },
-    {
-      "id": "ch14-q10",
-      "chapter": 14,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Does the official MCP Registry support private servers?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Yes, with a paid plan"
-        },
-        {
-          "letter": "B",
-          "text": "No — it's designed for publicly accessible servers; for private servers (private networks or private package registries) the recommendation is to host your own private MCP registry"
-        },
-        {
-          "letter": "C",
-          "text": "Yes, if they use OAuth"
-        },
-        {
-          "letter": "D",
-          "text": "Only for enterprise customers"
-        }
-      ],
-      "answer": "B",
-      "explanation": "The registry supports open- and closed-source servers as long as the installation method or the server itself is publicly accessible. Private servers (e.g., mcp.acme-corp.internal) belong in a self-hosted private registry implementing the same OpenAPI spec.",
-      "tags": [
-        "registry",
-        "private-servers"
-      ]
-    },
-    {
-      "id": "ch14-q11",
-      "chapter": 14,
       "type": "mcq",
       "difficulty": "hard",
-      "question": "Who is the primary intended consumer of the official MCP Registry's API?",
+      "question": "An MCPB package entry carries fileSha256. Who verifies that hash?",
       "options": [
         {
           "letter": "A",
-          "text": "End users browsing manually"
+          "text": "The registry, at publish time, rejecting any entry whose recomputed hash does not match"
         },
         {
           "letter": "B",
-          "text": "Downstream aggregators (e.g., MCP marketplaces), which pull metadata on a regular but infrequent basis and add curation or ratings; host applications should consume those sub-registries rather than the official registry directly"
+          "text": "GitHub or GitLab, as part of the release-asset upload"
         },
         {
           "letter": "C",
-          "text": "LLMs at inference time"
+          "text": "Nobody: it is informational metadata for humans reading server.json"
         },
         {
           "letter": "D",
-          "text": "Package registries like npm"
+          "text": "MCP clients, before installing the artifact; the registry itself does not validate it"
         }
       ],
-      "answer": "B",
-      "explanation": "The registry's metadata is deliberately unopinionated. Aggregators consume it (roughly hourly), layer curation on top, and expose the same OpenAPI interface; host applications are meant to consume aggregators, not the official registry directly.",
+      "explanation": "The registry does not validate the hash. MCP clients validate it before installation to ensure file integrity, and downstream registries may add their own checks. The MCPB URL must also contain the string 'mcp'.",
       "tags": [
         "registry",
-        "aggregators",
-        "architecture"
-      ]
-    },
-    {
-      "id": "ch14-q12",
-      "chapter": 14,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "How does the official registry handle security scanning of server code?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "It runs a full sandbox analysis of every package"
-        },
-        {
-          "letter": "B",
-          "text": "It delegates scanning to the underlying package registries (npm, PyPI, Docker Hub) and to downstream aggregators, focusing itself on namespace authentication and metadata hosting"
-        },
-        {
-          "letter": "C",
-          "text": "Publishers self-certify with a checkbox"
-        },
-        {
-          "letter": "D",
-          "text": "All code is manually audited by maintainers"
-        }
+        "mcpb"
       ],
-      "answer": "B",
-      "explanation": "The registry's trust model: namespace auth proves the publisher's identity; actual code scanning is delegated to package registries' own security tooling and to aggregators/marketplaces that can add checks, ratings, or curation.",
-      "tags": [
-        "registry",
-        "security",
-        "trust"
-      ]
-    },
-    {
-      "id": "ch14-q13",
-      "chapter": 14,
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "Which mechanisms does the registry use to prevent spam?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Namespace authentication requirements, character limits with regex validation on free-form fields, and manual takedown under the moderation policy"
-        },
-        {
-          "letter": "B",
-          "text": "A $100 listing fee"
-        },
-        {
-          "letter": "C",
-          "text": "A CAPTCHA per API call"
-        },
-        {
-          "letter": "D",
-          "text": "Nothing; spam is allowed"
-        }
-      ],
-      "answer": "A",
-      "explanation": "Publishers must prove namespace ownership (GitHub, DNS, or HTTP challenges), fields are limited and validated, and maintainers can remove spam or malicious servers per the moderation policy. Rate limiting and AI-based detection are under consideration.",
-      "tags": [
-        "registry",
-        "spam",
-        "moderation"
-      ]
-    },
-    {
-      "id": "ch14-q14",
-      "chapter": 14,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "SCENARIO: After publishing, you want to confirm your server io.github.my-username/weather is live. What's the documented way?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Wait for a confirmation email"
-        },
-        {
-          "letter": "B",
-          "text": "Query the registry API, e.g., curl \"https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.my-username/weather\", and check your server's metadata appears in the results JSON"
-        },
-        {
-          "letter": "C",
-          "text": "Run npm view on the registry"
-        },
-        {
-          "letter": "D",
-          "text": "Check the GitHub Actions tab of the registry repo"
-        }
-      ],
-      "answer": "B",
-      "explanation": "The quickstart's verification step is a search against the public REST API; your server.json metadata (name, version, packages, remotes) should come back in the servers array.",
-      "tags": [
-        "registry",
-        "api",
-        "scenario",
-        "verification"
-      ]
-    },
-    {
-      "id": "ch14-q15",
-      "chapter": 14,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "How do other registries interoperate with the official MCP Registry?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "They must mirror its database verbatim"
-        },
-        {
-          "letter": "B",
-          "text": "The registry defines an OpenAPI spec that downstream aggregators and private registries can implement, giving host applications a standardized interface regardless of which registry they consume"
-        },
-        {
-          "letter": "C",
-          "text": "Interoperability is prohibited"
-        },
-        {
-          "letter": "D",
-          "text": "Via nightly FTP dumps"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Beyond the hosted service, the project publishes an OpenAPI specification. Aggregators and private registries implementing it benefit from existing host application support — though the official codebase itself is not designed for self-hosting.",
-      "tags": [
-        "registry",
-        "openapi",
-        "ecosystem"
-      ]
-    },
-    {
-      "id": "ch14-scenario-extra-1",
-      "chapter": 14,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A Registry entry points to an npm package. The package exists, but package.json has no ownership marker tying it to the MCP server name. What should a publication test verify?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The mcpName ownership marker"
-        },
-        {
-          "letter": "B",
-          "text": "An Mcp-Session-Id header"
-        },
-        {
-          "letter": "C",
-          "text": "A Last-Event-ID value"
-        },
-        {
-          "letter": "D",
-          "text": "A tasks/result method"
-        }
-      ],
-      "answer": "A",
-      "explanation": "For npm packages, the Registry ownership marker is mcpName in package.json.",
-      "tags": [
-        "registry",
-        "npm",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch14-scenario-extra-2",
-      "chapter": 14,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A company wants to publish com.acme/payments but cannot prove control of acme.com. What is the likely registry issue?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Reverse-DNS namespaces require the corresponding DNS/HTTP ownership challenge"
-        },
-        {
-          "letter": "B",
-          "text": "All com.* names are public and unverified"
-        },
-        {
-          "letter": "C",
-          "text": "Only GitHub usernames can be used in names"
-        },
-        {
-          "letter": "D",
-          "text": "The package must be MCPB"
-        }
-      ],
-      "answer": "A",
-      "explanation": "Reverse-DNS names such as com.acme/* are tied to domain ownership verification.",
-      "tags": [
-        "registry",
-        "namespace",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch14-scenario-extra-3",
-      "chapter": 14,
-      "type": "scenario",
-      "difficulty": "easy",
-      "question": "A team asks the public MCP Registry to host the executable server code itself. What misconception should the tester clarify?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The Registry is metadata; code/packages live in package/container distribution systems such as npm, PyPI, or OCI registries"
-        },
-        {
-          "letter": "B",
-          "text": "The Registry only hosts model weights"
-        },
-        {
-          "letter": "C",
-          "text": "The Registry requires source code in every metadata record"
-        },
-        {
-          "letter": "D",
-          "text": "The Registry is an OAuth authorization server"
-        }
-      ],
-      "answer": "A",
-      "explanation": "The MCP Registry is a metadata registry. It points to packages/artifacts hosted elsewhere rather than becoming the code host itself.",
-      "tags": [
-        "registry",
-        "metadata",
-        "tester-scenario"
-      ]
+      "domain": "Use Cases & Ecosystem",
+      "source": "registry/package-types",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     }
   ]
 }

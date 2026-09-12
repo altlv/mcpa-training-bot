@@ -1,5 +1,7 @@
 # MCPA Scenario Reasoning Guide — Tester Edition
 
+> **Revised 2026-09-11.** Every rule below was re-checked against the MCP specification 2026-07-28 and JSON-RPC 2.0. Corrections are marked **[FIXED]** and additions **[ADDED]**. Where the text says "in the supplied material", the rule has now been confirmed in the spec unless noted otherwise.
+
 ## Purpose
 
 This guide is designed to sit beside the scenario questions in the MCPA question bank. It assumes you are comfortable testing software behavior but may not write MCP clients or servers yourself.
@@ -112,6 +114,10 @@ When you see `id: null`, do not classify it as a notification. A notification om
 
 When a response has both `result` and `error`, stop there: the response envelope itself is invalid before you reason about tool behavior.
 
+**[ADDED]** MCP carries **no JSON-RPC batches**. Each Streamable HTTP POST body is exactly one request or notification, and each stdio line is exactly one message. If a scenario sends an array of requests, base JSON-RPC batch rules do not apply to MCP.
+
+**[ADDED]** Every MCP result carries a `resultType`. If a legacy server omits it, treat the result as `"complete"`. A value the client doesn't recognise is invalid.
+
 ### Core error anchors
 
 - `-32700` — invalid JSON / Parse error
@@ -120,12 +126,15 @@ When a response has both `result` and `error`, stop there: the response envelope
 - `-32602` — invalid params, including required request metadata problems in the supplied study material
 - `-32603` — internal error
 
-Modern MCP-specific anchors in the supplied material:
+Modern MCP-specific anchors (these are **all** of them):
 
-- `-32001` — InvalidProtocolVersion
-- `-32020` — HeaderMismatch
-- `-32021` — MissingRequiredClientCapability
-- `-32022` — UnsupportedProtocolVersion
+- `-32020` — HeaderMismatch (HTTP 400)
+- `-32021` — MissingRequiredClientCapability (HTTP 400)
+- `-32022` — UnsupportedProtocolVersion (HTTP 400; `data.supported` lists the server's versions)
+
+**[FIXED]** The earlier "`-32001` — InvalidProtocolVersion" line was wrong: that code does not exist in the 2026-07-28 spec. The drafts used -32001 for HeaderMismatch, and the changelog renumbered it to -32020. A *missing* protocol version is a malformed request (-32602). A version that is present but *unsupported* is -32022. Codes from -32000 to -32019 are legacy, implementation-defined codes, and receivers must not assume any meaning for them.
+
+**[ADDED]** Two retired codes: `-32002` (old resource-not-found; clients should still accept it from legacy servers) and `-32042` (old URL-elicitation-required). Modern servers must not emit either.
 
 A useful memory hook is **20 / 21 / 22 = Header / Capability / Version**.
 
@@ -148,7 +157,9 @@ There are two superficially similar failures:
 
 **A required `_meta` field is absent.** The request is malformed. In the supplied material this maps to `-32602` and HTTP 400.
 
-**The capabilities metadata exists, but a capability required for the operation was not declared.** The request is structurally valid but capability-incompatible. This maps to `-32021`.
+**The capabilities metadata exists, but a capability required for the operation was not declared.** The request is structurally valid but capability-incompatible. This maps to `-32021`, and on HTTP it is also a `400 Bad Request`. `data.requiredCapabilities` lists what's missing. **[FIXED: added the status]**
+
+**[ADDED] A third look-alike: the version is present but the server doesn't support it.** This is `-32022` UnsupportedProtocolVersion with HTTP 400. The client should retry with a version from `data.supported`. It is not a malformed request.
 
 This is an excellent exam distinction because both can be described casually as “the client doesn't support what the server needs.” Inspect the exact failure condition.
 
@@ -256,13 +267,33 @@ Passing Inspector narrows the fault domain; it does not prove every host integra
 
 Modern Streamable HTTP uses HTTP POST for client messages. A response can be a normal JSON response or a per-request SSE stream.
 
-The older two-endpoint HTTP+SSE pattern with a separate GET stream is legacy/deprecated in the supplied material.
+The older two-endpoint HTTP+SSE pattern with a separate GET stream has been deprecated **since 2025-03-26**. The 2026-07-28 revision only reclassified it under the new lifecycle policy. **[FIXED: date]**
 
-### Mcp-Method and Mcp-Name
+### MCP-Protocol-Version, Mcp-Method and Mcp-Name
 
-The modern study material describes headers that expose method/target information to gateways so they can route, meter, rate-limit, or apply WAF policy without parsing the JSON body.
+These headers expose the version, method and target to gateways, so they can route, meter, rate-limit or apply WAF policy without parsing the JSON body.
 
-If the header says one method but the body says another, expect **HTTP 400 + HeaderMismatch (`-32020`)**.
+- `MCP-Protocol-Version`: required on **every POST**, and it must equal the protocol version in the body's `_meta`. **[ADDED]**
+- `Mcp-Method`: required on **all requests**. **[FIXED: this revision defines no header rules for notifications]**
+- `Mcp-Name`: required for `tools/call`, `resources/read` and `prompts/get`.
+
+If a header says one thing and the body says another, or a required header is missing, expect **HTTP 400 + HeaderMismatch (`-32020`)**. If the version header matches the body but the server doesn't support that version, expect **HTTP 400 + UnsupportedProtocolVersion (`-32022`)**.
+
+### Other observable HTTP outcomes [ADDED]
+
+| Observation | Expected |
+|---|---|
+| Notification POST accepted | `202 Accepted`, no body |
+| `Origin` header present but invalid | `403 Forbidden` (DNS-rebinding defence) |
+| Unknown JSON-RPC method | `404` with JSON-RPC error `-32601` in the body |
+| GET or DELETE sent to a modern-only endpoint | `405 Method Not Allowed` |
+| `Mcp-Session-Id` or `Last-Event-ID` sent by an old client | Ignored; the server never mints session ids |
+
+**Tester tip:** a `400`/`404` *with* a recognised modern JSON-RPC error in the body means the server speaks modern MCP. An empty or unrecognised body is how a dual-era client decides to fall back to legacy `initialize`.
+
+### Cancellation differs by transport [ADDED]
+
+On Streamable HTTP, closing the request's SSE response stream *is* the cancellation. On stdio, the client sends `notifications/cancelled` with the request id, because there is only one shared channel.
 
 ### Broken SSE stream
 
@@ -271,6 +302,8 @@ Do not think “resume from Last-Event-ID.” In the supplied modern model, resu
 ### subscriptions/listen
 
 Long-lived subscription delivery is opt-in and best-effort. A list-change notification can invalidate a cache even when its TTL has not expired.
+
+**[ADDED]** The first message on the stream is `notifications/subscriptions/acknowledged`, which lists the subset of the filter the server will honour. Every later notification carries `_meta["io.modelcontextprotocol/subscriptionId"]`, equal to the JSON-RPC id of the `subscriptions/listen` request. A graceful close sends the listen request's result before the stream closes. A drop without that result is an unexpected disconnect. `notifications/progress` and `notifications/message` never travel on the listen stream.
 
 ---
 
@@ -282,7 +315,7 @@ A tester-friendly memory hook:
 
 ### 401
 
-No token, invalid token, or expired token → 401 plus `WWW-Authenticate`. The client uses discovery metadata and runs/re-runs the authorization flow.
+No token, invalid token, or expired token → 401 plus `WWW-Authenticate`. The client uses discovery metadata and runs/re-runs the authorization flow. A token issued for a *different* audience is an invalid token too, so it also gets **401**. **[ADDED]**
 
 ### 403
 
@@ -290,7 +323,20 @@ The token is valid but lacks permission/scope → 403 `insufficient_scope`. The 
 
 ### 400
 
-A transport/request integrity problem such as MCP header/body mismatch → 400, not an OAuth challenge.
+A transport/request integrity problem such as MCP header/body mismatch → 400, not an OAuth challenge. In modern MCP, a missing required `_meta` field (-32602), an undeclared capability (-32021) and an unsupported version (-32022) are also 400s. **[ADDED]**
+
+### Client registration order [ADDED]
+
+When a scenario asks how the client obtains a `client_id`, the spec's priority order is:
+
+1. Pre-registered credentials, if the client has them.
+2. Client ID Metadata Documents (CIMD), if the authorization server advertises `client_id_metadata_document_supported`.
+3. Dynamic Client Registration, which is deprecated and only a fallback.
+4. Asking the user to enter client details.
+
+### Issuer validation (mix-up attacks) [ADDED]
+
+The client records the authorization server's `issuer` before redirecting. When the code comes back, it compares the `iss` parameter to that recorded value with an exact string match, before redeeming the code. PKCE alone does not stop a mix-up attack.
 
 ### Token validation
 
@@ -402,6 +448,8 @@ Deprecated means still present during a migration window. Removed means the mode
 
 The supplied material marks Roots, Sampling, Logging, and HTTP+SSE as deprecated, while items such as the initialize handshake, protocol sessions, ping, and SSE resumability are removed in the modern era.
 
+**[ADDED] Removal clocks differ.** Roots, Sampling, Logging and Dynamic Client Registration were deprecated in 2026-07-28. They become eligible for removal in the first revision released on or after 2027-07-28, following the 12-month minimum. HTTP+SSE has been deprecated since 2025-03-26, and its earliest removal is three months after SEP-2596 reaches Final. A proven security risk can shorten the 12-month window, but never below 90 days.
+
 ### Tester reasoning
 
 Before answering any lifecycle scenario, identify the target era. A behavior can be correct for a legacy endpoint and wrong for a modern one.
@@ -493,7 +541,11 @@ Now change the observation: `clientCapabilities` exists, but the capability need
 
 **Reasoning:** Structure is valid; compatibility/capability is insufficient.
 
-**Expected concept:** `-32021` MissingRequiredClientCapability.
+**Expected concept:** `-32021` MissingRequiredClientCapability (HTTP 400).
+
+Change it once more: `protocolVersion` is present and well-formed, `"2027-01-01"`, but the server doesn't know it.
+
+**Expected concept:** `-32022` UnsupportedProtocolVersion (HTTP 400). The client retries with a version from `data.supported`. **[ADDED]**
 
 ### Example B — tool failure vs protocol failure
 
@@ -502,6 +554,8 @@ Now change the observation: `clientCapabilities` exists, but the capability need
 **Reasoning:** The protocol worked; the action failed.
 
 **Expected concept:** tool result with `isError: true`, not automatically a JSON-RPC protocol error.
+
+**Contrast [ADDED]:** if the tool *name* doesn't exist, or the request fails the `tools/call` schema, that is a protocol error: JSON-RPC `-32602`.
 
 ### Example C — lost HTTP stream
 
@@ -525,7 +579,21 @@ Now change the observation: `clientCapabilities` exists, but the capability need
 
 **Reasoning:** Cryptographically valid does not mean valid for this resource server.
 
-**Expected concept:** reject; token passthrough/cross-audience acceptance is forbidden.
+**Expected concept:** reject with **HTTP 401** (an invalid token for this server); token passthrough/cross-audience acceptance is forbidden. **[FIXED: added the status]**
+
+### Example F — header says one thing, body another [ADDED]
+
+**Observation:** a gateway rate-limits by `Mcp-Name: get_balance`, but the body calls `transfer_funds`.
+
+**Reasoning:** different components trusting different sources of truth is exactly what header validation prevents.
+
+**Expected concept:** the MCP server rejects it with HTTP 400 + `-32020` HeaderMismatch.
+
+### Example G — the version header is missing [ADDED]
+
+**Observation:** the POST has `Mcp-Method` and a correct `_meta` protocol version, but no `MCP-Protocol-Version` header.
+
+**Expected concept:** HTTP 400 + `-32020`. A missing required header is a header-validation failure. (A server that deliberately supports pre-2025-06-18 clients may instead assume `2025-03-26`.)
 
 ---
 
@@ -558,7 +626,9 @@ That is very close to ordinary black-box and integration testing: establish the 
 - **Tasks: input goes through tasks/update.**
 - **stdio stdout = protocol wire; stderr = logs.**
 - **401 identity, 403 permission, 400 malformed/integrity problem.**
-- **20/21/22 = Header / Capability / Version.**
+- **20/21/22 = Header / Capability / Version, and there are no others.**
+- **Missing = malformed (-32602); present but unsupported = -32022.**
+- **Three headers: Version on every POST, Method on every request, Name on the three named methods.**
 - **A token for another audience is not your token.**
 - **Deprecated still exists; Removed does not.**
 - **Registry stores metadata, not the server code.**
@@ -567,4 +637,20 @@ That is very close to ordinary black-box and integration testing: establish the 
 
 ## Source boundary
 
-This guide was written from the concepts and assertions in the user-provided **MCPA Exam Cheat Sheet** and the existing question-bank structure. It deliberately avoids adding implementation requirements that are not present in those supplied materials. For actual certification study, treat the official exam objectives/specification as authoritative if they differ from this training material.
+This guide was originally written from the **MCPA Exam Cheat Sheet** and the question-bank structure. In the 2026-09-11 revision, every rule was re-checked against the MCP specification 2026-07-28, the Security Best Practices page and the JSON-RPC 2.0 specification.
+
+Changes in this revision:
+
+1. Removed the non-existent `-32001 InvalidProtocolVersion`.
+2. Added HTTP 400 to -32021 and -32022, plus a -32022 example.
+3. Added the `MCP-Protocol-Version` header and corrected the `Mcp-Method` scope.
+4. Added a table of HTTP outcomes (202 / 403 Origin / 404 / 405).
+5. Noted that cancellation differs by transport.
+6. Added the subscription acknowledgment details.
+7. Noted that MCP carries no batching, and the `resultType` rules.
+8. Added the client-registration order and `iss` validation.
+9. Added 401 for a wrong audience.
+10. Corrected the HTTP+SSE deprecation date and added the removal clocks.
+11. Added Examples F and G.
+
+The specification remains authoritative if anything here disagrees with it.

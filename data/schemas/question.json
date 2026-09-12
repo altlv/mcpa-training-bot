@@ -2,24 +2,24 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://mcpa-bot.com/schemas/question.json",
   "title": "MCPA Training Question",
-  "description": "Schema for quiz questions in the MCPA Training Bot. Use 'answer' for single-select (mcq), 'answers' for multiple-select (mcq-multi/multi_select).",
+  "description": "Schema for quiz questions in the MCPA Training Bot, revised 2026-09-11 to match the curated v2 bank. Single-select items ('mcq', 'scenario', 'true-false') carry exactly one 'answer' letter and 4 options; multiple-select items ('multi_select', 'mcq-multi') carry an 'answers' array of 2-3 letters and 5 options. Chapters run 1-17, matching the 17 question files.",
   "type": "object",
   "required": ["id", "chapter", "type", "difficulty", "question", "options", "explanation"],
   "properties": {
     "id": {
       "type": "string",
-      "description": "Unique question identifier (e.g., 'ch1-q1' for single, 'ch1-m1' for multiple-select)",
-      "pattern": "^ch[0-9]+-[qm][0-9]+$"
+      "description": "Unique question identifier: 'ch<chapter>-q<n>' for single-select, 'ch<chapter>-m<n>' for multiple-select",
+      "pattern": "^ch(1[0-7]|[1-9])-[qm][0-9]+$"
     },
     "chapter": {
       "type": "integer",
-      "description": "Chapter number (1-10)",
+      "description": "Chapter number (1-17)",
       "minimum": 1,
-      "maximum": 10
+      "maximum": 17
     },
     "type": {
       "type": "string",
-      "description": "Question type: 'mcq' or 'multi_select' for single-select, 'mcq-multi' for multiple-select",
+      "description": "'mcq', 'scenario' and 'true-false' are single-select; 'multi_select' and 'mcq-multi' are multiple-select",
       "enum": ["mcq", "mcq-multi", "multi_select", "true-false", "scenario"]
     },
     "difficulty": {
@@ -29,18 +29,19 @@
     },
     "question": {
       "type": "string",
-      "description": "The question text"
+      "description": "The question stem. Curated items state a situation and ask for a decision rather than quoting specification prose.",
+      "minLength": 40
     },
     "options": {
       "type": "array",
-      "description": "Answer options (for mcq type)",
+      "description": "Answer options: 4 (A-D) for single-select, 5 (A-E) for multiple-select",
       "items": {
         "type": "object",
         "required": ["letter", "text"],
         "properties": {
           "letter": {
             "type": "string",
-            "enum": ["A", "B", "C", "D"]
+            "enum": ["A", "B", "C", "D", "E"]
           },
           "text": {
             "type": "string"
@@ -48,32 +49,65 @@
         }
       },
       "minItems": 2,
-      "maxItems": 4
+      "maxItems": 5
     },
     "answer": {
       "type": "string",
-      "description": "Correct answer letter (A, B, C, or D) for single-select questions"
+      "description": "Correct answer letter for single-select questions",
+      "enum": ["A", "B", "C", "D", "E"]
     },
     "answers": {
       "type": "array",
-      "description": "Correct answer letters for multiple-select questions (e.g., ['A', 'C'])",
+      "description": "Correct answer letters for multiple-select questions, e.g. ['A','C','E']. Never all of the options.",
       "items": {
         "type": "string",
-        "enum": ["A", "B", "C", "D"]
+        "enum": ["A", "B", "C", "D", "E"]
       },
       "minItems": 2,
-      "maxItems": 4
+      "maxItems": 4,
+      "uniqueItems": true
     },
     "explanation": {
       "type": "string",
-      "description": "Why this answer is correct"
+      "description": "Why the key is correct and why the most tempting distractor is not",
+      "minLength": 80
     },
     "tags": {
       "type": "array",
       "description": "Topic tags for filtering",
-      "items": {
-        "type": "string"
-      }
+      "items": { "type": "string" }
+    },
+    "domain": {
+      "type": "string",
+      "description": "MCPA exam domain this item is scored against",
+      "enum": [
+        "MCP Fundamentals",
+        "Architecture & Components",
+        "Interactions & Execution",
+        "Security & Governance",
+        "Use Cases & Ecosystem"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "description": "Path of the primary source the item was written from, e.g. 'specification/2026-07-28/basic/authorization'"
+    },
+    "protocolVersion": {
+      "type": "string",
+      "description": "Protocol revision the item is valid for",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
     }
-  }
+  },
+  "oneOf": [
+    {
+      "description": "single-select",
+      "required": ["answer"],
+      "not": { "required": ["answers"] }
+    },
+    {
+      "description": "multiple-select",
+      "required": ["answers"],
+      "not": { "required": ["answer"] }
+    }
+  ]
 }

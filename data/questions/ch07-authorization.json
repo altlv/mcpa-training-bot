@@ -1,10 +1,13 @@
 {
   "meta": {
-    "title": "MCP Question Bank — Chapter 7: Authorization (OAuth 2.1)",
+    "title": "MCP Question Bank — Chapter 7: Authorization",
     "protocolVersion": "2026-07-28",
     "chapter": 7,
-    "chapterName": "Authorization (OAuth 2.1)",
-    "questionCount": 21
+    "chapterName": "Authorization",
+    "examDomain": "Security & Governance",
+    "mode": "single_select",
+    "questionCount": 12,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
   },
   "questions": [
     {
@@ -12,670 +15,411 @@
       "chapter": 7,
       "type": "mcq",
       "difficulty": "easy",
-      "question": "MCP's authorization model follows the conventions of which framework?",
+      "question": "A client calls a protected MCP server with no token. What comes back, and what does the client do with it?",
       "options": [
         {
           "letter": "A",
-          "text": "SAML 2.0"
+          "text": "403 with WWW-Authenticate listing required scopes; the client starts a step-up flow"
         },
         {
           "letter": "B",
-          "text": "OAuth 2.1"
+          "text": "401 with WWW-Authenticate naming resource_metadata; the client fetches that document"
         },
         {
           "letter": "C",
-          "text": "Kerberos"
+          "text": "200 with an empty result, from which the client infers that authorization is needed"
         },
         {
           "letter": "D",
-          "text": "Basic authentication over HTTPS"
+          "text": "400 with a JSON-RPC error; the client adds the Authorization header and retries"
         }
       ],
-      "answer": "B",
-      "explanation": "MCP authorization follows OAuth 2.1 conventions (authorization code flow with PKCE), building on standards like RFC 8414 (auth server metadata), RFC 7591 (dynamic client registration), RFC 9728 (protected resource metadata), and RFC 8707 (resource indicators).",
+      "explanation": "Missing, invalid or expired tokens all produce 401 plus a WWW-Authenticate header whose resource_metadata parameter points at the RFC 9728 document. 403 is for a valid token with insufficient scope.",
       "tags": [
-        "authorization",
-        "oauth"
-      ]
+        "oauth",
+        "401"
+      ],
+      "domain": "Security & Governance",
+      "source": "specification/2026-07-28/basic/authorization",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch7-q2",
       "chapter": 7,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "medium",
-      "question": "When an unauthenticated client first contacts a protected MCP server, how does the server kick off the authorization flow?",
+      "question": "Your client holds a token with files:read. A write operation returns 403 with scope=\"files:write\". Which scope set should the client request next?",
       "options": [
         {
           "letter": "A",
-          "text": "It returns 200 with a login form"
+          "text": "files:read files:write, the union of what it had and what was challenged"
         },
         {
           "letter": "B",
-          "text": "It responds 401 Unauthorized with a WWW-Authenticate header whose resource_metadata parameter points to the Protected Resource Metadata document"
+          "text": "files:write only, since that is what the server said it needs"
         },
         {
           "letter": "C",
-          "text": "It silently drops the connection"
+          "text": "files:write plus an offline_access scope, so the token can be refreshed"
         },
         {
           "letter": "D",
-          "text": "It redirects the client to google.com/oauth"
+          "text": "The full contents of scopes_supported, to avoid further round trips"
         }
       ],
-      "answer": "B",
-      "explanation": "The server answers 401 and the WWW-Authenticate header carries resource_metadata, pointing to the PRM document (RFC 9728) at a well-known path. The client fetches it to learn the authorization server(s), supported scopes, and resource information.",
+      "explanation": "Scope accumulation is the client's job: it computes the union of previously requested scopes and the challenged ones, so earlier permissions are not lost. Requesting everything in scopes_supported is the fallback only when a challenge carries no scope at all.",
       "tags": [
-        "authorization",
-        "prm",
-        "discovery"
-      ]
+        "oauth",
+        "scopes",
+        "step-up"
+      ],
+      "domain": "Security & Governance",
+      "source": "specification/2026-07-28/basic/authorization",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch7-q3",
       "chapter": 7,
       "type": "mcq",
       "difficulty": "medium",
-      "question": "What is Dynamic Client Registration (DCR) used for in MCP authorization?",
+      "question": "Which statement about sending access tokens to an MCP server is correct?",
       "options": [
         {
           "letter": "A",
-          "text": "Registering new tools at runtime"
+          "text": "Either the Authorization header or an access_token query parameter"
         },
         {
           "letter": "B",
-          "text": "Allowing an MCP client to register itself with an authorization server on the fly, instead of being pre-registered"
+          "text": "Authorization: Bearer on every request; never in the URI query string"
         },
         {
           "letter": "C",
-          "text": "Registering the MCP server in the public registry"
+          "text": "A signed cookie, so browsers can reuse the same credential"
         },
         {
           "letter": "D",
-          "text": "Rotating TLS certificates"
+          "text": "Authorization: Bearer on the first request of a session, then a session id"
         }
       ],
-      "answer": "B",
-      "explanation": "With DCR (RFC 7591), the client posts its information (name, redirect URIs, grant types) to the authorization server's registration_endpoint and receives client registration details, avoiding manual pre-registration. If neither DCR nor pre-registration is available, the client should let the user enter client information manually.",
+      "explanation": "Authorization MUST be included in every HTTP request from client to server, and access tokens MUST NOT be included in the URI query string. There is no session to attach a credential to after the first request.",
       "tags": [
-        "authorization",
-        "dcr"
-      ]
+        "oauth",
+        "token-transport"
+      ],
+      "domain": "Security & Governance",
+      "source": "specification/2026-07-28/basic/authorization",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch7-q4",
       "chapter": 7,
       "type": "mcq",
-      "difficulty": "hard",
-      "question": "Why is validating the aud (audience) claim of an access token critical for an MCP server?",
+      "difficulty": "medium",
+      "question": "How should a stdio server obtain credentials for the API it wraps?",
       "options": [
         {
           "letter": "A",
-          "text": "It determines the token's encryption algorithm"
+          "text": "By asking the client for its MCP access token and reusing that token upstream"
         },
         {
           "letter": "B",
-          "text": "It verifies the token was actually issued for this MCP server, preventing token reuse across services and token passthrough scenarios"
+          "text": "Through URL-mode elicitation on every single call that needs the upstream API"
         },
         {
           "letter": "C",
-          "text": "It contains the user's display name"
+          "text": "Through the same OAuth 2.1 flow as HTTP servers, using a loopback redirect URI on the host"
         },
         {
           "letter": "D",
-          "text": "It sets the token's expiry time"
+          "text": "From its environment: stdio implementations SHOULD NOT follow the authorization spec"
         }
       ],
-      "answer": "B",
-      "explanation": "The audience embeds the intended destination in the token. Checking that aud matches the MCP server's resource prevents accepting tokens minted for other APIs — a key defense against the token passthrough anti-pattern.",
+      "explanation": "Authorization is defined for HTTP transports; stdio implementations SHOULD NOT follow it and instead retrieve credentials from the environment. Reusing the client's token upstream would be token passthrough, which is forbidden.",
       "tags": [
-        "authorization",
-        "tokens",
-        "audience"
-      ]
+        "oauth",
+        "stdio"
+      ],
+      "domain": "Security & Governance",
+      "source": "specification/2026-07-28/basic/authorization",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch7-q5",
       "chapter": 7,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "medium",
-      "question": "According to the authorization tutorial, when is OAuth-based authorization typically NOT necessary for an MCP server?",
+      "question": "Your client fetches the protected resource metadata document named by a 401. What does it get from that document?",
       "options": [
         {
           "letter": "A",
-          "text": "When the server is hosted in the cloud"
+          "text": "An access token scoped to that resource, ready for use on the very next request it makes"
         },
         {
           "letter": "B",
-          "text": "When the server uses the STDIO transport locally — it can use environment-based credentials instead"
+          "text": "The list of tools the caller is permitted to invoke on that server"
         },
         {
           "letter": "C",
-          "text": "When the server has fewer than five tools"
+          "text": "The client_id and client_secret the client should use with that resource"
         },
         {
           "letter": "D",
-          "text": "When users are on the same corporate network"
+          "text": "The resource identifier and the authorization servers that issue tokens for it"
         }
       ],
-      "answer": "B",
-      "explanation": "OAuth flows are designed for HTTP-based transports with remotely hosted servers. Local STDIO servers can use environment-based credentials or credentials from embedded libraries, since they run on the user's machine.",
+      "explanation": "The RFC 9728 document describes the resource: its canonical identifier and which authorization servers to go to, plus supported scopes. Tokens, client credentials and per-tool permissions are not in it.",
       "tags": [
-        "authorization",
-        "stdio",
-        "credentials"
-      ]
+        "oauth",
+        "prm"
+      ],
+      "domain": "Security & Governance",
+      "source": "specification/2026-07-28/basic/authorization",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch7-q6",
       "chapter": 7,
       "type": "mcq",
       "difficulty": "medium",
-      "question": "Once the OAuth flow completes, how does an MCP client authenticate requests to the MCP server?",
+      "question": "Mid-session, a call that worked a minute ago returns 401 and the client holds a refresh token. What is the expected behaviour?",
       "options": [
         {
           "letter": "A",
-          "text": "By appending ?token=... to every URL"
+          "text": "Retry the same token twice before concluding that it has expired"
         },
         {
           "letter": "B",
-          "text": "By sending the access token in the Authorization: Bearer header"
+          "text": "Restart the full authorization code flow, since refresh tokens are not used in MCP"
         },
         {
           "letter": "C",
-          "text": "By embedding the token in the JSON-RPC id field"
+          "text": "Refresh at the authorization server and retry, without a new user-facing flow"
         },
         {
           "letter": "D",
-          "text": "By client TLS certificates only"
+          "text": "Treat it as a scope problem and request the union of all known scopes"
         }
       ],
-      "answer": "B",
-      "explanation": "The client includes the access token in the Authorization header as a Bearer token; the server must validate the token (e.g., via introspection or JWT validation) before processing the request.",
+      "explanation": "Expiry is the ordinary case for a 401: exchange the refresh token for a new access token and retry silently. A full interactive flow is the fallback when refresh fails, and scope problems present as 403, not 401.",
       "tags": [
-        "authorization",
-        "tokens"
-      ]
+        "oauth",
+        "expiry"
+      ],
+      "domain": "Security & Governance",
+      "source": "specification/2026-07-28/basic/authorization",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch7-q7",
       "chapter": 7,
       "type": "mcq",
       "difficulty": "hard",
-      "question": "Which of the following is listed as an authorization pitfall to avoid?",
+      "question": "A token is correctly signed by the right authorization server and is not expired, but its aud names a different MCP server. What must the resource server do?",
       "options": [
         {
           "letter": "A",
-          "text": "Using well-tested libraries for token validation"
+          "text": "Accept it but downgrade the request to read-only operations"
         },
         {
           "letter": "B",
-          "text": "Using short-lived access tokens"
+          "text": "Reject it with 403, since the token exists but lacks permission here"
         },
         {
           "letter": "C",
-          "text": "Logging Authorization headers and tokens for easier debugging"
+          "text": "Reject it with 401: tokens must be issued specifically for this server"
         },
         {
           "letter": "D",
-          "text": "Returning WWW-Authenticate challenges on 401"
+          "text": "Accept it, since the issuer is trusted and the signature verifies"
         }
       ],
-      "answer": "C",
-      "explanation": "Never log credentials: no Authorization headers, tokens, codes, or secrets; scrub query strings and redact sensitive fields. The other options are recommended practices, not pitfalls.",
+      "explanation": "MCP servers MUST validate that access tokens were issued for them as the intended audience and MUST NOT accept or transit any other token. An invalid token, including a wrong-audience one, gets 401; 403 is about scope, not audience.",
       "tags": [
-        "authorization",
-        "pitfalls",
-        "logging"
-      ]
+        "oauth",
+        "audience"
+      ],
+      "domain": "Security & Governance",
+      "source": "specification/2026-07-28/basic/authorization",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch7-q8",
       "chapter": 7,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which RFC defines the Protected Resource Metadata document used in MCP authorization discovery?",
+      "difficulty": "hard",
+      "question": "The authorization server's metadata has no code_challenge_methods_supported field. What must the MCP client do?",
       "options": [
         {
           "letter": "A",
-          "text": "RFC 9728"
+          "text": "Proceed without PKCE, since the parameter is optional in OAuth 2.1"
         },
         {
           "letter": "B",
-          "text": "RFC 2616"
+          "text": "Proceed, but only for confidential clients holding a client secret"
         },
         {
           "letter": "C",
-          "text": "RFC 6455"
+          "text": "Proceed with the plain code challenge method as a fallback"
         },
         {
           "letter": "D",
-          "text": "RFC 791"
+          "text": "Refuse to proceed: PKCE support cannot be verified"
         }
       ],
-      "answer": "A",
-      "explanation": "RFC 9728 defines Protected Resource Metadata. Related standards: RFC 8414 (Authorization Server Metadata), RFC 7591 (Dynamic Client Registration), and RFC 8707 (Resource Indicators).",
+      "explanation": "Clients MUST implement PKCE and MUST verify support before proceeding. Since neither OAuth 2.1 nor PKCE defines a discovery mechanism, clients rely on that metadata field, and its absence means the client MUST refuse to proceed. S256 is required when technically capable.",
       "tags": [
-        "authorization",
-        "rfcs"
-      ]
+        "oauth",
+        "pkce"
+      ],
+      "domain": "Security & Governance",
+      "source": "specification/2026-07-28/basic/authorization/security-considerations",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch7-q9",
       "chapter": 7,
       "type": "mcq",
-      "difficulty": "easy",
-      "question": "Is authorization mandatory for MCP servers?",
+      "difficulty": "hard",
+      "question": "A client with no prior relationship to an authorization server needs a client_id. Which order does the spec prescribe?",
       "options": [
         {
           "letter": "A",
-          "text": "Yes, every MCP server must implement OAuth"
+          "text": "Pre-registered credentials, then CIMD if advertised, then DCR, then ask the user"
         },
         {
           "letter": "B",
-          "text": "No — it's optional, but strongly recommended when the server accesses user-specific data, needs auditing, requires user consent, targets enterprises, or needs per-user rate limiting"
+          "text": "DCR first, then CIMD, then any pre-registered credentials, and finally ask the user"
         },
         {
           "letter": "C",
-          "text": "Only remote servers are allowed to have authorization"
+          "text": "Whichever the authorization server advertises; the spec sets no priority"
         },
         {
           "letter": "D",
-          "text": "Authorization is decided by the model at runtime"
+          "text": "CIMD only: dynamic client registration was removed in 2026-07-28"
         }
       ],
-      "answer": "B",
-      "explanation": "Authorization is optional in MCP, but strongly recommended for servers handling user data, auditable actions, consent-gated APIs, enterprise access controls, or per-user rate limiting/usage tracking.",
+      "explanation": "The priority is: use pre-registered information if available; use Client ID Metadata Documents if the AS advertises client_id_metadata_document_supported; fall back to Dynamic Client Registration, which is deprecated but not removed; otherwise prompt the user.",
       "tags": [
-        "authorization",
-        "basics"
-      ]
+        "oauth",
+        "registration"
+      ],
+      "domain": "Security & Governance",
+      "source": "specification/2026-07-28/basic/authorization/client-registration",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch7-q10",
       "chapter": 7,
       "type": "mcq",
-      "difficulty": "easy",
-      "question": "After the user consents at the authorization endpoint, what does the client exchange the authorization code for?",
+      "difficulty": "hard",
+      "question": "Which value belongs in the RFC 8707 resource parameter, and where must it be sent?",
       "options": [
         {
           "letter": "A",
-          "text": "A username and password"
+          "text": "The MCP server's canonical URI, in both the authorization and the token request"
         },
         {
           "letter": "B",
-          "text": "Tokens — an access token (and typically a refresh token) returned with token_type and expires_in"
+          "text": "The client's redirect URI, in the authorization request only"
         },
         {
           "letter": "C",
-          "text": "A client certificate"
+          "text": "The tool name being invoked, in the token request only"
         },
         {
           "letter": "D",
-          "text": "A session cookie for the MCP server"
+          "text": "The authorization server's issuer URL, in the token request but not the authorization request"
         }
       ],
-      "answer": "B",
-      "explanation": "The authorization server redirects back with an authorization code, which the client exchanges at the token endpoint for an access token (plus refresh token, token_type Bearer, expires_in), following standard OAuth 2.1 authorization code with PKCE.",
+      "explanation": "Clients MUST send the resource parameter identifying the MCP server by its canonical URI, in both requests, and MUST do so whether or not the authorization server supports it. https://mcp.example.com/mcp is canonical; mcp.example.com (no scheme) and URLs with fragments are not.",
       "tags": [
-        "authorization",
         "oauth",
-        "tokens"
-      ]
+        "resource-parameter"
+      ],
+      "domain": "Security & Governance",
+      "source": "specification/2026-07-28/basic/authorization",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch7-q11",
       "chapter": 7,
       "type": "mcq",
-      "difficulty": "easy",
-      "question": "Which OAuth extension does MCP's authorization code flow use to protect the code exchange?",
+      "difficulty": "hard",
+      "question": "An authorization server advertises authorization_response_iss_parameter_supported: true, but the callback arrives without an iss parameter. What must the client do?",
       "options": [
         {
           "letter": "A",
-          "text": "PKCE (Proof Key for Code Exchange)"
+          "text": "Proceed, since iss is only a SHOULD in the current revision"
         },
         {
           "letter": "B",
-          "text": "SAML assertions"
+          "text": "Compare the redirect host to the recorded issuer and proceed if they match"
         },
         {
           "letter": "C",
-          "text": "HTTP Digest authentication"
+          "text": "Reject the response and stop before redeeming the code"
         },
         {
           "letter": "D",
-          "text": "Kerberos tickets"
+          "text": "Redeem the code, then verify the issuer from the token's iss claim"
         }
       ],
-      "answer": "A",
-      "explanation": "The user authorization step follows standard OAuth 2.1 authorization code with PKCE conventions, which protects the authorization code exchange against interception.",
+      "explanation": "RFC 9207 validation is keyed to that metadata flag: advertised and present means compare to the recorded issuer with an exact string match; advertised and absent means reject. This mitigates mix-up attacks, which PKCE alone does not stop.",
       "tags": [
-        "authorization",
         "oauth",
-        "pkce"
-      ]
+        "iss",
+        "mix-up"
+      ],
+      "domain": "Security & Governance",
+      "source": "specification/2026-07-28/basic/authorization",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch7-q12",
       "chapter": 7,
       "type": "scenario",
-      "difficulty": "medium",
-      "question": "SCENARIO: Your MCP server at http://localhost:3000 introspects a token and finds aud: [\"account\", \"test-client\"] — neither matching your server's resource. The token is otherwise valid and unexpired. What should your server do?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Accept it; the token is valid and active"
-        },
-        {
-          "letter": "B",
-          "text": "Reject the request — none of the audiences match the configured resource, so the token was not issued for this server"
-        },
-        {
-          "letter": "C",
-          "text": "Accept it but log a warning"
-        },
-        {
-          "letter": "D",
-          "text": "Forward the token to the downstream API to let it decide"
-        }
-      ],
-      "answer": "B",
-      "explanation": "The tutorial's verifier does exactly this: it checks each audience against the server's resource URL and rejects when none match. Accepting foreign-audience tokens is the token passthrough anti-pattern.",
-      "tags": [
-        "authorization",
-        "audience",
-        "scenario"
-      ]
-    },
-    {
-      "id": "ch7-q13",
-      "chapter": 7,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "In the Keycloak tutorial, how does the example MCP server verify that a received token is valid?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "By comparing it to a hardcoded string"
-        },
-        {
-          "letter": "B",
-          "text": "Via OAuth 2.0 Token Introspection (RFC 7662) against Keycloak's introspection endpoint (JWT validation via libraries is an equally valid alternative)"
-        },
-        {
-          "letter": "C",
-          "text": "By asking the MCP client to vouch for it"
-        },
-        {
-          "letter": "D",
-          "text": "Tokens are trusted implicitly over localhost"
-        }
-      ],
-      "answer": "B",
-      "explanation": "The sample servers post the token to Keycloak's introspection endpoint using the server's own client credentials, checking active, scope, expiry, and audience. The docs note introspection is one of several valid approaches — standalone JWT-validation libraries work too.",
-      "tags": [
-        "authorization",
-        "introspection",
-        "keycloak"
-      ]
-    },
-    {
-      "id": "ch7-q14",
-      "chapter": 7,
-      "type": "scenario",
       "difficulty": "hard",
-      "question": "SCENARIO: Your MCP client connects to a server whose authorization server does not support Dynamic Client Registration, and your client is not pre-registered with it. What does the tutorial say is the client developer's responsibility?",
+      "question": "Dynamic client registration is deprecated and your client has no pre-registered client_id. What is the recommended way to identify it?",
       "options": [
         {
           "letter": "A",
-          "text": "Refuse to connect permanently"
+          "text": "A client_id derived by hashing the redirect URI, as the spec prescribes"
         },
         {
           "letter": "B",
-          "text": "Provide an affordance for the end user to enter client registration information manually"
+          "text": "A client ID metadata document, whose URL the client presents as its client_id"
         },
         {
           "letter": "C",
-          "text": "Generate a random client_id and hope it works"
+          "text": "A self-signed JWT asserting the client's identity, sent in place of a client_id"
         },
         {
           "letter": "D",
-          "text": "Fall back to sending no credentials"
+          "text": "No client_id at all, since public clients using PKCE do not need one"
         }
       ],
-      "answer": "B",
-      "explanation": "When neither DCR nor pre-registration is available, it's the client developer's responsibility to let the end user enter client information manually so the flow can still complete.",
-      "tags": [
-        "authorization",
-        "dcr",
-        "scenario"
-      ]
-    },
-    {
-      "id": "ch7-q15",
-      "chapter": 7,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Why should MCP servers 'return proper challenges' on a 401?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "To satisfy HTTP/2 framing rules"
-        },
-        {
-          "letter": "B",
-          "text": "Including WWW-Authenticate with Bearer, realm, and resource_metadata lets clients discover how to authenticate automatically"
-        },
-        {
-          "letter": "C",
-          "text": "To trigger the browser's basic-auth popup"
-        },
-        {
-          "letter": "D",
-          "text": "Challenges are only needed on 500 errors"
-        }
-      ],
-      "answer": "B",
-      "explanation": "The 401 challenge is the entry point of the whole discovery chain: without WWW-Authenticate carrying resource_metadata (and optionally required scopes), the client can't find the PRM document or the authorization server and the flow can't start.",
-      "tags": [
-        "authorization",
-        "challenges",
-        "discovery"
-      ]
-    },
-    {
-      "id": "ch7-q16",
-      "chapter": 7,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "SCENARIO: Match the HTTP status a protected MCP server should return: (1) request with no token or an invalid/expired token; (2) valid token lacking a required scope; (3) request whose Mcp-Name header contradicts the body.",
-      "options": [
-        {
-          "letter": "A",
-          "text": "(1) 401 Unauthorized with a WWW-Authenticate challenge; (2) 403 with insufficient_scope (triggering step-up); (3) 400 Bad Request with the HeaderMismatch error"
-        },
-        {
-          "letter": "B",
-          "text": "(1) 403; (2) 401; (3) 500"
-        },
-        {
-          "letter": "C",
-          "text": "All three return 401"
-        },
-        {
-          "letter": "D",
-          "text": "(1) 400; (2) 400; (3) 401"
-        }
-      ],
-      "answer": "A",
-      "explanation": "401 means authenticate (the WWW-Authenticate header kicks off discovery); 403 insufficient_scope means the identity is known but lacks permission, prompting step-up authorization for additional scopes; 400 + HeaderMismatch (-32020) covers malformed requests whose headers and body disagree.",
-      "tags": [
-        "authorization",
-        "status-codes",
-        "scenario"
-      ]
-    },
-    {
-      "id": "ch7-q17",
-      "chapter": 7,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "After a 403 insufficient_scope challenge, which scopes should the client request when re-authorizing?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Only the newly challenged scopes, discarding old ones"
-        },
-        {
-          "letter": "B",
-          "text": "The union of previously granted scopes and the newly challenged scopes, so the new token covers everything the old one did plus the new requirement"
-        },
-        {
-          "letter": "C",
-          "text": "All scopes in scopes_supported, always"
-        },
-        {
-          "letter": "D",
-          "text": "No scopes; scopes are server-side only"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Scope accumulation is a client-side responsibility in the step-up flow: compute the union of held and challenged scopes so previously granted permissions aren't lost, while servers stay stateless about client scope sets.",
-      "tags": [
-        "authorization",
-        "scopes",
-        "step-up"
-      ]
-    },
-    {
-      "id": "ch7-q18",
-      "chapter": 7,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "SCENARIO: A client connects to a brand-new protected server and receives 401 with WWW-Authenticate but NO scope parameter. Per the scope selection strategy, what should it request?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "No scopes at all"
-        },
-        {
-          "letter": "B",
-          "text": "Fall back to requesting all scopes listed in the PRM document's scopes_supported, letting the authorization server and end user decide during consent"
-        },
-        {
-          "letter": "C",
-          "text": "Invent scopes based on tool names"
-        },
-        {
-          "letter": "D",
-          "text": "Abort the connection"
-        }
-      ],
-      "answer": "B",
-      "explanation": "When the initial challenge carries no scope parameter, the documented fallback is to request everything in scopes_supported — general-purpose MCP clients lack domain knowledge to pick, so the authorization server and user determine appropriate permissions at consent time.",
-      "tags": [
-        "authorization",
-        "scopes",
-        "scenario",
-        "discovery"
-      ]
-    },
-    {
-      "id": "ch7-scenario-extra-1",
-      "chapter": 7,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A remote MCP request has no access token. Which response should an OAuth test primarily expect?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "200 with an empty tool list"
-        },
-        {
-          "letter": "B",
-          "text": "401 with WWW-Authenticate information that leads the client toward protected-resource metadata"
-        },
-        {
-          "letter": "C",
-          "text": "403 insufficient_scope"
-        },
-        {
-          "letter": "D",
-          "text": "400 HeaderMismatch"
-        }
-      ],
-      "answer": "B",
-      "explanation": "401 means authentication is missing/invalid. The client uses the challenge to discover protected-resource metadata and continue the OAuth flow.",
+      "explanation": "The order is pre-registered credentials, then a client ID metadata document (CIMD) whose HTTPS URL is the client_id, then deprecated DCR, then asking the user. PKCE protects the code exchange but does not remove the need to identify the client.",
       "tags": [
         "oauth",
-        "401",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch7-scenario-extra-2",
-      "chapter": 7,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "A client has a valid access token, but the requested operation needs an additional scope. Which outcome best matches the expected flow?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "401 and delete all credentials"
-        },
-        {
-          "letter": "B",
-          "text": "403 insufficient_scope, then request the union of existing and newly required scopes"
-        },
-        {
-          "letter": "C",
-          "text": "400 because scopes are HTTP headers"
-        },
-        {
-          "letter": "D",
-          "text": "-32700 parse error"
-        }
+        "cimd",
+        "dcr"
       ],
-      "answer": "B",
-      "explanation": "A valid identity/token with insufficient permission is a 403 step-up case. The client should request the union of old and newly needed scopes rather than dropping existing ones.",
-      "tags": [
-        "oauth",
-        "403",
-        "scopes",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch7-scenario-extra-3",
-      "chapter": 7,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "Server A accepts an access token whose audience is Server B because both services use the same identity provider. Which security assertion should fail?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "None; same issuer makes tokens interchangeable"
-        },
-        {
-          "letter": "B",
-          "text": "Audience validation: a server must not accept tokens minted for another audience"
-        },
-        {
-          "letter": "C",
-          "text": "PKCE is optional for this reason"
-        },
-        {
-          "letter": "D",
-          "text": "Only refresh tokens have an audience"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Token passthrough/interchange is forbidden. The resource server must validate that the token audience is itself, in addition to signature, expiry, and issuer.",
-      "tags": [
-        "oauth",
-        "audience",
-        "token-passthrough",
-        "tester-scenario"
-      ]
+      "domain": "Security & Governance",
+      "source": "specification/2026-07-28/basic/authorization",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     }
   ]
 }

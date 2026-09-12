@@ -1,84 +1,97 @@
 {
+  "meta": {
+    "title": "MCP Question Bank — Chapter 10: Debugging (multi-select)",
+    "protocolVersion": "2026-07-28",
+    "chapter": 10,
+    "chapterName": "Debugging",
+    "examDomain": "Interactions & Execution",
+    "mode": "multi_select",
+    "questionCount": 3,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
+  },
   "questions": [
     {
       "id": "ch10-m1",
       "chapter": 10,
       "type": "multi_select",
       "difficulty": "medium",
-      "question": "Which events does the debugging guide list as important to log? (Select all that apply.)",
+      "question": "A stdio server is producing parse errors at the client. Which causes are plausible? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "Startup steps"
+          "text": "The client sent two requests before reading the first response"
         },
         {
           "letter": "B",
-          "text": "Resource access"
+          "text": "A JSON message contains an embedded newline"
         },
         {
           "letter": "C",
-          "text": "Tool execution"
+          "text": "A log line is emitted with print() instead of to stderr"
         },
         {
           "letter": "D",
-          "text": "Error conditions and performance metrics"
+          "text": "A library writes a progress bar to stdout"
         },
         {
           "letter": "E",
-          "text": "Raw Authorization headers for reproduction"
+          "text": "The server writes its responses to stderr instead of stdout"
         }
       ],
+      "explanation": "stdout is protocol-only and messages are newline-delimited with no embedded newlines, so A, B and C corrupt framing. Writing responses to stderr produces silence, not parse errors, and interleaved requests are normal: correlation is by id.",
+      "tags": [
+        "debugging",
+        "stdio"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/basic/transports/stdio",
+      "protocolVersion": "2026-07-28",
       "answers": [
-        "A",
         "B",
         "C",
         "D"
-      ],
-      "explanation": "Startup, resource access, tool execution, errors, and performance metrics are the list. Credentials must never be logged.",
-      "tags": [
-        "debugging",
-        "logging"
       ]
     },
     {
       "id": "ch10-m2",
       "chapter": 10,
       "type": "multi_select",
-      "difficulty": "hard",
-      "question": "A client fails to connect. Which steps are on the official connection-troubleshooting checklist? (Select all that apply.)",
+      "difficulty": "medium",
+      "question": "A tool call fails in the host and you do not yet know whose fault it is. Which steps actually narrow that down? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "Check the client's logs"
+          "text": "Re-publish the server to the registry to refresh its metadata"
         },
         {
           "letter": "B",
-          "text": "Verify the server process is running"
+          "text": "Run the same call through the Inspector CLI against the same server"
         },
         {
           "letter": "C",
-          "text": "Test the server standalone with the MCP Inspector"
+          "text": "Compare the protocol version each side advertises"
         },
         {
           "letter": "D",
-          "text": "Call server/discover to verify protocol compatibility"
+          "text": "Delete the client's cache directory and reconnect"
         },
         {
           "letter": "E",
-          "text": "Flush the OS DNS cache as the first step"
+          "text": "Read the server's stderr log, which the host captures separately"
         }
       ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "Logs, process check, Inspector, and protocol verification via server/discover (plus inspecting the per-request _meta fields) are the documented steps. DNS flushing isn't part of the checklist.",
+      "explanation": "A second client, the server's own error stream and the advertised revisions each isolate a different layer: server logic, server runtime and version negotiation. Clearing caches and re-publishing change nothing about a failing call.",
       "tags": [
         "debugging",
-        "troubleshooting",
-        "checklist"
+        "isolation"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/basic",
+      "protocolVersion": "2026-07-28",
+      "answers": [
+        "B",
+        "C",
+        "E"
       ]
     },
     {
@@ -86,240 +99,41 @@
       "chapter": 10,
       "type": "multi_select",
       "difficulty": "hard",
-      "question": "Which error-code interpretations from the 2026-07-28 debugging guidance are correct? (Select all that apply.)",
+      "question": "Which client-visible outcomes point at a header or metadata problem rather than a tool bug? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "-32022 UnsupportedProtocolVersionError — the data field lists the server's supported versions"
+          "text": "400 with -32020 after a gateway rewrote Mcp-Name"
         },
         {
           "letter": "B",
-          "text": "-32021 MissingRequiredClientCapabilityError — names client capabilities the server needs but the request didn't declare"
+          "text": "400 with -32602 when _meta lacks protocolVersion"
         },
         {
           "letter": "C",
-          "text": "-32602 Invalid params — also returned when a request is missing required _meta fields"
+          "text": "200 with isError: true after the tool's upstream API failed"
         },
         {
           "letter": "D",
-          "text": "-32020 HeaderMismatch — Streamable HTTP headers disagree with the body"
+          "text": "404 with -32601 after calling a method the server does not implement"
         },
         {
           "letter": "E",
-          "text": "-32700 — the server ran out of memory"
+          "text": "400 with -32022 listing the server's supported versions"
         }
       ],
+      "explanation": "A, B and C are all metadata or header validation failures, and all are 400. A tool result with isError is a business failure, and -32601 means the method itself is unknown, not that its metadata was wrong.",
+      "tags": [
+        "debugging",
+        "http-status"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/basic/transports/streamable-http",
+      "protocolVersion": "2026-07-28",
       "answers": [
         "A",
         "B",
-        "C",
-        "D"
-      ],
-      "explanation": "A–D are correct. -32700 is JSON-RPC's Parse error (invalid JSON), not an out-of-memory signal.",
-      "tags": [
-        "debugging",
-        "error-codes"
-      ]
-    },
-    {
-      "id": "ch10-m4",
-      "chapter": 10,
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which statements about Claude Desktop's MCP logs are accurate? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "macOS location: ~/Library/Logs/Claude"
-        },
-        {
-          "letter": "B",
-          "text": "Windows location: %APPDATA%\\Claude\\logs"
-        },
-        {
-          "letter": "C",
-          "text": "mcp.log holds general connection logging"
-        },
-        {
-          "letter": "D",
-          "text": "mcp-server-SERVERNAME.log captures each server's stderr output"
-        },
-        {
-          "letter": "E",
-          "text": "Logs are only available with a paid plan"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "Locations and file roles are as documented; logging is built in, not gated.",
-      "tags": [
-        "debugging",
-        "logs",
-        "claude-desktop"
-      ]
-    },
-    {
-      "id": "ch10-m5",
-      "chapter": 10,
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which are documented debugging workflows for a misbehaving local server? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Test it standalone in the Inspector before blaming the host integration"
-        },
-        {
-          "letter": "B",
-          "text": "Tail ~/Library/Logs/Claude/mcp-server-NAME.log to read the server's stderr"
-        },
-        {
-          "letter": "C",
-          "text": "Add stderr logging around startup, tool execution, and error paths"
-        },
-        {
-          "letter": "D",
-          "text": "Add print() statements to trace the message flow on stdio"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "print() writes to stdout and corrupts the protocol stream — the one thing you must not do on a stdio server.",
-      "tags": [
-        "debugging",
-        "stdio",
-        "logs"
-      ]
-    },
-    {
-      "id": "ch10-m6",
-      "chapter": 10,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "Your modern client gets error -32021 from a server. Which statements apply? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The error is MissingRequiredClientCapabilityError"
-        },
-        {
-          "letter": "B",
-          "text": "The server needs a client capability (possibly an extension) the request's _meta didn't declare"
-        },
-        {
-          "letter": "C",
-          "text": "The fix is declaring the capability in io.modelcontextprotocol/clientCapabilities on each request"
-        },
-        {
-          "letter": "D",
-          "text": "The error means the JSON was unparseable"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "-32021 is the capability-gap error in the MCP-reserved range; unparseable JSON is -32700.",
-      "tags": [
-        "debugging",
-        "error-codes",
-        "capabilities"
-      ]
-    },
-    {
-      "id": "ch10-m7",
-      "chapter": 10,
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which places surface MCP diagnostics in Claude Desktop? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "mcp.log for general connection events"
-        },
-        {
-          "letter": "B",
-          "text": "mcp-server-NAME.log for a specific server's stderr"
-        },
-        {
-          "letter": "C",
-          "text": "The Developer settings / tools UI showing server status"
-        },
-        {
-          "letter": "D",
-          "text": "The macOS Console app is required to decrypt the logs"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Logs are plain files under ~/Library/Logs/Claude (or %APPDATA%\\Claude\\logs) — nothing is encrypted.",
-      "tags": [
-        "debugging",
-        "claude-desktop",
-        "logs"
-      ]
-    },
-    {
-      "id": "ch10-m8",
-      "chapter": 10,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "A dual-era server serves an old IDE plugin and a new agent. Which debugging expectations are correct? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "A legacy client's traffic starts with an initialize handshake and may carry no modern protocol header"
-        },
-        {
-          "letter": "B",
-          "text": "A modern client's requests each carry protocol metadata in _meta and can hit any instance"
-        },
-        {
-          "letter": "C",
-          "text": "The server routes per request, so both clients can share one deployment"
-        },
-        {
-          "letter": "D",
-          "text": "Version negotiation automatically translates legacy requests into modern ones"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Negotiation detects era, it doesn't bridge it — the server (or SDK) must actually implement both legs; nothing translates on the wire for free.",
-      "tags": [
-        "debugging",
-        "protocol-eras",
-        "dual-era"
+        "E"
       ]
     }
   ]

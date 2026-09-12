@@ -1,10 +1,13 @@
 {
   "meta": {
-    "title": "MCP Question Bank — Chapter 2: Architecture & Components",
+    "title": "MCP Question Bank — Chapter 2: Architecture & Protocol Layers",
     "protocolVersion": "2026-07-28",
     "chapter": 2,
-    "chapterName": "Architecture & Components",
-    "questionCount": 32
+    "chapterName": "Architecture & Protocol Layers",
+    "examDomain": "Architecture & Components",
+    "mode": "single_select",
+    "questionCount": 7,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
   },
   "questions": [
     {
@@ -12,1017 +15,238 @@
       "chapter": 2,
       "type": "mcq",
       "difficulty": "easy",
-      "question": "In MCP's architecture, what is the role of the 'MCP Host'?",
+      "question": "A user clicks 'Allow' on a permission dialog before a tool runs. Which participant is responsible for that decision point?",
       "options": [
         {
           "letter": "A",
-          "text": "The program that provides context data to clients"
+          "text": "The server, which must not execute a tool until the client confirms consent"
         },
         {
           "letter": "B",
-          "text": "The AI application that coordinates and manages one or multiple MCP clients"
+          "text": "The client, which sits closest to the server and can block the outgoing request"
         },
         {
           "letter": "C",
-          "text": "The transport layer that frames JSON-RPC messages"
+          "text": "The model, which decides whether the requested tool is appropriate to call"
         },
         {
           "letter": "D",
-          "text": "The authorization server that issues tokens"
+          "text": "The host, which enforces security policies and handles user authorization decisions"
         }
       ],
-      "answer": "B",
-      "explanation": "The MCP host is the AI application (e.g., Claude Desktop, VS Code) that coordinates and manages MCP clients. Each client maintains a dedicated connection to one MCP server, and servers provide context to clients.",
+      "explanation": "The host creates and manages clients, controls connection permissions and lifecycle, enforces security policies and consent requirements, and handles user authorization decisions. Clients route messages; they do not own the consent decision.",
       "tags": [
-        "architecture",
-        "participants"
-      ]
+        "roles",
+        "responsibilities"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/architecture",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch2-q2",
       "chapter": 2,
       "type": "mcq",
-      "difficulty": "easy",
-      "question": "How many MCP servers does a single MCP client connect to?",
+      "difficulty": "medium",
+      "question": "A tool call returns HTTP 200, but the body contains a JSON-RPC error object. Which layer failed?",
       "options": [
         {
           "letter": "A",
-          "text": "Exactly one — each client maintains a dedicated connection to one server"
+          "text": "Both: an error body always implies the request never reached the server"
         },
         {
           "letter": "B",
-          "text": "Up to ten servers per client"
+          "text": "Neither: an error inside a 200 is how MCP signals a successful tool failure"
         },
         {
           "letter": "C",
-          "text": "As many servers as the host configures"
+          "text": "The data layer: transport delivery succeeded, MCP semantics did not"
         },
         {
           "letter": "D",
-          "text": "Two: one local and one remote"
+          "text": "The transport layer: a 200 with an error body is a malformed HTTP response"
         }
       ],
-      "answer": "A",
-      "explanation": "The host creates one MCP client for each MCP server it connects to. Each client maintains a dedicated one-to-one connection with its corresponding server.",
+      "explanation": "The transport layer moves and frames bytes; the data layer defines JSON-RPC and MCP semantics. A 200 proves only that the transport worked. Note the contrast with a tool execution failure, which is a normal result carrying isError: true, not an error object.",
       "tags": [
-        "architecture",
-        "participants"
-      ]
+        "layers",
+        "debugging"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/architecture",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch2-q3",
       "chapter": 2,
       "type": "mcq",
-      "difficulty": "easy",
-      "question": "Which two transport mechanisms does MCP support?",
+      "difficulty": "medium",
+      "question": "Which statement about server/discover is correct?",
       "options": [
         {
           "letter": "A",
-          "text": "WebSocket and gRPC"
+          "text": "Both sides MUST use it: it replaces initialize as the mandatory first exchange"
         },
         {
           "letter": "B",
-          "text": "Stdio and Streamable HTTP"
+          "text": "It is optional on both sides and exists only for the Inspector's UI"
         },
         {
           "letter": "C",
-          "text": "TCP sockets and GraphQL"
+          "text": "Clients MUST call it first; servers MAY implement it if they advertise capabilities"
         },
         {
           "letter": "D",
-          "text": "MQTT and Server-Sent Events only"
+          "text": "Servers MUST implement it; clients MAY call it before any other request"
         }
       ],
-      "answer": "B",
-      "explanation": "MCP supports the stdio transport (standard input/output for local processes) and the Streamable HTTP transport (HTTP POST with optional Server-Sent Events, used for remote servers).",
+      "explanation": "Servers MUST implement server/discover. Calling it is optional for clients: a client may invoke any RPC inline and handle UnsupportedProtocolVersionError (-32022) if its version is not supported. It is also the stdio probe for telling modern servers from legacy ones.",
       "tags": [
-        "architecture",
-        "transports"
-      ]
+        "discover",
+        "clients"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/server/discover",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch2-q4",
       "chapter": 2,
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "What underlying RPC protocol does MCP's data layer use?",
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "You move a working server from stdio to Streamable HTTP. Which part of your implementation has to change?",
       "options": [
         {
           "letter": "A",
-          "text": "gRPC"
+          "text": "Only the method names, which carry a different prefix on HTTP transports than on stdio"
         },
         {
           "letter": "B",
-          "text": "SOAP"
+          "text": "Neither: the SDK negotiates the transport, so no code changes at all"
         },
         {
           "letter": "C",
-          "text": "JSON-RPC 2.0"
+          "text": "Only the transport plumbing; the JSON-RPC methods and message shapes are identical"
         },
         {
           "letter": "D",
-          "text": "REST over HTTP/2"
+          "text": "Both: HTTP transports use a REST mapping instead of JSON-RPC messages"
         }
       ],
-      "answer": "C",
-      "explanation": "The data layer implements a JSON-RPC 2.0 based exchange protocol that defines message structure and semantics, and the same JSON-RPC format is used across all transports.",
+      "explanation": "MCP separates a data layer (JSON-RPC 2.0 messages and their semantics) from a transport layer (stdio or Streamable HTTP). The same tools/call looks the same on both; what changes is framing, headers and authorization.",
       "tags": [
-        "architecture",
-        "data-layer",
-        "json-rpc"
-      ]
+        "layers",
+        "portability"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/architecture",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch2-q5",
       "chapter": 2,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "As of protocol version 2026-07-28, MCP is described as a stateless protocol. What does this mean in practice?",
+      "difficulty": "hard",
+      "question": "How do a client and server learn what each other supports in 2026-07-28?",
       "options": [
         {
           "letter": "A",
-          "text": "Servers never store any data anywhere"
+          "text": "Client capabilities ride in every request's _meta; server capabilities come from server/discover"
         },
         {
           "letter": "B",
-          "text": "Every request carries the protocol version and relevant capabilities in its _meta field, so servers can process each request on its own"
+          "text": "Capabilities are declared in the transport headers and mirrored into the body"
         },
         {
           "letter": "C",
-          "text": "Clients must reconnect after every request"
+          "text": "The client calls server/discover, and the server calls client/discover in return"
         },
         {
           "letter": "D",
-          "text": "Notifications are no longer supported"
+          "text": "Both sides exchange their capabilities once, in the initialize handshake, and cache them for the connection"
         }
       ],
-      "answer": "B",
-      "explanation": "Statelessness means each request is self-contained: the _meta field carries io.modelcontextprotocol/protocolVersion and clientCapabilities (and normally clientInfo), so the server infers nothing from previous requests.",
+      "explanation": "There is no handshake. Clients include io.modelcontextprotocol/clientCapabilities on every request, and servers advertise theirs in the server/discover result, which clients MAY call but are not required to.",
       "tags": [
-        "architecture",
-        "statelessness",
-        "meta"
-      ]
+        "capabilities",
+        "negotiation"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/architecture",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch2-q6",
       "chapter": 2,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which request lets a client learn a server's supported protocol versions, capabilities, and identity in a single call?",
+      "difficulty": "hard",
+      "question": "In one host, the CRM server's calls fail while the filesystem server's calls succeed. What does the architecture tell you about where to look?",
       "options": [
         {
           "letter": "A",
-          "text": "initialize"
+          "text": "At that one client-server relationship: its config, transport, authorization or server"
         },
         {
           "letter": "B",
-          "text": "server/discover"
+          "text": "At the host's client pool, since a single client multiplexes both of the server connections"
         },
         {
           "letter": "C",
-          "text": "capabilities/get"
+          "text": "At the shared session store, because both servers read the same session state"
         },
         {
           "letter": "D",
-          "text": "server/handshake"
+          "text": "At the model, since it selects which server's tools to call for each request"
         }
       ],
-      "answer": "B",
-      "explanation": "The mandatory server/discover request returns supportedVersions, the server's capabilities object, and serverInfo in _meta. Calling it is optional for clients, since every request already carries per-request metadata, but every server must implement it.",
+      "explanation": "Each client talks to exactly one server, so a failure confined to one server lives in that relationship. A host-wide fault would affect both. There is no shared session store: 2026-07-28 removed protocol sessions.",
       "tags": [
-        "architecture",
-        "discovery"
-      ]
+        "isolation",
+        "fault-localization"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/architecture",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch2-q7",
       "chapter": 2,
       "type": "mcq",
       "difficulty": "hard",
-      "question": "How does a client opt in to receiving change notifications (such as tool list changes) from a server in protocol version 2026-07-28?",
+      "question": "A gateway process exposes tools to a host and, to answer them, calls three upstream MCP servers itself. Is that allowed, and what is it?",
       "options": [
         {
           "letter": "A",
-          "text": "Notifications are always sent automatically to every connected client"
+          "text": "Yes, but only if the gateway declares itself a proxy in server/discover"
         },
         {
           "letter": "B",
-          "text": "The client polls notifications/poll every few seconds"
+          "text": "Yes: one process can be a server to its caller and a client to its upstreams"
         },
         {
           "letter": "C",
-          "text": "The client opens a long-lived subscriptions/listen stream naming the notification types it wants"
+          "text": "No: a process must pick one role, so the gateway must proxy raw bytes instead"
         },
         {
           "letter": "D",
-          "text": "The client sets a webhook URL during initialization"
+          "text": "No: chaining is possible only through the registry, which brokers the connections"
         }
       ],
-      "answer": "C",
-      "explanation": "Change notifications are opt-in: the client sends a subscriptions/listen request with a notifications filter (e.g., toolsListChanged: true). The server acknowledges with notifications/subscriptions/acknowledged and delivers matching notifications on that stream.",
+      "explanation": "Roles are per-connection, not per-process, so composition is normal: the gateway is a server downstream and a client upstream. It carries the usual server duties toward its caller, including not passing tokens through to upstreams.",
       "tags": [
-        "architecture",
-        "notifications",
-        "subscriptions"
-      ]
-    },
-    {
-      "id": "ch2-q8",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "In a subscriptions/listen flow, what value does the io.modelcontextprotocol/subscriptionId field in each notification's _meta carry?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "A random UUID generated per notification"
-        },
-        {
-          "letter": "B",
-          "text": "The JSON-RPC ID of the subscriptions/listen request that opened the stream"
-        },
-        {
-          "letter": "C",
-          "text": "The server's version string"
-        },
-        {
-          "letter": "D",
-          "text": "A monotonically increasing sequence number"
-        }
+        "roles",
+        "composability"
       ],
-      "answer": "B",
-      "explanation": "Every notification on the stream carries a subscriptionId equal to the JSON-RPC ID of the subscriptions/listen request that opened it, letting clients correlate notifications with the subscription that produced them.",
-      "tags": [
-        "architecture",
-        "notifications",
-        "subscriptions"
-      ]
-    },
-    {
-      "id": "ch2-q9",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "What guarantee does MCP make about delivery of change notifications?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Exactly-once delivery is guaranteed"
-        },
-        {
-          "letter": "B",
-          "text": "At-least-once delivery is guaranteed"
-        },
-        {
-          "letter": "C",
-          "text": "Delivery is best effort; clients should also rely on polling to preserve freshness"
-        },
-        {
-          "letter": "D",
-          "text": "Notifications are retried indefinitely until acknowledged"
-        }
-      ],
-      "answer": "C",
-      "explanation": "Notifications are best effort — there is no guarantee every notification is sent or received, particularly across transport reconnects, so clients should also poll to keep results fresh.",
-      "tags": [
-        "architecture",
-        "notifications"
-      ]
-    },
-    {
-      "id": "ch2-q10",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which statement about local vs remote MCP servers is correct?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Local servers typically use the STDIO transport and serve a single client, while remote servers typically use Streamable HTTP and serve many clients"
-        },
-        {
-          "letter": "B",
-          "text": "Local servers must use HTTP; remote servers must use STDIO"
-        },
-        {
-          "letter": "C",
-          "text": "Remote servers cannot expose tools, only resources"
-        },
-        {
-          "letter": "D",
-          "text": "A server's location changes its protocol semantics"
-        }
-      ],
-      "answer": "A",
-      "explanation": "'MCP server' refers to the program serving context regardless of where it runs. Local servers use STDIO and typically serve one client; remote servers use Streamable HTTP and typically serve many clients. The data layer semantics stay the same.",
-      "tags": [
-        "architecture",
-        "transports"
-      ]
-    },
-    {
-      "id": "ch2-q11",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "In the 2026-07-28 spec, what are the ttlMs and cacheScope fields returned in results like server/discover and tools/list used for?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Rate limiting the client's requests"
-        },
-        {
-          "letter": "B",
-          "text": "Caching: ttlMs is a freshness hint in milliseconds and cacheScope indicates who may reuse the response"
-        },
-        {
-          "letter": "C",
-          "text": "Timing out slow tool calls"
-        },
-        {
-          "letter": "D",
-          "text": "Configuring the transport keep-alive interval"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Results carry caching hints: ttlMs tells the client how long the result stays fresh (e.g., a tool list cacheable for five minutes), and cacheScope indicates who may reuse it (e.g., public). A cached list should also be treated as stale once a list_changed notification arrives.",
-      "tags": [
-        "architecture",
-        "caching"
-      ]
-    },
-    {
-      "id": "ch2-q12",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "According to the specification overview, MCP takes inspiration from which existing protocol?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The Language Server Protocol (LSP)"
-        },
-        {
-          "letter": "B",
-          "text": "The Simple Mail Transfer Protocol (SMTP)"
-        },
-        {
-          "letter": "C",
-          "text": "The Border Gateway Protocol (BGP)"
-        },
-        {
-          "letter": "D",
-          "text": "The Session Initiation Protocol (SIP)"
-        }
-      ],
-      "answer": "A",
-      "explanation": "The spec notes that MCP takes inspiration from the Language Server Protocol, which standardized language support across development tools; MCP similarly standardizes integrating context and tools into AI applications.",
-      "tags": [
-        "architecture",
-        "spec",
-        "history"
-      ]
-    },
-    {
-      "id": "ch2-q13",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "What is the authoritative source of truth for the MCP specification's protocol requirements?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The TypeScript schema (schema.ts) in the specification repository"
-        },
-        {
-          "letter": "B",
-          "text": "A PDF published annually"
-        },
-        {
-          "letter": "C",
-          "text": "The Python SDK source code"
-        },
-        {
-          "letter": "D",
-          "text": "The MCP Inspector's behavior"
-        }
-      ],
-      "answer": "A",
-      "explanation": "The specification defines the authoritative protocol requirements based on the TypeScript schema in schema.ts for each protocol version (e.g., schema/2026-07-28/schema.ts).",
-      "tags": [
-        "architecture",
-        "spec",
-        "schema"
-      ]
-    },
-    {
-      "id": "ch2-q14",
-      "chapter": 2,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "SCENARIO: A client sends a request declaring protocol version 2026-07-28 in _meta, but the server only supports 2025-11-25. What happens according to the discovery/versioning model?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The server silently downgrades and answers in the older format"
-        },
-        {
-          "letter": "B",
-          "text": "The server rejects the request with an UnsupportedProtocolVersionError listing the versions it supports, and the client retries with a mutually supported version"
-        },
-        {
-          "letter": "C",
-          "text": "The transport connection is terminated with no explanation"
-        },
-        {
-          "letter": "D",
-          "text": "The server forwards the request to a newer server"
-        }
-      ],
-      "answer": "B",
-      "explanation": "If a server doesn't support the requested version, it rejects the request with an UnsupportedProtocolVersionError (-32022) whose data lists supported versions; the client can then retry with a version both sides support. server/discover's supportedVersions lets clients learn this up front.",
-      "tags": [
-        "architecture",
-        "versioning",
-        "scenario"
-      ]
-    },
-    {
-      "id": "ch2-q15",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "How do the data layer and transport layer relate conceptually in MCP?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The data layer is the inner layer (JSON-RPC protocol, primitives) and the transport layer is the outer layer (connections, framing, authorization)"
-        },
-        {
-          "letter": "B",
-          "text": "They are the same layer viewed from different sides"
-        },
-        {
-          "letter": "C",
-          "text": "The transport layer defines tools; the data layer defines HTTP headers"
-        },
-        {
-          "letter": "D",
-          "text": "The data layer only exists for stdio servers"
-        }
-      ],
-      "answer": "A",
-      "explanation": "Conceptually the data layer (JSON-RPC 2.0 exchange, discovery, primitives, notifications) is the inner layer, wrapped by the transport layer (stdio or Streamable HTTP), which handles connection establishment, message framing, and authorization while keeping the same JSON-RPC format everywhere.",
-      "tags": [
-        "architecture",
-        "layers"
-      ]
-    },
-    {
-      "id": "ch2-q16",
-      "chapter": 2,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "SCENARIO: An MCP host connects to 3 different MCP servers, and one of those servers (a remote one) also serves 50 other users' hosts. Describe the cardinality correctly.",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The host instantiates 3 MCP clients — one per server, each holding a dedicated 1:1 connection; the remote server meanwhile serves many clients (one per connected host)"
-        },
-        {
-          "letter": "B",
-          "text": "One client multiplexes all 3 servers"
-        },
-        {
-          "letter": "C",
-          "text": "Each server requires 3 clients"
-        },
-        {
-          "letter": "D",
-          "text": "Hosts connect to servers directly without clients"
-        }
-      ],
-      "answer": "A",
-      "explanation": "Cardinality: Host → many clients; each client ↔ exactly one server (dedicated connection). Local STDIO servers typically serve a single client, while remote Streamable HTTP servers typically serve many clients across hosts.",
-      "tags": [
-        "architecture",
-        "cardinality",
-        "participants",
-        "scenario"
-      ]
-    },
-    {
-      "id": "ch2-q17",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "How does Streamable HTTP differ from the legacy HTTP+SSE transport it replaced?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "They are identical apart from the name"
-        },
-        {
-          "letter": "B",
-          "text": "Legacy HTTP+SSE used separate endpoints (a long-lived GET/SSE channel plus a POST endpoint); Streamable HTTP (introduced 2025-03-26) uses a single MCP endpoint where POST carries client messages with optional SSE streaming on the response — and HTTP+SSE is now formally Deprecated"
-        },
-        {
-          "letter": "C",
-          "text": "Streamable HTTP requires WebSockets"
-        },
-        {
-          "letter": "D",
-          "text": "HTTP+SSE was faster and remains recommended"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Streamable HTTP replaced the two-endpoint HTTP+SSE design with a single endpoint supporting POST plus optional SSE streaming. The 2026-07-28 revision reclassified HTTP+SSE as Deprecated under the lifecycle policy, with migration to Streamable HTTP.",
-      "tags": [
-        "architecture",
-        "transports",
-        "http-sse",
-        "streamable-http"
-      ]
-    },
-    {
-      "id": "ch2-q18",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "How does capability negotiation differ between the legacy and modern protocol eras?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "There is no capability negotiation in either era"
-        },
-        {
-          "letter": "B",
-          "text": "Legacy (≤2025-11-25): capabilities are exchanged once in the initialize handshake and apply to the whole session. Modern (2026-07-28): negotiation is per-request — the client declares clientCapabilities in every request's _meta, and the server's capabilities are discoverable via server/discover"
-        },
-        {
-          "letter": "C",
-          "text": "Capabilities are negotiated in DNS TXT records"
-        },
-        {
-          "letter": "D",
-          "text": "Only servers declare capabilities; clients never do"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Capability negotiation ensures unsupported operations are never attempted. Legacy sessions negotiated once at initialize; the stateless modern era moved this to per-request metadata plus the mandatory server/discover RPC, and MissingRequiredClientCapabilityError (-32021) fires when a needed client capability wasn't declared.",
-      "tags": [
-        "architecture",
-        "capabilities",
-        "negotiation",
-        "eras"
-      ]
-    },
-    {
-      "id": "ch2-q19",
-      "chapter": 2,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "SCENARIO: In the docs' example, Visual Studio Code connects to the Sentry MCP server and then also to the local filesystem server. What happens inside VS Code?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "One shared client object handles both servers"
-        },
-        {
-          "letter": "B",
-          "text": "The VS Code runtime (the host) instantiates one MCP client object per connection — a second client is created for the filesystem server, each maintaining its own dedicated connection"
-        },
-        {
-          "letter": "C",
-          "text": "Sentry proxies the filesystem traffic"
-        },
-        {
-          "letter": "D",
-          "text": "VS Code must restart between servers"
-        }
-      ],
-      "answer": "B",
-      "explanation": "This example illustrates the participant model: VS Code acts as the MCP host; connecting to each additional server instantiates an additional MCP client object dedicated to that server.",
-      "tags": [
-        "architecture",
-        "participants",
-        "scenario",
-        "hosts"
-      ]
-    },
-    {
-      "id": "ch2-q20",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "In the 2026-07-28 revision, what replaced the initialize/notifications/initialized handshake?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "A new handshake/start method that must be called once per connection"
-        },
-        {
-          "letter": "B",
-          "text": "Every request carries its protocol version and client capabilities in _meta; server/discover is available for up-front discovery"
-        },
-        {
-          "letter": "C",
-          "text": "An HTTP-only Mcp-Session-Id header that carries the negotiated capabilities"
-        },
-        {
-          "letter": "D",
-          "text": "A TLS extension that embeds the protocol version in the certificate"
-        }
-      ],
-      "answer": "B",
-      "explanation": "SEP-2575 removed the handshake entirely. Each request self-describes via _meta (io.modelcontextprotocol/protocolVersion and clientCapabilities), and clients MAY call server/discover for up-front version/capability discovery. (Spec 2026-07-28 changelog, major change 2-3.)",
-      "tags": [
-        "stateless-core",
-        "meta",
-        "handshake"
-      ]
-    },
-    {
-      "id": "ch2-q21",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "Which _meta fields are REQUIRED on every client request in protocol version 2026-07-28?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "io.modelcontextprotocol/protocolVersion, clientCapabilities, and clientInfo"
-        },
-        {
-          "letter": "B",
-          "text": "io.modelcontextprotocol/protocolVersion and clientCapabilities only"
-        },
-        {
-          "letter": "C",
-          "text": "io.modelcontextprotocol/clientInfo and clientCapabilities only"
-        },
-        {
-          "letter": "D",
-          "text": "io.modelcontextprotocol/protocolVersion only"
-        }
-      ],
-      "answer": "B",
-      "explanation": "protocolVersion and clientCapabilities are required on every request. clientInfo is a SHOULD (recommended but optional), and logLevel is optional. A common trap is treating clientInfo as required. (Spec basic/index, per-request protocol fields table.)",
-      "tags": [
-        "stateless-core",
-        "meta"
-      ]
-    },
-    {
-      "id": "ch2-q22",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "A request arrives missing the required io.modelcontextprotocol/clientCapabilities _meta field. What must the server return?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "-32021 MissingRequiredClientCapability"
-        },
-        {
-          "letter": "B",
-          "text": "-32602 Invalid params, and on HTTP a 400 Bad Request status"
-        },
-        {
-          "letter": "C",
-          "text": "-32600 Invalid request, and on HTTP a 401 status"
-        },
-        {
-          "letter": "D",
-          "text": "It should process the request assuming empty capabilities"
-        }
-      ],
-      "answer": "B",
-      "explanation": "A request missing a required _meta field is malformed: the server MUST reject it with -32602 (Invalid params) and HTTP 400. -32021 is different: it applies when the fields are present but a needed capability was not declared. (Spec basic/index.)",
-      "tags": [
-        "stateless-core",
-        "meta",
-        "error-codes"
-      ]
-    },
-    {
-      "id": "ch2-q23",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "A client's request includes valid _meta, but processing it requires a capability the client did not declare in clientCapabilities. What does the spec require?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The server proceeds and hopes the client can handle the response"
-        },
-        {
-          "letter": "B",
-          "text": "The server returns -32602 Invalid params"
-        },
-        {
-          "letter": "C",
-          "text": "The server returns MissingRequiredClientCapabilityError (-32021) with data.requiredCapabilities listing what is missing, HTTP 400"
-        },
-        {
-          "letter": "D",
-          "text": "The server silently downgrades to a reduced feature set"
-        }
-      ],
-      "answer": "C",
-      "explanation": "A server MUST NOT rely on capabilities the client has not declared. If a needed capability is absent, it MUST return -32021 with data.requiredCapabilities listing the missing capabilities (HTTP 400). (Spec basic/index.)",
-      "tags": [
-        "stateless-core",
-        "capabilities",
-        "error-codes"
-      ]
-    },
-    {
-      "id": "ch2-q24",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which statement about server/discover is correct in 2026-07-28?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Clients MUST call it before any other request"
-        },
-        {
-          "letter": "B",
-          "text": "Servers MUST implement it; clients MAY call it (e.g., for up-front version selection or as a stdio backward-compatibility probe)"
-        },
-        {
-          "letter": "C",
-          "text": "It is optional for servers but mandatory for clients on stdio"
-        },
-        {
-          "letter": "D",
-          "text": "It replaces tools/list, prompts/list, and resources/list"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Servers MUST implement server/discover, but calling it is optional for clients - a client can invoke any RPC inline and handle UnsupportedProtocolVersionError. It is useful for presenting server info in one request and as the stdio legacy-vs-modern probe. (Spec server/discover.)",
-      "tags": [
-        "stateless-core",
-        "discovery"
-      ]
-    },
-    {
-      "id": "ch2-q25",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which set of information does a server/discover result carry?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "supportedVersions, capabilities (including extensions), serverInfo in _meta, optional instructions, plus ttlMs and cacheScope"
-        },
-        {
-          "letter": "B",
-          "text": "Only supportedVersions and a session token"
-        },
-        {
-          "letter": "C",
-          "text": "The complete tools, prompts, and resources catalogs"
-        },
-        {
-          "letter": "D",
-          "text": "The server's OAuth client_id and scopes_supported"
-        }
-      ],
-      "answer": "A",
-      "explanation": "DiscoverResult includes supportedVersions, capabilities, _meta['io.modelcontextprotocol/serverInfo'], and optional instructions; the operation supports caching, so it also carries ttlMs and cacheScope. It does not return full primitive catalogs. (Spec server/discover.)",
-      "tags": [
-        "stateless-core",
-        "discovery",
-        "caching"
-      ]
-    },
-    {
-      "id": "ch2-q26",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "A stdio server keeps a long-lived process per client and infers 'this connection already told me its capabilities' from an earlier request. Why does this violate 2026-07-28?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "stdio servers must restart after each request"
-        },
-        {
-          "letter": "B",
-          "text": "Servers MUST NOT rely on prior requests over the same connection for context; an open connection is not a session, and clients may interleave unrelated requests on one transport"
-        },
-        {
-          "letter": "C",
-          "text": "Capabilities may only be transmitted over HTTP headers"
-        },
-        {
-          "letter": "D",
-          "text": "It is allowed, as long as the process was launched by the client"
-        }
-      ],
-      "answer": "B",
-      "explanation": "MCP is stateless: every request supplies its own metadata in _meta, and connection or process identity is explicitly not a proxy for session continuity. Cross-request state must use explicit identifiers passed on each request. (Spec basic/index, Statelessness.)",
-      "tags": [
-        "stateless-core",
-        "statelessness",
-        "stdio"
-      ]
-    },
-    {
-      "id": "ch2-q27",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "A Streamable HTTP response stream breaks mid-request in the modern era. What must the client do?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Reconnect with the Last-Event-ID header to resume the stream"
-        },
-        {
-          "letter": "B",
-          "text": "Send notifications/resume with the old request ID"
-        },
-        {
-          "letter": "C",
-          "text": "Re-issue the lost request as a new request with a new request ID"
-        },
-        {
-          "letter": "D",
-          "text": "Wait for the server to replay missed SSE events"
-        }
-      ],
-      "answer": "C",
-      "explanation": "SSE resumability (Last-Event-ID and event IDs) was removed in 2026-07-28. A broken response stream loses the in-flight request; the client MUST re-issue it as a new request with a new ID. (Spec 2026-07-28 changelog, major change 9.)",
-      "tags": [
-        "stateless-core",
-        "transports",
-        "sse"
-      ]
-    },
-    {
-      "id": "ch2-q28",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "Which statement about the resultType field is FALSE under 2026-07-28?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "A result with an unrecognized resultType value must be considered invalid by the client"
-        },
-        {
-          "letter": "B",
-          "text": "Clients must treat an absent resultType from an earlier-protocol server as \"complete\""
-        },
-        {
-          "letter": "C",
-          "text": "Extensions may add resultType values, but only ones advertised via capabilities count as supported"
-        },
-        {
-          "letter": "D",
-          "text": "A modern server may omit resultType on small results to save bytes"
-        }
-      ],
-      "answer": "D",
-      "explanation": "Every result MUST include resultType in 2026-07-28 - there is no size exception. The other three statements are the exact spec rules: unrecognized values are invalid, absence from legacy servers means \"complete\", and extensions extend the value set via advertised capabilities. (Spec basic/index, ResultType.)",
-      "tags": [
-        "stateless-core",
-        "result-type"
-      ]
-    },
-    {
-      "id": "ch2-q29",
-      "chapter": 2,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Where does a modern server identify itself, and how much should clients trust that identity?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "In io.modelcontextprotocol/serverInfo within each result's _meta (SHOULD); it is self-reported and must not drive security decisions"
-        },
-        {
-          "letter": "B",
-          "text": "In a signed X-Server-Identity HTTP header that clients MUST verify"
-        },
-        {
-          "letter": "C",
-          "text": "Only in the server/discover response; other results never carry identity"
-        },
-        {
-          "letter": "D",
-          "text": "In the OAuth token's aud claim"
-        }
-      ],
-      "answer": "A",
-      "explanation": "Servers SHOULD include io.modelcontextprotocol/serverInfo in every result's _meta. It is self-reported, intended for display/logging/debugging; implementations SHOULD NOT change behavior or make security decisions based on it. (Spec basic/index, per-response protocol fields.)",
-      "tags": [
-        "stateless-core",
-        "meta",
-        "server-info"
-      ]
-    },
-    {
-      "id": "ch2-scenario-extra-1",
-      "chapter": 2,
-      "type": "scenario",
-      "difficulty": "easy",
-      "question": "You are drawing a test architecture. One desktop host connects to a filesystem server and a CRM server at the same time. Which structure is correct?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "One client instance talks directly to both servers"
-        },
-        {
-          "letter": "B",
-          "text": "The host manages separate client instances, each communicating with one server"
-        },
-        {
-          "letter": "C",
-          "text": "Both servers must share one client process and one JSON-RPC id space"
-        },
-        {
-          "letter": "D",
-          "text": "A server creates a client for the host"
-        }
-      ],
-      "answer": "B",
-      "explanation": "The host can manage many clients, but each MCP client communicates with exactly one server. Think: host has clients; each client talks to one server.",
-      "tags": [
-        "architecture",
-        "cardinality",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch2-scenario-extra-2",
-      "chapter": 2,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A defect is filed because TLS termination is implemented in the transport/gateway layer rather than inside JSON-RPC method handling. Is that inherently an MCP layering violation?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Yes; TLS belongs to the data layer"
-        },
-        {
-          "letter": "B",
-          "text": "No; transport concerns such as connections and transport-level auth belong to the transport layer"
-        },
-        {
-          "letter": "C",
-          "text": "Yes; all security must be implemented by tools/call"
-        },
-        {
-          "letter": "D",
-          "text": "No, because MCP has no transport layer"
-        }
-      ],
-      "answer": "B",
-      "explanation": "MCP separates the data layer (JSON-RPC semantics and MCP primitives) from the transport layer (connections, framing, transport-level security/auth concerns).",
-      "tags": [
-        "architecture",
-        "layers",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch2-scenario-extra-3",
-      "chapter": 2,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A remote MCP server accepts connections from many users. A tester assumes this means one MCP client object should be shared by all those users. What is wrong with the assumption?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Nothing; client objects are globally shared by definition"
-        },
-        {
-          "letter": "B",
-          "text": "Remote servers may serve many clients, but the client-to-server protocol relationship is still one client instance to one server"
-        },
-        {
-          "letter": "C",
-          "text": "Remote servers are limited to one client"
-        },
-        {
-          "letter": "D",
-          "text": "Only stdio can have clients"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Server multi-client capacity does not change the client cardinality rule: an MCP client instance communicates with one server.",
-      "tags": [
-        "architecture",
-        "cardinality",
-        "tester-scenario"
-      ]
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/architecture",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     }
   ]
 }

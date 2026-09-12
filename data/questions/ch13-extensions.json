@@ -1,716 +1,286 @@
 {
   "meta": {
-    "title": "MCP Question Bank — Chapter 13: Extensions (MCP Apps, Tasks, Auth Extensions)",
+    "title": "MCP Question Bank — Chapter 13: Extensions",
     "protocolVersion": "2026-07-28",
     "chapter": 13,
-    "chapterName": "Extensions (MCP Apps, Tasks, Auth Extensions)",
-    "questionCount": 22
+    "chapterName": "Extensions",
+    "examDomain": "Use Cases & Ecosystem",
+    "mode": "single_select",
+    "questionCount": 8,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
   },
   "questions": [
     {
       "id": "ch13-q1",
       "chapter": 13,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "easy",
-      "question": "What are MCP extensions?",
+      "question": "Your client polls tasks/get and wants to stop polling as soon as the status can no longer change. Which statuses mean it can stop?",
       "options": [
         {
           "letter": "A",
-          "text": "Mandatory add-ons every implementation must support"
+          "text": "completed and failed only, since a cancelled task may still finish"
         },
         {
           "letter": "B",
-          "text": "Optional, versioned additions to the core protocol that require explicit support from both client and server, negotiated via the extension capabilities mechanism"
+          "text": "completed only, because failed and cancelled tasks are retried automatically"
         },
         {
           "letter": "C",
-          "text": "Browser plugins for the Inspector"
+          "text": "completed, failed and cancelled: once reached, the state does not change"
         },
         {
           "letter": "D",
-          "text": "Paid features licensed by Anthropic"
+          "text": "completed, failed, cancelled and input_required"
         }
       ],
-      "answer": "B",
-      "explanation": "Extensions add modular, specialized, or experimental functionality beyond the core protocol. They are always opt-in and negotiated: clients declare them in the extensions field of clientCapabilities, and servers advertise theirs via server/discover.",
+      "explanation": "working and input_required are transient; completed, failed and cancelled are terminal. Cancellation is cooperative, so a cancelled request may still end up completed or failed, but once a terminal state is reached the task does not change again.",
       "tags": [
-        "extensions",
-        "basics"
-      ]
+        "tasks",
+        "statuses"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "extensions/tasks/overview",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch13-q2",
       "chapter": 13,
       "type": "mcq",
       "difficulty": "medium",
-      "question": "What format do extension identifiers follow?",
+      "question": "Which set of task methods exists in the 2026-07-28 Tasks extension?",
       "options": [
         {
           "letter": "A",
-          "text": "{vendor-prefix}/{extension-name}, e.g., io.modelcontextprotocol/tasks; official extensions use the io.modelcontextprotocol prefix"
+          "text": "tasks/get, tasks/update, tasks/cancel"
         },
         {
           "letter": "B",
-          "text": "Sequential integers assigned by the registry"
+          "text": "tasks/create, tasks/poll, tasks/cancel"
         },
         {
           "letter": "C",
-          "text": "UUIDs"
+          "text": "tasks/get, tasks/result, tasks/cancel"
         },
         {
           "letter": "D",
-          "text": "ext-<name>-v<number> only"
+          "text": "tasks/get, tasks/list, tasks/result"
         }
       ],
-      "answer": "A",
-      "explanation": "Extensions are identified as {vendor-prefix}/{extension-name}. Official extensions use the io.modelcontextprotocol vendor prefix and live in MCP GitHub org repositories with an ext- prefix (ext-apps, ext-tasks, ext-auth).",
+      "explanation": "The redesign replaced the blocking tasks/result with polling via tasks/get, added tasks/update for client-to-server input, and removed tasks/list. Tasks are created by the server returning a CreateTaskResult, not by a tasks/create call.",
       "tags": [
-        "extensions",
-        "identifiers"
-      ]
+        "tasks",
+        "methods"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "extensions/tasks/overview",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch13-q3",
       "chapter": 13,
       "type": "mcq",
       "difficulty": "medium",
-      "question": "How is extension support negotiated in the 2026-07-28 protocol?",
+      "question": "Which identifier format do official MCP extensions use, and where do they live?",
       "options": [
         {
           "letter": "A",
-          "text": "Via a dedicated extensions/negotiate RPC"
+          "text": "A reverse-DNS name owned by the implementing vendor, such as com.acme/tasks"
         },
         {
           "letter": "B",
-          "text": "Clients declare supported extensions in the extensions field of the io.modelcontextprotocol/clientCapabilities sent in each request's _meta; servers advertise theirs in the capabilities returned by server/discover"
+          "text": "A semantic version string such as tasks@1.2.0, kept in the main specification repository itself"
         },
         {
           "letter": "C",
-          "text": "By exchanging config files out of band"
+          "text": "A bare name such as tasks, registered in the MCP Registry"
         },
         {
           "letter": "D",
-          "text": "Extensions are enabled by default unless disabled"
+          "text": "A vendor prefix plus name, such as io.modelcontextprotocol/tasks, in ext-* repositories"
         }
       ],
-      "answer": "B",
-      "explanation": "The changelog added an extensions field to both ClientCapabilities and ServerCapabilities. Both sides must declare support — extensions are never active by default.",
+      "explanation": "Extension identifiers follow the _meta key rules with a mandatory prefix; official ones use the io.modelcontextprotocol prefix and live in repositories prefixed ext- (experimental ones in experimental-ext-). Third parties use a reverse-DNS prefix they own.",
       "tags": [
         "extensions",
-        "negotiation",
-        "capabilities"
-      ]
+        "identifiers"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "extensions/overview",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch13-q4",
       "chapter": 13,
       "type": "mcq",
-      "difficulty": "easy",
-      "question": "What do MCP Apps enable?",
+      "difficulty": "hard",
+      "question": "A Tasks-extension task reaches status input_required. How does the client supply the answer?",
       "options": [
         {
           "letter": "A",
-          "text": "Running MCP servers inside mobile apps"
+          "text": "By opening subscriptions/listen and sending the answers on that stream"
         },
         {
           "letter": "B",
-          "text": "Servers delivering interactive UI elements (charts, forms, dashboards, video players) that render inline within conversations in MCP hosts"
+          "text": "tasks/update with the taskId and inputResponses"
         },
         {
           "letter": "C",
-          "text": "Compiling servers to native binaries"
+          "text": "By retrying the original tools/call with inputResponses and requestState"
         },
         {
           "letter": "D",
-          "text": "App-store distribution of servers"
+          "text": "By calling tasks/result with the answers attached"
         }
       ],
-      "answer": "B",
-      "explanation": "MCP Apps let tools return interactive HTML interfaces rendered directly in the chat — data visualizations, forms, dashboards — instead of only text and structured data.",
+      "explanation": "This is the classic trap: core MRTR answers by retrying the original request, but the Tasks extension answers with tasks/update against the taskId. tasks/result does not exist in the redesigned extension.",
       "tags": [
-        "extensions",
-        "mcp-apps"
-      ]
+        "tasks",
+        "input"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "extensions/tasks/overview",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch13-q5",
       "chapter": 13,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "How does an MCP App link a tool to its user interface?",
+      "difficulty": "hard",
+      "question": "Who decides that a particular request becomes a task, and how is that possible without a per-call flag?",
       "options": [
         {
           "letter": "A",
-          "text": "The tool declares a UI resource using the ui:// URI scheme, and references it via metadata (_meta.ui.resourceUri) so the host can fetch and render it"
+          "text": "The server decides once per connection and applies that decision to every request that follows"
         },
         {
           "letter": "B",
-          "text": "The tool returns raw HTML in its text content"
+          "text": "The server decides per request; the client opts in once through the extension capability"
         },
         {
           "letter": "C",
-          "text": "The host guesses the UI from the tool name"
+          "text": "The host decides, based on how long previous calls to that tool took"
         },
         {
           "letter": "D",
-          "text": "UIs are uploaded to the registry separately"
+          "text": "The client decides per call, by setting a task flag in the request params"
         }
       ],
-      "answer": "A",
-      "explanation": "MCP Apps introduces predeclared UI resources on the ui:// scheme (MIME type text/html;profile=mcp-app), tool-UI linkage via _meta.ui.resourceUri, and bidirectional communication — the extension identifier is io.modelcontextprotocol/ui.",
+      "explanation": "Tasks are server-directed: the client declares io.modelcontextprotocol/tasks in its per-request capabilities and must then handle either result shape, while the server chooses per request whether to return a CreateTaskResult. Returning a task to a client that did not declare support is a violation.",
       "tags": [
-        "extensions",
-        "mcp-apps",
-        "ui-resources"
-      ]
+        "tasks",
+        "opt-in"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "extensions/tasks/overview",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch13-q6",
       "chapter": 13,
-      "type": "scenario",
+      "type": "mcq",
       "difficulty": "hard",
-      "question": "SCENARIO: A user clicks a button inside an MCP App's rendered widget, which triggers another tool call. From a security standpoint, how does this action flow?",
+      "question": "How does a tool tell a host that it has an MCP App interface, and how is that interface rendered?",
       "options": [
         {
           "letter": "A",
-          "text": "The iframe calls the server's API directly over the network"
+          "text": "The tool returns an HTML content block, which the host injects into the conversation"
         },
         {
           "letter": "B",
-          "text": "The UI runs in a mandatory sandboxed iframe and communicates with the host via JSON-RPC over postMessage; the tool call is proxied through the host and goes through the host's ordinary audit and consent path"
+          "text": "The server exposes a resource with mimeType text/html, which the host opens in a browser tab"
         },
         {
           "letter": "C",
-          "text": "The click is converted to a shell command"
+          "text": "The tool's outputSchema declares a ui type, which the host renders natively"
         },
         {
           "letter": "D",
-          "text": "UI actions bypass consent because the user already approved rendering"
+          "text": "_meta.ui.resourceUri points at a ui:// resource, rendered in a sandboxed iframe"
         }
       ],
-      "answer": "B",
-      "explanation": "MCP Apps' security model: mandatory iframe sandboxing, host-constructed CSP from server-declared domains (default deny-all network), and auditable JSON-RPC/postMessage communication. A UI-triggered tool call gets the same consent treatment as a direct one.",
+      "explanation": "The tool description carries _meta.ui.resourceUri pointing at a ui:// resource (text/html;profile=mcp-app). Hosts typically render it in a sandboxed iframe, and _meta.ui may also carry csp and permissions.",
       "tags": [
-        "extensions",
         "mcp-apps",
-        "security",
-        "scenario"
-      ]
+        "ui"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "extensions/apps/overview",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch13-q7",
       "chapter": 13,
       "type": "mcq",
-      "difficulty": "easy",
-      "question": "What problem does the Tasks extension solve?",
+      "difficulty": "hard",
+      "question": "An MCP App wants to call a tool in response to a button click. What does the security model say?",
       "options": [
         {
           "letter": "A",
-          "text": "Slow JSON parsing"
+          "text": "It calls the server directly over its own HTTP connection, using the host's token"
         },
         {
           "letter": "B",
-          "text": "Long-running operations: instead of blocking, the server returns a durable task handle so clients can poll for progress, provide mid-flight input, and retrieve the result even after reconnecting"
+          "text": "It may call only tools exposed by the same server, without further checks"
         },
         {
           "letter": "C",
-          "text": "Scheduling cron jobs on the client"
+          "text": "It asks the host over postMessage, and the host applies its normal consent and policy"
         },
         {
           "letter": "D",
-          "text": "Compressing large tool results"
+          "text": "It cannot call tools at all: apps are display-only surfaces"
         }
       ],
-      "answer": "B",
-      "explanation": "Tasks (io.modelcontextprotocol/tasks) address CI pipelines, batch processing, human approvals, and similar work: no long-lived connections, crash resilience via durable task IDs, progress visibility, and mid-flight interaction.",
+      "explanation": "Apps are isolated in a sandboxed iframe and communicate with the host through postMessage using a JSON-RPC dialect (ui/ methods plus shared ones like tools/call). The host controls which capabilities the app may use, and tool calls run through the host's consent path.",
       "tags": [
-        "extensions",
-        "tasks"
-      ]
+        "mcp-apps",
+        "security"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "extensions/apps/overview",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch13-q8",
       "chapter": 13,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "How is a task returned to the client, and how does the client get the result?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Via a webhook the client registers"
-        },
-        {
-          "letter": "B",
-          "text": "The server returns a CreateTaskResult (resultType: \"task\") with a taskId, initial status, TTL, and suggested poll interval; the client polls tasks/get (respecting pollIntervalMs) until a terminal status, where result or error appears"
-        },
-        {
-          "letter": "C",
-          "text": "The server emails the result"
-        },
-        {
-          "letter": "D",
-          "text": "The client blocks on tasks/result"
-        }
-      ],
-      "answer": "B",
-      "explanation": "The 2026-07-28 redesign replaced the blocking tasks/result with polling via tasks/get (plus tasks/update for input and tasks/cancel). The task must be durably created before the CreateTaskResult is sent.",
-      "tags": [
-        "extensions",
-        "tasks",
-        "polling"
-      ]
-    },
-    {
-      "id": "ch13-q9",
-      "chapter": 13,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which task statuses exist, and which are terminal?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "working, input_required, completed, failed, cancelled — with completed, failed, and cancelled terminal"
-        },
-        {
-          "letter": "B",
-          "text": "queued, running, done"
-        },
-        {
-          "letter": "C",
-          "text": "open and closed"
-        },
-        {
-          "letter": "D",
-          "text": "pending, active, archived, purged"
-        }
-      ],
-      "answer": "A",
-      "explanation": "Tasks carry status metadata: working, input_required (server needs client input via inputRequests/tasks/update), and the terminal states completed (result field), failed (error field), and cancelled. Terminal state never changes.",
-      "tags": [
-        "extensions",
-        "tasks",
-        "lifecycle"
-      ]
-    },
-    {
-      "id": "ch13-q10",
-      "chapter": 13,
       "type": "scenario",
       "difficulty": "hard",
-      "question": "SCENARIO: A server wants to return a task handle for a slow tools/call, but the incoming request's clientCapabilities did not include the tasks extension. What must the server do?",
+      "question": "You call tasks/cancel, and the next tasks/get still shows working, then completed. Is the implementation broken?",
       "options": [
         {
           "letter": "A",
-          "text": "Return the task anyway; clients must handle it"
+          "text": "No: cancellation is cooperative, so a task may still finish before it notices"
         },
         {
           "letter": "B",
-          "text": "Never return a task to a client that didn't declare support — verify the extension in the per-request capabilities first, and otherwise process the request synchronously"
+          "text": "Yes: a cancelled task must report cancelled on the next tasks/get"
         },
         {
           "letter": "C",
-          "text": "Return an empty result"
+          "text": "No, but the server must then re-run the task so that the earlier result is discarded"
         },
         {
           "letter": "D",
-          "text": "Convert the task to an elicitation"
+          "text": "Yes: tasks/cancel must block until the task reaches a terminal state"
         }
       ],
-      "answer": "B",
-      "explanation": "Task creation is server-directed but capability-gated: before returning a CreateTaskResult, the server must verify the client included io.modelcontextprotocol/tasks in its per-request capabilities.",
+      "explanation": "Cancellation is a request, not a kill switch: the server stops work where it can, and a task already past the point of no return may reach completed or failed instead. Once a terminal state is reached it does not change again.",
       "tags": [
-        "extensions",
         "tasks",
-        "scenario",
-        "capabilities"
-      ]
-    },
-    {
-      "id": "ch13-q11",
-      "chapter": 13,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Is task cancellation guaranteed to stop the work?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Yes; tasks/cancel kills the worker immediately"
-        },
-        {
-          "letter": "B",
-          "text": "No — cancellation is cooperative: the server acknowledges the intent, but the task may still reach a non-cancelled terminal status"
-        },
-        {
-          "letter": "C",
-          "text": "Only if the task is younger than its TTL"
-        },
-        {
-          "letter": "D",
-          "text": "Cancellation is not part of the extension"
-        }
+        "cancel"
       ],
-      "answer": "B",
-      "explanation": "tasks/cancel signals intent; the server acks with an empty result and honors it when possible, but is not obligated to stop the work.",
-      "tags": [
-        "extensions",
-        "tasks",
-        "cancellation"
-      ]
-    },
-    {
-      "id": "ch13-q12",
-      "chapter": 13,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "What does the OAuth Client Credentials auth extension add to MCP?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Passwordless logins for humans"
-        },
-        {
-          "letter": "B",
-          "text": "Machine-to-machine authentication via the OAuth 2.1 client credentials flow — no user interaction, using pre-registered client credentials established out of band"
-        },
-        {
-          "letter": "C",
-          "text": "Biometric authentication"
-        },
-        {
-          "letter": "D",
-          "text": "Anonymous access mode"
-        }
-      ],
-      "answer": "B",
-      "explanation": "io.modelcontextprotocol/oauth-client-credentials enables M2M auth for HTTP-based transports where no user is in the loop (e.g., service-to-service agents), building on the baseline authorization requirements.",
-      "tags": [
-        "extensions",
-        "auth",
-        "client-credentials"
-      ]
-    },
-    {
-      "id": "ch13-q13",
-      "chapter": 13,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "What is the purpose of the Enterprise-Managed Authorization (EMA) extension?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Charging enterprises per token"
-        },
-        {
-          "letter": "B",
-          "text": "Centralized access control through the organization's identity provider: employees get connected MCP servers on first login with a single sign-on, no per-app OAuth, and the IdP can enforce which users/groups may use which clients with which servers and scopes"
-        },
-        {
-          "letter": "C",
-          "text": "Replacing OAuth with API keys"
-        },
-        {
-          "letter": "D",
-          "text": "Encrypting all traffic with enterprise certificates"
-        }
-      ],
-      "answer": "B",
-      "explanation": "EMA (now stable) addresses repeated consent prompts in enterprises: the trusted IdP centrally provisions MCP server access — e.g., engineering gets read-only source-control access from a code editor while marketing gets docs read/write — for zero-touch setup.",
-      "tags": [
-        "extensions",
-        "auth",
-        "enterprise"
-      ]
-    },
-    {
-      "id": "ch13-q14",
-      "chapter": 13,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "SCENARIO: A monitoring agent (no human user) must call a protected MCP server nightly, while your employees access the same server through the company IdP with zero-touch setup. Which extensions map to each need?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "MCP Apps for the agent; Tasks for the employees"
-        },
-        {
-          "letter": "B",
-          "text": "OAuth Client Credentials for the machine-to-machine agent; Enterprise-Managed Authorization for centralized, IdP-driven employee access"
-        },
-        {
-          "letter": "C",
-          "text": "Both need Dynamic Client Registration only"
-        },
-        {
-          "letter": "D",
-          "text": "Neither; core MCP forbids unattended access"
-        }
-      ],
-      "answer": "B",
-      "explanation": "The two auth extensions cover exactly these cases: client credentials for M2M auth without a user, and EMA for centrally managed employee access through the enterprise IdP. Both require explicit client support and are never active by default.",
-      "tags": [
-        "extensions",
-        "auth",
-        "scenario"
-      ]
-    },
-    {
-      "id": "ch13-q15",
-      "chapter": 13,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "Where do official MCP extensions live, and how can you check which clients support them?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "In npm only; support is universal"
-        },
-        {
-          "letter": "B",
-          "text": "In MCP GitHub org repositories prefixed ext- (ext-apps, ext-tasks, ext-auth); the docs publish an extension support matrix showing which MCP clients implement which official extensions"
-        },
-        {
-          "letter": "C",
-          "text": "In a private Anthropic repository"
-        },
-        {
-          "letter": "D",
-          "text": "Inside the core schema.ts"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Official extensions are developed in ext-* repos under github.com/modelcontextprotocol, and the Extension Support Matrix page (extensions/client-matrix) tracks per-client support — important because support varies and requires explicit opt-in.",
-      "tags": [
-        "extensions",
-        "ecosystem",
-        "client-matrix"
-      ]
-    },
-    {
-      "id": "ch13-q16",
-      "chapter": 13,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "How is the Tasks extension negotiated in the modern protocol?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "It is on by default for tools/call"
-        },
-        {
-          "letter": "B",
-          "text": "The client includes io.modelcontextprotocol/tasks under extensions in its per-request clientCapabilities; the server advertises the same extension in its server/discover capabilities - and a server must never return a task to a client that did not declare support"
-        },
-        {
-          "letter": "C",
-          "text": "The server sends notifications/tasks/offer once per connection"
-        },
-        {
-          "letter": "D",
-          "text": "The host enables it in claude_desktop_config.json"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Extensions are opt-in on both sides. The server decides per-request whether to create a task (no per-request client flag needed), but only for clients that declared the extension capability. (Tasks extension overview.)",
-      "tags": [
-        "extensions",
-        "tasks",
-        "negotiation"
-      ]
-    },
-    {
-      "id": "ch13-q17",
-      "chapter": 13,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which task methods exist in the redesigned io.modelcontextprotocol/tasks extension, and which were removed?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "tasks/get, tasks/update, tasks/cancel exist; tasks/list was removed and the blocking tasks/result was replaced by polling tasks/get"
-        },
-        {
-          "letter": "B",
-          "text": "tasks/list, tasks/get, tasks/result exist; tasks/cancel was removed"
-        },
-        {
-          "letter": "C",
-          "text": "Only tasks/get exists"
-        },
-        {
-          "letter": "D",
-          "text": "tasks/get, tasks/result, tasks/update exist; tasks/cancel was removed"
-        }
-      ],
-      "answer": "A",
-      "explanation": "The 2026-07-28 redesign removed tasks/list, replaced blocking tasks/result with tasks/get polling, and added tasks/update for client-to-server input. Trap 8: tasks/list and tasks/result do NOT exist. (Changelog major change 6; Tasks extension.)",
-      "tags": [
-        "extensions",
-        "tasks",
-        "methods"
-      ]
-    },
-    {
-      "id": "ch13-q18",
-      "chapter": 13,
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "Which task statuses are terminal?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "working and input_required"
-        },
-        {
-          "letter": "B",
-          "text": "completed, failed, and cancelled"
-        },
-        {
-          "letter": "C",
-          "text": "completed only"
-        },
-        {
-          "letter": "D",
-          "text": "cancelled and input_required"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Once a task reaches completed, failed, or cancelled its state never changes. working and input_required are transient. Cancellation is cooperative, so a cancelled request may still finish in another terminal state. (Tasks extension, task lifecycle.)",
-      "tags": [
-        "extensions",
-        "tasks",
-        "lifecycle"
-      ]
-    },
-    {
-      "id": "ch13-q19",
-      "chapter": 13,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "A polled task reports status input_required. How does the client supply the requested information?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "It retries the original tools/call with inputResponses, exactly like core MRTR"
-        },
-        {
-          "letter": "B",
-          "text": "It reads the inputRequests map from the tasks/get response and submits the answers via tasks/update (the server acks and ignores unknown or already-satisfied keys)"
-        },
-        {
-          "letter": "C",
-          "text": "It opens a second connection for a server-initiated elicitation"
-        },
-        {
-          "letter": "D",
-          "text": "It cancels and recreates the task with the answers inline"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Tasks handle mid-flight input through tasks/update rather than retrying the original request - the durable taskId already anchors the state. Servers can also push full task state via notifications/tasks over subscriptions/listen, replacing polls. (Tasks extension, implementation guide.)",
-      "tags": [
-        "extensions",
-        "tasks",
-        "input-required",
-        "mrtr"
-      ]
-    },
-    {
-      "id": "ch13-scenario-extra-1",
-      "chapter": 13,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "A server returns resultType:'task' to a client that never declared the Tasks extension. What should a conformance test conclude?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Valid because extensions are server-controlled"
-        },
-        {
-          "letter": "B",
-          "text": "Violation: extensions are opt-in and both sides must declare support"
-        },
-        {
-          "letter": "C",
-          "text": "Valid if the task finishes quickly"
-        },
-        {
-          "letter": "D",
-          "text": "Valid only over stdio"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Extensions are not default-on. A server must not use extension behavior with a client that has not opted in.",
-      "tags": [
-        "extensions",
-        "tasks",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch13-scenario-extra-2",
-      "chapter": 13,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "A task enters input_required. The client answers by retrying the original tools/call request with inputResponses, just like core MRTR. What is wrong?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Nothing; Tasks and MRTR use the same continuation mechanism"
-        },
-        {
-          "letter": "B",
-          "text": "Tasks use tasks/update against the taskId; core MRTR retries the original request"
-        },
-        {
-          "letter": "C",
-          "text": "The client should call tasks/result"
-        },
-        {
-          "letter": "D",
-          "text": "The client should open an HTTP GET stream"
-        }
-      ],
-      "answer": "B",
-      "explanation": "This is an important distinction: core MRTR retries the original request; Tasks mid-flight input is supplied through tasks/update.",
-      "tags": [
-        "extensions",
-        "tasks",
-        "mrtr",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch13-scenario-extra-3",
-      "chapter": 13,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A test script polls a task continuously, ignoring pollIntervalMs returned by the server. Which behavior should be improved?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Respect pollIntervalMs when polling tasks/get"
-        },
-        {
-          "letter": "B",
-          "text": "Replace tasks/get with tasks/list"
-        },
-        {
-          "letter": "C",
-          "text": "Reuse the original JSON-RPC id for every poll"
-        },
-        {
-          "letter": "D",
-          "text": "Disable extension negotiation"
-        }
-      ],
-      "answer": "A",
-      "explanation": "Tasks are polled with tasks/get and clients should respect the server's pollIntervalMs guidance to avoid excessive polling.",
-      "tags": [
-        "extensions",
-        "tasks",
-        "polling",
-        "tester-scenario"
-      ]
+      "domain": "Use Cases & Ecosystem",
+      "source": "extensions/tasks/overview",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     }
   ]
 }

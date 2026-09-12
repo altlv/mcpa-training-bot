@@ -1,43 +1,55 @@
 {
+  "meta": {
+    "title": "MCP Question Bank — Chapter 2: Architecture & Protocol Layers (multi-select)",
+    "protocolVersion": "2026-07-28",
+    "chapter": 2,
+    "chapterName": "Architecture & Protocol Layers",
+    "examDomain": "Architecture & Components",
+    "mode": "multi_select",
+    "questionCount": 3,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
+  },
   "questions": [
     {
       "id": "ch2-m1",
       "chapter": 2,
       "type": "multi_select",
       "difficulty": "medium",
-      "question": "Which statements about MCP participants are correct? (Select all that apply.)",
+      "question": "Which responsibilities does the specification assign to the client? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "The host is the AI application coordinating one or multiple MCP clients"
+          "text": "Deciding which tools the model is allowed to see"
         },
         {
           "letter": "B",
-          "text": "Each MCP client maintains a dedicated connection to exactly one server"
+          "text": "Attaching the protocol version and capabilities to every request"
         },
         {
           "letter": "C",
-          "text": "A remote Streamable HTTP server typically serves many clients"
+          "text": "Maintaining security boundaries between servers"
         },
         {
           "letter": "D",
-          "text": "Local STDIO servers typically serve many clients simultaneously"
+          "text": "Storing the user's OAuth refresh tokens for all connected servers"
         },
         {
           "letter": "E",
-          "text": "The term 'MCP server' changes meaning depending on where the program runs"
+          "text": "Communicating with exactly one server"
         }
       ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Host→many clients, client↔one server; remote servers serve many clients while local STDIO servers typically serve a single client. 'MCP server' refers to the program serving context regardless of where it runs.",
+      "explanation": "The architecture page lists exactly A, B, C (plus routing messages and managing subscriptions) for clients. Deciding what the model sees and holding credentials are host concerns.",
       "tags": [
-        "architecture",
-        "participants",
-        "cardinality"
+        "roles",
+        "responsibilities"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/architecture",
+      "protocolVersion": "2026-07-28",
+      "answers": [
+        "B",
+        "C",
+        "E"
       ]
     },
     {
@@ -45,38 +57,41 @@
       "chapter": 2,
       "type": "multi_select",
       "difficulty": "medium",
-      "question": "Which responsibilities belong to the DATA layer (as opposed to the transport layer)? (Select all that apply.)",
+      "question": "A new hire asks what their MCP server is on the hook for and what the host handles. Which of these are the server's responsibilities? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "Defining the JSON-RPC 2.0 message structure and semantics"
+          "text": "Deciding which tool the model should call for a given user message"
         },
         {
           "letter": "B",
-          "text": "Core primitives such as tools, resources, and prompts"
+          "text": "Exposing tools, resources and prompts and describing them"
         },
         {
           "letter": "C",
-          "text": "Connection establishment and message framing"
+          "text": "Validating that an access token was issued for this server's own audience"
         },
         {
           "letter": "D",
-          "text": "Discovery of protocol versions and capabilities"
+          "text": "Doing the work behind a call and returning a conformant result or error"
         },
         {
           "letter": "E",
-          "text": "Transport-specific authorization"
+          "text": "Rendering approval dialogs before a tool is executed"
         }
       ],
-      "answers": [
-        "A",
-        "B",
-        "D"
-      ],
-      "explanation": "The data layer (inner) covers JSON-RPC semantics, primitives, discovery, and notifications; the transport layer (outer) handles connections, framing, and transport-level authorization.",
+      "explanation": "Servers publish and describe their primitives, enforce their own token audience, and execute requests. Choosing a tool is the model's job and showing an approval dialog is the host's; a server never does either.",
       "tags": [
-        "architecture",
-        "layers"
+        "roles",
+        "responsibilities"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/architecture",
+      "protocolVersion": "2026-07-28",
+      "answers": [
+        "B",
+        "C",
+        "D"
       ]
     },
     {
@@ -84,241 +99,41 @@
       "chapter": 2,
       "type": "multi_select",
       "difficulty": "hard",
-      "question": "Under the 2026-07-28 stateless model, which fields belong in every request's _meta? (Select all that apply.)",
+      "question": "Which observations point at the TRANSPORT layer rather than the data layer? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "io.modelcontextprotocol/protocolVersion (required)"
+          "text": "The SSE response stream drops before the final response arrives"
         },
         {
           "letter": "B",
-          "text": "io.modelcontextprotocol/clientCapabilities (required)"
+          "text": "A tools/call returns isError: true after the upstream API times out"
         },
         {
           "letter": "C",
-          "text": "io.modelcontextprotocol/clientInfo (should be included unless configured not to)"
+          "text": "The result object is missing its required resultType field"
         },
         {
           "letter": "D",
-          "text": "io.modelcontextprotocol/serverInfo (required on requests)"
+          "text": "The POST is rejected with 403 because the Origin header is not allowed"
         },
         {
           "letter": "E",
-          "text": "Mcp-Session-Id (required on requests)"
+          "text": "The server's stdout contains a line that is not valid JSON"
         }
       ],
+      "explanation": "Framing, HTTP status and stream lifetime are transport concerns. A missing resultType is a data-layer schema violation, and isError: true is a perfectly valid data-layer result reporting a business failure.",
+      "tags": [
+        "layers",
+        "transport"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/architecture",
+      "protocolVersion": "2026-07-28",
       "answers": [
         "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Requests must carry protocolVersion and clientCapabilities, and clients should include clientInfo. serverInfo appears in the server's RESULT _meta, and Mcp-Session-Id was removed entirely.",
-      "tags": [
-        "architecture",
-        "meta",
-        "statelessness"
-      ]
-    },
-    {
-      "id": "ch2-m4",
-      "chapter": 2,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "Which statements about 2026-07-28 change notifications are true? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "They are opt-in via a subscriptions/listen request naming the wanted notification types"
-        },
-        {
-          "letter": "B",
-          "text": "The server acknowledges with notifications/subscriptions/acknowledged before other notifications on that subscription"
-        },
-        {
-          "letter": "C",
-          "text": "Every notification on the stream carries io.modelcontextprotocol/subscriptionId in _meta"
-        },
-        {
-          "letter": "D",
-          "text": "Delivery is guaranteed exactly-once across reconnects"
-        },
-        {
-          "letter": "E",
-          "text": "Request-scoped notifications like notifications/progress also travel on the subscriptions/listen stream"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Notifications are opt-in, acknowledged first, and tagged with the subscription ID (the listen request's JSON-RPC id). Delivery is best-effort (clients should also poll), and request-scoped notifications flow on the originating request's response stream instead.",
-      "tags": [
-        "architecture",
-        "notifications",
-        "subscriptions"
-      ]
-    },
-    {
-      "id": "ch2-m5",
-      "chapter": 2,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "Which fields does a server/discover result contain? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "supportedVersions — the protocol revisions the server speaks"
-        },
-        {
-          "letter": "B",
-          "text": "capabilities — including any supported extensions"
-        },
-        {
-          "letter": "C",
-          "text": "serverInfo — the server's identity"
-        },
-        {
-          "letter": "D",
-          "text": "ttlMs and cacheScope — how long and where the discovery result may be cached"
-        },
-        {
-          "letter": "E",
-          "text": "The result always includes a sessionToken for subsequent requests"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "All four are part of the mandatory server/discover response in 2026-07-28 — here 'All of the above' is genuinely correct, so both the individual letters and E count.",
-      "tags": [
-        "architecture",
-        "discovery",
-        "server-discover"
-      ]
-    },
-    {
-      "id": "ch2-m6",
-      "chapter": 2,
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which notification types can a client opt into via subscriptions/listen? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "toolsListChanged"
-        },
-        {
-          "letter": "B",
-          "text": "promptsListChanged"
-        },
-        {
-          "letter": "C",
-          "text": "resourcesListChanged"
-        },
-        {
-          "letter": "D",
-          "text": "resourceSubscriptions (per-resource updates)"
-        },
-        {
-          "letter": "E",
-          "text": "progressUpdates"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "The four opt-in types are the list-changed trio plus resourceSubscriptions. Progress is request-scoped and flows on the originating request's response stream, never on subscriptions/listen.",
-      "tags": [
-        "architecture",
-        "subscriptions",
-        "notifications"
-      ]
-    },
-    {
-      "id": "ch2-m7",
-      "chapter": 2,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "Under the stateless 2026-07-28 model, which statements are true? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Every request carries io.modelcontextprotocol/protocolVersion in _meta"
-        },
-        {
-          "letter": "B",
-          "text": "Every request carries io.modelcontextprotocol/clientCapabilities in _meta"
-        },
-        {
-          "letter": "C",
-          "text": "Clients SHOULD include io.modelcontextprotocol/clientInfo on each request"
-        },
-        {
-          "letter": "D",
-          "text": "Any server instance behind a load balancer can answer any request"
-        },
-        {
-          "letter": "E",
-          "text": "Servers MUST persist session state between requests for continuity"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "All four hold — self-contained requests are exactly what enables round-robin load balancing and serverless deployment. 'All of the above' is correct here.",
-      "tags": [
-        "architecture",
-        "statelessness",
-        "meta"
-      ]
-    },
-    {
-      "id": "ch2-m8",
-      "chapter": 2,
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which statements about the two transports are correct? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "stdio: the client launches the server as a subprocess and speaks newline-delimited JSON-RPC over stdin/stdout"
-        },
-        {
-          "letter": "B",
-          "text": "stdio: stderr is the safe channel for logging"
-        },
-        {
-          "letter": "C",
-          "text": "Streamable HTTP: client messages travel as HTTP POST, optionally answered with an SSE stream"
-        },
-        {
-          "letter": "D",
-          "text": "Streamable HTTP: a broken SSE stream can be resumed with Last-Event-ID"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "SSE resumability was removed in 2026-07-28 — a broken stream loses the in-flight request, which the client re-issues with a new ID. That sinks D and the all-of-the-above option.",
-      "tags": [
-        "architecture",
-        "transports"
+        "D",
+        "E"
       ]
     }
   ]

@@ -1,43 +1,55 @@
 {
+  "meta": {
+    "title": "MCP Question Bank — Chapter 7: Authorization (multi-select)",
+    "protocolVersion": "2026-07-28",
+    "chapter": 7,
+    "chapterName": "Authorization",
+    "examDomain": "Security & Governance",
+    "mode": "multi_select",
+    "questionCount": 3,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
+  },
   "questions": [
     {
       "id": "ch7-m1",
       "chapter": 7,
       "type": "multi_select",
       "difficulty": "medium",
-      "question": "Authorization is optional for MCP servers, but strongly recommended when... (Select all that apply.)",
+      "question": "Which status/condition pairings are correct for a protected MCP server? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "the server accesses user-specific data such as emails, documents, or databases"
+          "text": "401 for a missing, invalid or expired token"
         },
         {
           "letter": "B",
-          "text": "you need to audit who performed which actions"
+          "text": "400 for a malformed authorization request"
         },
         {
           "letter": "C",
-          "text": "the server grants access to APIs requiring user consent"
+          "text": "403 for a token issued for a different MCP server"
         },
         {
           "letter": "D",
-          "text": "you're building for enterprise environments with strict access controls"
+          "text": "403 for a valid token whose scopes are insufficient"
         },
         {
           "letter": "E",
-          "text": "the server only performs pure, stateless math with no data access"
+          "text": "429 for a client that has exceeded its step-up retry limit"
         }
       ],
+      "explanation": "The spec's table is 401 unauthorized, 403 forbidden (invalid scopes or insufficient permissions), 400 bad request. A wrong-audience token is an invalid token, so 401. Retry limits are client-side behaviour, not a defined server response.",
+      "tags": [
+        "oauth",
+        "status-codes"
+      ],
+      "domain": "Security & Governance",
+      "source": "specification/2026-07-28/basic/authorization",
+      "protocolVersion": "2026-07-28",
       "answers": [
         "A",
         "B",
-        "C",
         "D"
-      ],
-      "explanation": "The tutorial lists user data, auditing, consent-gated APIs, enterprise controls, and per-user rate limiting/usage tracking as the triggers. A pure calculator has no such need.",
-      "tags": [
-        "authorization",
-        "when"
       ]
     },
     {
@@ -45,282 +57,83 @@
       "chapter": 7,
       "type": "multi_select",
       "difficulty": "hard",
-      "question": "Order-independent: which steps are genuinely part of the MCP OAuth authorization flow? (Select all that apply.)",
+      "question": "Which requirements does the authorization spec place on discovery? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "Server returns 401 with WWW-Authenticate pointing at the Protected Resource Metadata"
+          "text": "Clients MUST support both metadata discovery mechanisms"
         },
         {
           "letter": "B",
-          "text": "Client fetches PRM, then the authorization server's metadata (OIDC discovery or RFC 8414)"
+          "text": "MCP servers MUST host their own authorization server at the same origin"
         },
         {
           "letter": "C",
-          "text": "Client registers (pre-registered, DCR, or CIMD) and sends the user to the authorization endpoint"
+          "text": "Authorization servers MUST provide RFC 8414 metadata, OIDC Discovery, or both"
         },
         {
           "letter": "D",
-          "text": "Client exchanges the authorization code for tokens using PKCE"
+          "text": "Clients MUST cache the discovery documents for the lifetime of the token"
         },
         {
           "letter": "E",
-          "text": "Client embeds the access token in the JSON-RPC id field of each request"
+          "text": "MCP servers MUST implement OAuth 2.0 Protected Resource Metadata (RFC 9728)"
         }
       ],
+      "explanation": "A, B and C are explicit requirements. Caching policy is not mandated, and the authorization server may be hosted with the resource server or be an entirely separate entity.",
+      "tags": [
+        "oauth",
+        "discovery"
+      ],
+      "domain": "Security & Governance",
+      "source": "specification/2026-07-28/basic/authorization",
+      "protocolVersion": "2026-07-28",
       "answers": [
         "A",
-        "B",
         "C",
-        "D"
-      ],
-      "explanation": "Steps A–D are the flow. Tokens travel in the Authorization: Bearer header — never in the JSON-RPC message itself.",
-      "tags": [
-        "authorization",
-        "flow",
-        "oauth"
+        "E"
       ]
     },
     {
       "id": "ch7-m3",
       "chapter": 7,
       "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which RFC/standard pairings used by MCP authorization are correct? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "RFC 9728 — Protected Resource Metadata"
-        },
-        {
-          "letter": "B",
-          "text": "RFC 8414 — Authorization Server Metadata"
-        },
-        {
-          "letter": "C",
-          "text": "RFC 7591 — Dynamic Client Registration"
-        },
-        {
-          "letter": "D",
-          "text": "RFC 8707 — Resource Indicators"
-        },
-        {
-          "letter": "E",
-          "text": "RFC 2616 — Token introspection"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "The four pairings are correct; RFC 2616 is the old HTTP/1.1 spec — token introspection is RFC 7662.",
-      "tags": [
-        "authorization",
-        "rfcs"
-      ]
-    },
-    {
-      "id": "ch7-m4",
-      "chapter": 7,
-      "type": "multi_select",
       "difficulty": "hard",
-      "question": "Which items appear on the authorization tutorial's 'pitfalls to avoid' list? (Select all that apply.)",
+      "question": "Which token-handling rules does the spec state? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "Implementing token validation logic yourself instead of using well-tested libraries"
+          "text": "An MCP server calling an upstream API must obtain its own token for that API"
         },
         {
           "letter": "B",
-          "text": "Logging Authorization headers, tokens, or secrets"
+          "text": "Clients MUST store refresh tokens in the same store as the user's password manager"
         },
         {
           "letter": "C",
-          "text": "Accepting generic audiences (like 'api') or unrelated resources"
+          "text": "MCP servers MAY forward the client's token upstream if the audience allows it"
         },
         {
           "letter": "D",
-          "text": "Tying authorization decisions to the Mcp-Session-Id header"
+          "text": "Refresh tokens MUST be rotated for public clients"
         },
         {
           "letter": "E",
-          "text": "Returning WWW-Authenticate challenges on 401 responses"
+          "text": "Authorization servers SHOULD issue short-lived access tokens"
         }
       ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "A–D are pitfalls (session identifiers are untrusted input; never tie authorization to them). Returning proper WWW-Authenticate challenges is a recommended practice, not a pitfall.",
+      "explanation": "Short-lived tokens and refresh-token rotation for public clients are explicit; token passthrough is explicitly forbidden, so an MCP server acting as a client upstream uses a separate token from the upstream authorization server.",
       "tags": [
-        "authorization",
-        "pitfalls"
-      ]
-    },
-    {
-      "id": "ch7-m5",
-      "chapter": 7,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "Which requirements does the 2026-07-28 authorization spec place on MCP clients? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Validate a present iss parameter against the recorded issuer before redeeming the authorization code"
-        },
-        {
-          "letter": "B",
-          "text": "Key persisted client credentials by issuer and never reuse them with a different authorization server"
-        },
-        {
-          "letter": "C",
-          "text": "Specify an appropriate application_type during Dynamic Client Registration"
-        },
-        {
-          "letter": "D",
-          "text": "Use PKCE in the authorization code flow"
-        },
-        {
-          "letter": "E",
-          "text": "Maintain a persistent session using Mcp-Session-Id across all requests"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "SEP-2468, SEP-2352, SEP-837, and the OAuth 2.1 baseline respectively — all four are real MUSTs, so 'All of the above' stands.",
-      "tags": [
-        "authorization",
         "oauth",
-        "changelog"
-      ]
-    },
-    {
-      "id": "ch7-m6",
-      "chapter": 7,
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which client-registration mechanisms exist for MCP, and in what standing? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Pre-registered static clients"
-        },
-        {
-          "letter": "B",
-          "text": "Dynamic Client Registration (RFC 7591) — still works, but deprecated"
-        },
-        {
-          "letter": "C",
-          "text": "Client ID Metadata Documents (CIMD) — the recommended replacement, using a URL as the client ID"
-        },
-        {
-          "letter": "D",
-          "text": "API-key self-registration defined by the MCP spec"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
+        "tokens"
       ],
+      "domain": "Security & Governance",
+      "source": "specification/2026-07-28/basic/authorization/security-considerations",
+      "protocolVersion": "2026-07-28",
       "answers": [
         "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Static registration, DCR (deprecated), and CIMD are the three; MCP defines no API-key registration scheme.",
-      "tags": [
-        "authorization",
-        "registration",
-        "cimd",
-        "dcr"
-      ]
-    },
-    {
-      "id": "ch7-m7",
-      "chapter": 7,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "A request hits your protected MCP server. Which response pairings are correct? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "No token, or an expired/invalid one → 401 with a WWW-Authenticate challenge pointing at the Protected Resource Metadata"
-        },
-        {
-          "letter": "B",
-          "text": "Valid token missing a needed scope → 403 with insufficient_scope, prompting client step-up for the scope union"
-        },
-        {
-          "letter": "C",
-          "text": "Mcp-Name header contradicting the body → 400 with HeaderMismatch (-32020)"
-        },
-        {
-          "letter": "D",
-          "text": "Valid token for a different audience → accept it, since the issuer matches"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Audience mismatch means rejection — accepting it is the token-passthrough anti-pattern. That false D poisons the all-of-the-above option.",
-      "tags": [
-        "authorization",
-        "status-codes",
-        "audience"
-      ]
-    },
-    {
-      "id": "ch7-m8",
-      "chapter": 7,
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which discovery documents and standards participate in the MCP OAuth flow? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Protected Resource Metadata (RFC 9728), found via the WWW-Authenticate header"
-        },
-        {
-          "letter": "B",
-          "text": "Authorization Server Metadata (RFC 8414 or OIDC discovery)"
-        },
-        {
-          "letter": "C",
-          "text": "Resource Indicators (RFC 8707) binding tokens to the target server"
-        },
-        {
-          "letter": "D",
-          "text": "WSDL service descriptions"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "PRM → AS metadata → resource-bound token request is the discovery chain. WSDL belongs to SOAP, not OAuth.",
-      "tags": [
-        "authorization",
-        "discovery",
-        "rfcs"
+        "D",
+        "E"
       ]
     }
   ]

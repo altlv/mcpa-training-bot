@@ -1,161 +1,97 @@
 {
+  "meta": {
+    "title": "MCP Question Bank — Chapter 16: Community, Governance & Security (multi-select)",
+    "protocolVersion": "2026-07-28",
+    "chapter": 16,
+    "chapterName": "Community, Governance & Security",
+    "examDomain": "Security & Governance",
+    "mode": "multi_select",
+    "questionCount": 2,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
+  },
   "questions": [
     {
       "id": "ch16-m1",
       "chapter": 16,
       "type": "multi_select",
       "difficulty": "medium",
-      "question": "Which statements about MCP's governance roles are correct? (Select all that apply.)",
+      "question": "Your company wants to fork the reference SDK and republish parts of the specification in its own docs. Which statements apply? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "Maintainers steward specific areas (SDKs, docs, Working Groups) with write access to their repos"
+          "text": "Non-specification documentation is CC BY 4.0, so reuse requires credit"
         },
         {
           "letter": "B",
-          "text": "Core Maintainers can veto Maintainer decisions by majority vote and appoint or remove Maintainers"
+          "text": "The specification, not any SDK's behaviour, is the authoritative source of truth"
         },
         {
           "letter": "C",
-          "text": "Lead Maintainers (BDFL) can veto any decision and appoint or remove Core Maintainers"
+          "text": "Redistribution requires the Steering Group's written approval"
         },
         {
           "letter": "D",
-          "text": "Corporate seats guarantee each member company one Core Maintainer"
+          "text": "Code and the specification are Apache 2.0, so a commercial fork is permitted with attribution"
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "Forks may not use the name MCP in any form without a trademark licence agreement"
         }
       ],
+      "explanation": "Apache 2.0 covers code and specs, CC BY 4.0 covers the other documentation, and both permit reuse with attribution rather than permission. Where an SDK and the spec disagree, the spec wins.",
+      "tags": [
+        "licensing",
+        "artifacts"
+      ],
+      "domain": "Security & Governance",
+      "source": "modelcontextprotocol.io/community/governance",
+      "protocolVersion": "2026-07-28",
       "answers": [
         "A",
         "B",
-        "C"
-      ],
-      "explanation": "Membership is individual and merit-based — there are explicitly NO company-reserved seats, which sinks D and the all-of-the-above option.",
-      "tags": [
-        "governance",
-        "roles"
+        "D"
       ]
     },
     {
       "id": "ch16-m2",
       "chapter": 16,
       "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which licensing/legal facts about the MCP project are true? (Select all that apply.)",
+      "difficulty": "hard",
+      "question": "Which statements about MCP's groups and meetings are correct? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "The project is established as a Series of LF Projects, LLC"
+          "text": "The Member and Community Moderator roles are part of the Steering Group"
         },
         {
           "letter": "B",
-          "text": "Code and specification contributions use Apache License 2.0"
+          "text": "Core Maintainers meet every two weeks, and decisions are recorded transparently"
         },
         {
           "letter": "C",
-          "text": "Documentation (excluding specifications) is CC BY 4.0"
+          "text": "Interest Groups articulate problems; Working Groups produce solutions such as SEPs"
         },
         {
           "letter": "D",
-          "text": "Contributors retain copyright — no assignment to the project is required"
+          "text": "Working Group decisions are final and cannot be escalated to Core Maintainers"
         },
         {
           "letter": "E",
-          "text": "The MCP project requires contributors to sign a CLA transferring copyright"
+          "text": "Maintainers, Core Maintainers and Lead Maintainers form the MCP Steering Group"
         }
       ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "All four facts come straight from the governance page's General Project Policies — a legitimate 'All of the above'.",
+      "explanation": "The Steering Group is the three maintainer tiers; Member and Community Moderator sit outside it. Interest Groups identify problems and Working Groups build deliverables, and Maintainers escalate to Core Maintainers when needed.",
       "tags": [
         "governance",
-        "licensing"
-      ]
-    },
-    {
-      "id": "ch16-m3",
-      "chapter": 16,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "Which reports are IN scope under the MCP security policy? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "An authorization bypass caused by an SDK bug"
-        },
-        {
-          "letter": "B",
-          "text": "Token leakage stemming from a specification-level flaw"
-        },
-        {
-          "letter": "C",
-          "text": "A parsing crash reachable through the Streamable HTTP transport"
-        },
-        {
-          "letter": "D",
-          "text": "A malicious local stdio server hanging the client that spawned it (no remote reachability, no sandbox escape)"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
+        "groups"
       ],
+      "domain": "Security & Governance",
+      "source": "community/governance",
+      "protocolVersion": "2026-07-28",
       "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Stdio-peer-only DoS is the canonical out-of-scope case — the stdio transport is not a sandbox and peers share a trust boundary. A–C are squarely in scope.",
-      "tags": [
-        "security-policy",
-        "scope"
-      ]
-    },
-    {
-      "id": "ch16-m4",
-      "chapter": 16,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "Which disclosure-process statements are correct? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Reports go through GitHub Security Advisories (private reporting) on the affected repository"
-        },
-        {
-          "letter": "B",
-          "text": "Public issues, discussions, and pull requests must not be used for security reports"
-        },
-        {
-          "letter": "C",
-          "text": "Maintainers coordinate cross-SDK so fixes and advisories ship together when a shared pattern is affected"
-        },
-        {
-          "letter": "D",
-          "text": "CVEs are assigned via GitHub's CNA in the GHSA workflow"
-        },
-        {
-          "letter": "E",
-          "text": "Security reports may be filed as public GitHub issues for transparency"
-        }
-      ],
-      "answers": [
-        "A",
         "B",
         "C",
-        "D"
-      ],
-      "explanation": "The full disclosure pipeline as documented — every statement holds, so E is correct too.",
-      "tags": [
-        "security-policy",
-        "disclosure"
+        "E"
       ]
     }
   ]

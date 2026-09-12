@@ -1,44 +1,56 @@
 {
+  "meta": {
+    "title": "MCP Question Bank — Chapter 12: Transports & Protocol Utilities (multi-select)",
+    "protocolVersion": "2026-07-28",
+    "chapter": 12,
+    "chapterName": "Transports & Protocol Utilities",
+    "examDomain": "Architecture & Components",
+    "mode": "multi_select",
+    "questionCount": 3,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
+  },
   "questions": [
     {
       "id": "ch12-m1",
       "chapter": 12,
       "type": "multi_select",
       "difficulty": "medium",
-      "question": "Which header requirements apply to 2026-07-28 Streamable HTTP POST requests? (Select all that apply.)",
+      "question": "Which statements about notifications in 2026-07-28 are correct? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "Mcp-Method is required on every request"
+          "text": "Change notifications arrive on the response stream of a subscriptions/listen request"
         },
         {
           "letter": "B",
-          "text": "Mcp-Name is required for tools/call, resources/read, and prompts/get"
+          "text": "notifications/message is delivered on the listen stream so clients see all logs"
         },
         {
           "letter": "C",
-          "text": "Servers reject requests where headers and body disagree (400 + HeaderMismatch, -32020)"
+          "text": "notifications/progress travels on the response stream of the request it relates to"
         },
         {
           "letter": "D",
-          "text": "Mcp-Session-Id is required for session affinity"
+          "text": "A server may push any notification type it thinks the client will find useful"
         },
         {
           "letter": "E",
-          "text": "x-mcp-header annotations can surface tool parameters as Mcp-Param-* headers"
+          "text": "Every notification on a listen stream carries io.modelcontextprotocol/subscriptionId"
         }
       ],
+      "explanation": "Request-scoped notifications (progress, and logging's notifications/message) flow only on the originating request's stream. Long-lived change notifications come from subscriptions/listen, tagged with the subscription id, and the server MUST NOT send types the client did not request.",
+      "tags": [
+        "utilities",
+        "progress",
+        "subscriptions"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/basic/patterns",
+      "protocolVersion": "2026-07-28",
       "answers": [
         "A",
-        "B",
         "C",
         "E"
-      ],
-      "explanation": "Mcp-Session-Id was removed with protocol sessions. The rest is SEP-2243's header model, enabling gateways to route without parsing bodies.",
-      "tags": [
-        "transports",
-        "headers",
-        "sep-2243"
       ]
     },
     {
@@ -46,283 +58,83 @@
       "chapter": 12,
       "type": "multi_select",
       "difficulty": "hard",
-      "question": "Which things were REMOVED from the Streamable HTTP transport in 2026-07-28? (Select all that apply.)",
+      "question": "Which behaviours are correct for a 2026-07-28 Streamable HTTP server? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "Protocol-level sessions and the Mcp-Session-Id header"
+          "text": "Mint a session id and return it in Mcp-Session-Id on the first request"
         },
         {
           "letter": "B",
-          "text": "SSE stream resumability and message redelivery (Last-Event-ID, SSE event IDs)"
+          "text": "Answer an unknown JSON-RPC method with 404 and a -32601 error body"
         },
         {
           "letter": "C",
-          "text": "The standalone HTTP GET endpoint for server-to-client notifications"
+          "text": "Buffer notifications for a request whose stream dropped, and resend them on reconnect"
         },
         {
           "letter": "D",
-          "text": "The POST method for client messages"
+          "text": "Answer an accepted notification POST with 202 and no body"
         },
         {
           "letter": "E",
-          "text": "The initialize/notifications/initialized handshake"
+          "text": "Reject a request whose Origin header is present and invalid with 403"
         }
       ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "E"
-      ],
-      "explanation": "Sessions, resumability, the GET notification endpoint (replaced by subscriptions/listen), and the handshake are gone. POST remains the way client messages travel.",
+      "explanation": "A, B and C are spec behaviours. Sessions were removed, so a modern server never mints or echoes Mcp-Session-Id, and there is no redelivery: a dropped stream means the request is lost and must be re-issued.",
       "tags": [
         "transports",
-        "removals",
-        "statelessness"
+        "streamable-http"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/basic/transports/streamable-http",
+      "protocolVersion": "2026-07-28",
+      "answers": [
+        "B",
+        "D",
+        "E"
       ]
     },
     {
       "id": "ch12-m3",
       "chapter": 12,
       "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which results must carry ttlMs and cacheScope under the CacheableResult requirement? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "tools/list"
-        },
-        {
-          "letter": "B",
-          "text": "prompts/list"
-        },
-        {
-          "letter": "C",
-          "text": "resources/list and resources/templates/list"
-        },
-        {
-          "letter": "D",
-          "text": "resources/read"
-        },
-        {
-          "letter": "E",
-          "text": "tools/call"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "SEP-2549 requires the caching fields on the list endpoints and resources/read. Tool execution results are not cacheable list results.",
-      "tags": [
-        "utilities",
-        "caching",
-        "sep-2549"
-      ]
-    },
-    {
-      "id": "ch12-m4",
-      "chapter": 12,
-      "type": "multi_select",
       "difficulty": "hard",
-      "question": "Which statements about progress and cancellation are correct? (Select all that apply.)",
+      "question": "Which statements about promoting tool parameters into headers with x-mcp-header are correct? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "Progress requires the client to include a progressToken in the request's _meta"
+          "text": "A tool that marks a number parameter is dropped from tools/list"
         },
         {
           "letter": "B",
-          "text": "notifications/progress flows on the response stream of the request it relates to"
+          "text": "Only string, integer and boolean parameters may be promoted"
         },
         {
           "letter": "C",
-          "text": "Cancellation is a notification (notifications/cancelled) referencing the requestId, expecting no reply"
+          "text": "Any JSON type may be promoted as long as it is serialised first"
         },
         {
           "letter": "D",
-          "text": "A cancelled request still receives a normal final response"
+          "text": "Promoted values travel in the params object as well, for compatibility"
         },
         {
           "letter": "E",
-          "text": "The subscriptions/listen stream carries progress notifications"
+          "text": "Values that are not plain ASCII use the =?base64?...?= sentinel form"
         }
       ],
+      "explanation": "The allowed types are string, integer and boolean — never number — and a server that violates that must drop the offending tool from tools/list rather than advertise it. Non-ASCII values are encoded with the Base64 sentinel; the value does not also travel in params.",
+      "tags": [
+        "x-mcp-header",
+        "params"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/basic/transports",
+      "protocolVersion": "2026-07-28",
       "answers": [
         "A",
         "B",
-        "C"
-      ],
-      "explanation": "Progress rides the originating request's response stream (not subscriptions/listen), and a cancelled request produces no response — the server stops work and frees resources.",
-      "tags": [
-        "utilities",
-        "progress",
-        "cancellation"
-      ]
-    },
-    {
-      "id": "ch12-m5",
-      "chapter": 12,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "Which _meta observability keys did SEP-414 standardize, and with what effect? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "traceparent"
-        },
-        {
-          "letter": "B",
-          "text": "tracestate"
-        },
-        {
-          "letter": "C",
-          "text": "baggage"
-        },
-        {
-          "letter": "D",
-          "text": "A trace can follow one tool call from host through SDK, server, and downstream systems as a single span tree"
-        },
-        {
-          "letter": "E",
-          "text": "A monotonically increasing request counter for rate limiting"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "The three W3C Trace Context keys plus the resulting end-to-end correlation — everything listed is right.",
-      "tags": [
-        "transports",
-        "observability",
-        "opentelemetry"
-      ]
-    },
-    {
-      "id": "ch12-m6",
-      "chapter": 12,
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which requests require the Mcp-Name header on Streamable HTTP? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "tools/call"
-        },
-        {
-          "letter": "B",
-          "text": "resources/read"
-        },
-        {
-          "letter": "C",
-          "text": "prompts/get"
-        },
-        {
-          "letter": "D",
-          "text": "tools/list"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Only the three that name a target carry Mcp-Name; list calls carry just Mcp-Method. 'All of the above' fails on D.",
-      "tags": [
-        "transports",
-        "headers",
-        "sep-2243"
-      ]
-    },
-    {
-      "id": "ch12-m7",
-      "chapter": 12,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "How does subscriptions/listen behave? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "It is a single long-lived POST whose response stream carries the opted-in notifications"
-        },
-        {
-          "letter": "B",
-          "text": "The client names the notification types it wants; the server acknowledges via notifications/subscriptions/acknowledged"
-        },
-        {
-          "letter": "C",
-          "text": "The subscriptionId equals the listen request's JSON-RPC id and tags every notification"
-        },
-        {
-          "letter": "D",
-          "text": "Delivery is guaranteed and replayed after reconnect"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Delivery is best-effort — resumability was removed, so clients should still poll or refresh after a dropped stream. D poisons E.",
-      "tags": [
-        "transports",
-        "subscriptions",
-        "notifications"
-      ]
-    },
-    {
-      "id": "ch12-m8",
-      "chapter": 12,
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which caching statements from SEP-2549 are correct? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "ttlMs is a freshness hint in milliseconds"
-        },
-        {
-          "letter": "B",
-          "text": "cacheScope: \"public\" permits shared intermediaries to cache; \"private\" restricts caching to the client"
-        },
-        {
-          "letter": "C",
-          "text": "A list_changed notification supersedes an unexpired TTL"
-        },
-        {
-          "letter": "D",
-          "text": "The fields appear on tools/list, prompts/list, resources/list, resources/templates/list, and resources/read results"
-        },
-        {
-          "letter": "E",
-          "text": "TTL values must be set by the server and cannot be overridden by the client"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "All four describe the CacheableResult contract accurately.",
-      "tags": [
-        "transports",
-        "caching",
-        "sep-2549"
+        "E"
       ]
     }
   ]

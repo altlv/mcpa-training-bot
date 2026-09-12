@@ -1,10 +1,13 @@
 {
   "meta": {
-    "title": "MCP Question Bank — Chapter 4: Client Concepts (Elicitation, Roots, Sampling)",
+    "title": "MCP Question Bank — Chapter 4: Client Concepts",
     "protocolVersion": "2026-07-28",
     "chapter": 4,
-    "chapterName": "Client Concepts (Elicitation, Roots, Sampling)",
-    "questionCount": 30
+    "chapterName": "Client Concepts",
+    "examDomain": "Interactions & Execution",
+    "mode": "single_select",
+    "questionCount": 8,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
   },
   "questions": [
     {
@@ -12,949 +15,273 @@
       "chapter": 4,
       "type": "mcq",
       "difficulty": "easy",
-      "question": "What does the Elicitation client feature allow an MCP server to do?",
+      "question": "The user presses Escape and the elicitation dialog closes. Which action does the client report?",
       "options": [
         {
           "letter": "A",
-          "text": "Request LLM completions from the client"
+          "text": "cancel, with no content field"
         },
         {
           "letter": "B",
-          "text": "Request specific information or input from the user during an interaction"
+          "text": "decline, with no content field"
         },
         {
           "letter": "C",
-          "text": "Read arbitrary files on the client machine"
+          "text": "No response at all: the client simply never retries"
         },
         {
           "letter": "D",
-          "text": "Register new tools on the client"
+          "text": "accept, with an empty content object"
         }
       ],
-      "answer": "B",
-      "explanation": "Elicitation gives servers a structured way to request information from users on demand — for example, asking for seat preferences or booking confirmation — instead of requiring all information up front.",
+      "explanation": "The three-action model distinguishes accept (explicit submit, content only in form mode), decline (an explicit no) and cancel (dismissed without choosing). Servers must handle all three.",
       "tags": [
-        "client-concepts",
-        "elicitation"
-      ]
+        "elicitation",
+        "actions"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/client/elicitation",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch4-q2",
       "chapter": 4,
       "type": "mcq",
       "difficulty": "medium",
-      "question": "Which two modes does elicitation support in the 2026-07-28 protocol?",
+      "question": "A client sends clientCapabilities: {} and calls a tool that must ask the user a question. What does the server return?",
       "options": [
         {
           "letter": "A",
-          "text": "Sync mode and async mode"
+          "text": "A result with isError: true explaining that elicitation is unavailable"
         },
         {
           "letter": "B",
-          "text": "Form mode and URL mode"
+          "text": "-32021 MissingRequiredClientCapability with data.requiredCapabilities, and HTTP 400"
         },
         {
           "letter": "C",
-          "text": "Text mode and voice mode"
+          "text": "An InputRequiredResult anyway, letting the client decide whether it can comply"
         },
         {
           "letter": "D",
-          "text": "Inline mode and modal mode"
+          "text": "-32602 Invalid params, because the capabilities object is effectively missing"
         }
       ],
-      "answer": "B",
-      "explanation": "Form mode has the client collect structured data from the user against a schema; URL mode has the user open a URL so the interaction happens out of band — suitable for sensitive flows like credential entry or third-party OAuth.",
+      "explanation": "The request is structurally valid, so it is not -32602; the missing piece is a capability, which is -32021 with the list in data.requiredCapabilities. A server MUST NOT send an input request type the client has not declared.",
       "tags": [
-        "client-concepts",
-        "elicitation",
-        "modes"
-      ]
+        "capabilities",
+        "errors"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/basic",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch4-q3",
       "chapter": 4,
       "type": "mcq",
-      "difficulty": "hard",
-      "question": "How is an elicitation/create request delivered to the client in protocol version 2026-07-28?",
+      "difficulty": "medium",
+      "question": "What is the status of sampling and roots in 2026-07-28?",
       "options": [
         {
           "letter": "A",
-          "text": "As a server-initiated JSON-RPC request over a reverse channel"
+          "text": "Deprecated for servers but still required for clients to implement"
         },
         {
           "letter": "B",
-          "text": "Via the Multi Round-Trip Requests (MRTR) pattern: the server responds to the original request with an InputRequiredResult whose inputRequests carry the elicitation, and the client retries the original request with inputResponses"
+          "text": "Deprecated but functional, reachable only through MRTR input requests"
         },
         {
           "letter": "C",
-          "text": "By email to the registered user"
+          "text": "Active: they are the two client features alongside elicitation"
         },
         {
           "letter": "D",
-          "text": "As an HTTP 302 redirect"
+          "text": "Removed: servers must migrate to tool parameters and provider APIs immediately"
         }
       ],
-      "answer": "B",
-      "explanation": "Elicitation follows the MRTR pattern. When a server needs user input mid-request (e.g., during tools/call), it returns an InputRequiredResult containing elicitation/create requests; the client gathers input and retries the original request, attaching inputResponses and echoing any requestState.",
+      "explanation": "SEP-2577 deprecated Roots, Sampling and Logging in 2026-07-28; they remain functional during the window, with earliest removal in the first revision released on or after 2027-07-28. While they exist, servers reach them as MRTR inputRequests, never as server-initiated requests.",
       "tags": [
-        "client-concepts",
-        "elicitation",
-        "mrtr"
-      ]
+        "deprecations",
+        "sampling",
+        "roots"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/deprecated",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch4-q4",
       "chapter": 4,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Why should servers use URL mode instead of form mode when requesting credentials such as passwords or API keys?",
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "Your client receives an InputRequiredResult for tools/call id 1, collects the user's answer, and retries. Which retry is conformant?",
       "options": [
         {
           "letter": "A",
-          "text": "URL mode is faster to render"
+          "text": "A new request with id 2, the original params, inputResponses, and requestState echoed exactly"
         },
         {
           "letter": "B",
-          "text": "Form mode has a character limit"
+          "text": "A new request with id 1, so the server can correlate it with the original call"
         },
         {
           "letter": "C",
-          "text": "URL mode keeps the sensitive data out of band, so it never passes through the client or the LLM context"
+          "text": "A new request with id 2 and inputResponses only, since requestState is server-side state"
         },
         {
           "letter": "D",
-          "text": "Form mode is deprecated"
+          "text": "A notifications/input_provided message carrying the answers for request id 1"
         }
       ],
-      "answer": "C",
-      "explanation": "Servers must not use form mode for sensitive information like passwords, API keys, tokens, or payment credentials. URL mode keeps the interaction between the user and the target site, so the data never passes through the client or the LLM context.",
+      "explanation": "The retry is an independent request and MUST use a different JSON-RPC id; correlation happens through requestState, which the client MUST echo byte for byte when the server sent one and MUST NOT invent when it did not.",
       "tags": [
-        "client-concepts",
-        "elicitation",
-        "security"
-      ]
+        "mrtr",
+        "retry"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/basic/patterns/mrtr",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch4-q5",
       "chapter": 4,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which client primitives are deprecated as of protocol version 2026-07-28?",
+      "difficulty": "hard",
+      "question": "On which requests may a server return resultType: \"input_required\"?",
       "options": [
         {
           "letter": "A",
-          "text": "Elicitation and notifications"
+          "text": "Any request, provided the client declared the elicitation capability"
         },
         {
           "letter": "B",
-          "text": "Sampling and roots (and protocol-level logging on the server side)"
+          "text": "tools/call and tools/list, the two tool-related requests"
         },
         {
           "letter": "C",
-          "text": "Tools and prompts"
+          "text": "Any request except server/discover"
         },
         {
           "letter": "D",
-          "text": "Nothing has been deprecated"
+          "text": "tools/call, resources/read and prompts/get only"
         }
       ],
-      "answer": "B",
-      "explanation": "Sampling and roots are deprecated as of 2026-07-28 and scheduled for removal. New implementations should integrate directly with LLM provider APIs (instead of sampling) and pass directories via tool parameters, resource URIs, or configuration (instead of roots). Protocol logging via notifications/message is also deprecated in favor of stderr/OpenTelemetry.",
+      "explanation": "Servers MAY send an InputRequiredResult on prompts/get, resources/read and tools/call, and MUST NOT send one on any other request. Seeing input_required on tools/list or server/discover is a conformance bug.",
       "tags": [
-        "client-concepts",
-        "deprecations"
-      ]
+        "mrtr",
+        "scope"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/basic/patterns/mrtr",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch4-q6",
       "chapter": 4,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "Before its deprecation, what was the purpose of the Roots feature?",
+      "difficulty": "hard",
+      "question": "A server needs the user's third-party API key to finish a tool call. Which elicitation is conformant?",
       "options": [
         {
           "letter": "A",
-          "text": "Granting servers superuser (root) access"
+          "text": "Form mode, because only form mode supports schema validation of the value"
         },
         {
           "letter": "B",
-          "text": "Communicating filesystem boundaries — file:// URIs indicating directories where servers should focus their operations"
+          "text": "Either mode, as long as the client declared support for the one chosen"
         },
         {
           "letter": "C",
-          "text": "Defining the root JSON-RPC endpoint"
+          "text": "Form mode with a string field marked sensitive, so the client can mask it"
         },
         {
           "letter": "D",
-          "text": "Pinning TLS root certificates"
+          "text": "URL mode, so the secret never passes through the MCP client"
         }
       ],
-      "answer": "B",
-      "explanation": "Roots were file:// URIs that told servers which directories were in scope. Importantly, they were a coordination mechanism, not a security boundary — the spec said servers SHOULD respect them, and real enforcement belongs at the OS level.",
+      "explanation": "Servers MUST NOT use form mode to request passwords, API keys, access tokens or payment credentials, and MUST use URL mode for those. URL mode keeps the secret out of the client and the model's context entirely.",
       "tags": [
-        "client-concepts",
-        "roots"
-      ]
+        "elicitation",
+        "modes"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/client/elicitation",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch4-q7",
       "chapter": 4,
       "type": "mcq",
       "difficulty": "hard",
-      "question": "In a (now deprecated) sampling request, what do the modelPreferences priority fields express?",
+      "question": "A URL-mode elicitation comes back with action: \"accept\". What does the server actually know?",
       "options": [
         {
           "letter": "A",
-          "text": "costPriority, speedPriority, and intelligencePriority — relative weights guiding the client's model selection"
+          "text": "That the client fetched the URL and validated the response on the user's behalf"
         },
         {
           "letter": "B",
-          "text": "The exact model version the client must use, with no flexibility"
+          "text": "That the out-of-band interaction completed successfully"
         },
         {
           "letter": "C",
-          "text": "GPU memory limits for inference"
+          "text": "That the user consented to open the URL, not that the out-of-band step finished"
         },
         {
           "letter": "D",
-          "text": "The order in which tools should be called"
+          "text": "That the user completed the flow and the client captured the resulting credential"
         }
       ],
-      "answer": "A",
-      "explanation": "modelPreferences included model hints plus costPriority, speedPriority, and intelligencePriority values (0–1) so the client could pick an appropriate model while keeping full control over permissions and security.",
+      "explanation": "accept signals consent to the interaction. The interaction happens out of band and the client is not informed of its outcome; on the retry the server decides from its own state or the echoed requestState whether to finish or ask again. Clients MUST NOT pre-fetch the URL.",
       "tags": [
-        "client-concepts",
-        "sampling"
-      ]
+        "elicitation",
+        "url-mode"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/client/elicitation",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch4-q8",
       "chapter": 4,
       "type": "mcq",
-      "difficulty": "easy",
-      "question": "What is the key distinction between an MCP 'host' and an MCP 'client'?",
+      "difficulty": "hard",
+      "question": "A tool wants to elicit an order: a customer name plus a list of line items, each with a product and a quantity. What does the elicitation schema allow?",
       "options": [
         {
           "letter": "A",
-          "text": "There is none; the terms are interchangeable"
+          "text": "Any JSON Schema at all, so the nested array of objects can be requested exactly as it stands"
         },
         {
           "letter": "B",
-          "text": "The host is the application users interact with, while clients are the protocol-level components that each handle one server connection"
+          "text": "Nested objects but not arrays, so the line items must become numbered fields"
         },
         {
           "letter": "C",
-          "text": "The host runs remotely and the client runs locally"
+          "text": "Only a flat object of primitive properties, so the nested list has to be restructured"
         },
         {
           "letter": "D",
-          "text": "The client manages the UI while the host manages the network"
+          "text": "Only a single string field, with any structure parsed out of it by the server"
         }
       ],
-      "answer": "B",
-      "explanation": "The host application (like Claude.ai or an IDE) manages the overall user experience and coordinates multiple clients; each client handles direct communication with exactly one server.",
+      "explanation": "Elicitation schemas are deliberately restricted to a flat object whose properties are primitives such as string, number, boolean and enum, so that any client can render them as a simple form. Complex input is collected in stages or passed as tool arguments instead.",
       "tags": [
-        "client-concepts",
-        "participants"
-      ]
-    },
-    {
-      "id": "ch4-q9",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "Which method does a server use to request user input via elicitation?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "elicitation/create"
-        },
-        {
-          "letter": "B",
-          "text": "user/ask"
-        },
-        {
-          "letter": "C",
-          "text": "input/request"
-        },
-        {
-          "letter": "D",
-          "text": "elicit/form"
-        }
-      ],
-      "answer": "A",
-      "explanation": "Servers request user input with elicitation/create requests, delivered inside an InputRequiredResult via the Multi Round-Trip Requests pattern.",
-      "tags": [
-        "client-concepts",
         "elicitation",
-        "methods"
-      ]
-    },
-    {
-      "id": "ch4-q10",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "How does a client tell a server that it supports elicitation?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "By declaring \"elicitation\": {} in the io.modelcontextprotocol/clientCapabilities field of each request's _meta"
-        },
-        {
-          "letter": "B",
-          "text": "By sending elicitation/enable once"
-        },
-        {
-          "letter": "C",
-          "text": "By setting an HTTP header X-Elicitation: on"
-        },
-        {
-          "letter": "D",
-          "text": "Support is assumed for all clients"
-        }
+        "schema"
       ],
-      "answer": "A",
-      "explanation": "Client capabilities travel with every request in _meta under io.modelcontextprotocol/clientCapabilities; declaring elicitation there tells the server it can gather additional input from the user when requested.",
-      "tags": [
-        "client-concepts",
-        "capabilities",
-        "meta"
-      ]
-    },
-    {
-      "id": "ch4-q11",
-      "chapter": 4,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "SCENARIO: While processing a tools/call to finalize a vacation booking, your server realizes it needs the traveler's seat preference and booking confirmation. What is the appropriate mechanism?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Fail the call with an error telling the user to retry with more arguments"
-        },
-        {
-          "letter": "B",
-          "text": "Respond with an InputRequiredResult carrying a form-mode elicitation/create request with a schema (e.g., confirmBooking boolean, seatPreference enum), then complete the retried call using the user's responses"
-        },
-        {
-          "letter": "C",
-          "text": "Silently pick a window seat"
-        },
-        {
-          "letter": "D",
-          "text": "Email the user a form"
-        }
-      ],
-      "answer": "B",
-      "explanation": "This is the elicitation pattern: rather than failing when data is missing, the server pauses via MRTR, requests structured input against a schema, and the client retries the original request with the collected inputResponses.",
-      "tags": [
-        "client-concepts",
-        "elicitation",
-        "scenario"
-      ]
-    },
-    {
-      "id": "ch4-q12",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "When a client receives an elicitation request, which options must the user have?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Only 'submit'; declining is not part of the model"
-        },
-        {
-          "letter": "B",
-          "text": "Provide the requested information, decline to provide it (optionally explaining why), or cancel the entire operation"
-        },
-        {
-          "letter": "C",
-          "text": "Approve within 30 seconds or the server crashes"
-        },
-        {
-          "letter": "D",
-          "text": "Forward the request to another user"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Elicitation is designed to respect user autonomy: users can provide the information through appropriate UI controls, decline with an optional explanation, or cancel the operation. Clients validate responses against the schema before returning them.",
-      "tags": [
-        "client-concepts",
-        "elicitation",
-        "ux"
-      ]
-    },
-    {
-      "id": "ch4-q13",
-      "chapter": 4,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "SCENARIO: A server sends a URL-mode elicitation asking the user to authorize a third-party account. Which client behavior is correct per the docs?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The client fetches the URL itself to save the user a step"
-        },
-        {
-          "letter": "B",
-          "text": "The client shows the full URL, gathers explicit consent before opening it, never fetches it automatically, and only learns whether the user consented — the interaction stays between the user and the target site"
-        },
-        {
-          "letter": "C",
-          "text": "The client embeds the URL in an invisible iframe"
-        },
-        {
-          "letter": "D",
-          "text": "The client extracts credentials from the page and returns them to the server"
-        }
-      ],
-      "answer": "B",
-      "explanation": "For URL mode, clients show the full URL and require explicit consent before opening it, and never fetch it automatically. The client only learns whether the user consented; the data exchanged stays out of band, which is exactly why URL mode suits credential and OAuth flows.",
-      "tags": [
-        "client-concepts",
-        "elicitation",
-        "scenario",
-        "security"
-      ]
-    },
-    {
-      "id": "ch4-q14",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "What should new implementations do instead of using the deprecated sampling primitive?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Use roots instead"
-        },
-        {
-          "letter": "B",
-          "text": "Integrate directly with LLM provider APIs"
-        },
-        {
-          "letter": "C",
-          "text": "Poll the client for completions"
-        },
-        {
-          "letter": "D",
-          "text": "Embed a local model in every server"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Sampling is deprecated as of 2026-07-28 and scheduled for removal; the docs direct new implementations to integrate directly with LLM provider APIs.",
-      "tags": [
-        "client-concepts",
-        "sampling",
-        "deprecations"
-      ]
-    },
-    {
-      "id": "ch4-q15",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "When (deprecated) sampling requests include tool use, what constraint applies?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The tools must be ones the server already exposes via tools/list"
-        },
-        {
-          "letter": "B",
-          "text": "Clients declare support through the sampling.tools capability, and servers must not send tool-enabled sampling requests to clients that haven't declared it; the tool definitions are scoped to that sampling request"
-        },
-        {
-          "letter": "C",
-          "text": "Tool use in sampling is unrestricted"
-        },
-        {
-          "letter": "D",
-          "text": "Only read-only tools may be included"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Servers can include a tools array and optional toolChoice in a sampling request. The definitions are scoped to that request (they needn't match the server's own tools), but this is gated on the client declaring the sampling.tools capability.",
-      "tags": [
-        "client-concepts",
-        "sampling",
-        "capabilities"
-      ]
-    },
-    {
-      "id": "ch4-q16",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "Put the MRTR flow in the correct order: (1) server returns InputRequiredResult, (2) client sends the initial request, (3) server returns a complete result, (4) client retries the original request with inputResponses and echoed requestState, (5) client gathers input from the user.",
-      "options": [
-        {
-          "letter": "A",
-          "text": "2, 1, 5, 4, 3"
-        },
-        {
-          "letter": "B",
-          "text": "1, 2, 5, 4, 3"
-        },
-        {
-          "letter": "C",
-          "text": "2, 5, 1, 4, 3"
-        },
-        {
-          "letter": "D",
-          "text": "2, 1, 4, 5, 3"
-        }
-      ],
-      "answer": "A",
-      "explanation": "Client sends the request; server answers resultType \"input_required\" with inputRequests and requestState; client gathers the answers; client retries the original request with inputResponses plus the echoed requestState; server completes. (Spec basic/patterns/mrtr.)",
-      "tags": [
-        "mrtr",
-        "flow"
-      ]
-    },
-    {
-      "id": "ch4-q17",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "On which client requests MAY a server return an InputRequiredResult?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Any request, including tools/list and server/discover"
-        },
-        {
-          "letter": "B",
-          "text": "Only tools/call"
-        },
-        {
-          "letter": "C",
-          "text": "prompts/get, resources/read, and tools/call - and servers MUST NOT send it on any other request"
-        },
-        {
-          "letter": "D",
-          "text": "Only requests sent over Streamable HTTP"
-        }
-      ],
-      "answer": "C",
-      "explanation": "The MRTR supported-requests table lists exactly prompts/get, resources/read, and tools/call. InputRequiredResult on anything else is a protocol violation. (Spec basic/patterns/mrtr, Supported Requests.)",
-      "tags": [
-        "mrtr",
-        "supported-requests"
-      ]
-    },
-    {
-      "id": "ch4-q18",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "What kinds of request objects may appear as values in an InputRequiredResult's inputRequests map?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "ElicitRequest, CreateMessageRequest (sampling), or ListRootsRequest"
-        },
-        {
-          "letter": "B",
-          "text": "Any JSON-RPC request the server defines"
-        },
-        {
-          "letter": "C",
-          "text": "Only ElicitRequest, since sampling and roots are removed"
-        },
-        {
-          "letter": "D",
-          "text": "tools/call requests aimed back at the client"
-        }
-      ],
-      "answer": "A",
-      "explanation": "inputRequests values MUST be one of ElicitRequest, CreateMessageRequest, or ListRootsRequest, keyed by server-assigned identifiers unique within the request. Sampling and roots are deprecated but still ride MRTR during the deprecation window - a favorite trap. (Spec basic/patterns/mrtr.)",
-      "tags": [
-        "mrtr",
-        "input-requests"
-      ]
-    },
-    {
-      "id": "ch4-q19",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "Which client behavior around requestState is compliant?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Base64-decode requestState to pre-fill the elicitation form"
-        },
-        {
-          "letter": "B",
-          "text": "Echo the exact requestState value on the retry, without inspecting, parsing, or modifying it - and omit it entirely if the server sent none"
-        },
-        {
-          "letter": "C",
-          "text": "Attach the requestState to a parallel tools/call to reuse the server's context"
-        },
-        {
-          "letter": "D",
-          "text": "Cache requestState and reuse it for future unrelated requests to skip prompts"
-        }
-      ],
-      "answer": "B",
-      "explanation": "requestState is opaque to clients: they MUST NOT inspect, parse, modify, or assume anything about it; MUST echo it exactly on the retry; MUST NOT include one if none was given; and MUST NOT use it for any other request. (Spec basic/patterns/mrtr, client requirements.)",
-      "tags": [
-        "mrtr",
-        "request-state"
-      ]
-    },
-    {
-      "id": "ch4-q20",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "When a client retries the original request in an MRTR flow, what must be true of the JSON-RPC id?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "It must be identical to the initial request's id so the server can correlate them"
-        },
-        {
-          "letter": "B",
-          "text": "It must be null to mark it as a retry"
-        },
-        {
-          "letter": "C",
-          "text": "It must be different from the initial request's id - the retry is an independent request"
-        },
-        {
-          "letter": "D",
-          "text": "It must be the requestState value"
-        }
-      ],
-      "answer": "C",
-      "explanation": "The initial request and the retry are completely independent requests, so the retry MUST use a different id. Correlation happens through the echoed requestState, not the JSON-RPC id. (Spec basic/patterns/mrtr, client requirements.)",
-      "tags": [
-        "mrtr",
-        "json-rpc"
-      ]
-    },
-    {
-      "id": "ch4-q21",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "A server wants to return an InputRequiredResult that contains neither inputRequests nor requestState. Is that allowed?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Yes - both fields are optional"
-        },
-        {
-          "letter": "B",
-          "text": "No - every InputRequiredResult MUST include at least one of inputRequests or requestState"
-        },
-        {
-          "letter": "C",
-          "text": "Yes, but only on prompts/get"
-        },
-        {
-          "letter": "D",
-          "text": "No - both fields are always required together"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Each field is individually optional, but the spec requires at least one of them in every InputRequiredResult; an empty one would give the client nothing to act on. (Spec basic/patterns/mrtr, server requirement 6.)",
-      "tags": [
-        "mrtr",
-        "input-required-result"
-      ]
-    },
-    {
-      "id": "ch4-q22",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "A client's per-request capabilities do not declare elicitation. The server still needs user input to finish a tools/call. What may the server do?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Include an elicitation/create entry in inputRequests anyway - the client will figure it out"
-        },
-        {
-          "letter": "B",
-          "text": "Fall back to a server-initiated elicitation/create request over the same stream"
-        },
-        {
-          "letter": "C",
-          "text": "It MUST NOT include elicitation requests in inputRequests for that client; it can fail the request or complete without that input"
-        },
-        {
-          "letter": "D",
-          "text": "Return resultType \"task\" to force the input later"
-        }
-      ],
-      "answer": "C",
-      "explanation": "Servers MUST NOT send an inputRequests entry the client has not declared support for. Server-initiated requests no longer exist in the modern era, so the server must handle the request without elicitation or fail it. (Spec basic/patterns/mrtr, server requirement 7.)",
-      "tags": [
-        "mrtr",
-        "capabilities"
-      ]
-    },
-    {
-      "id": "ch4-q23",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "requestState passes through the client on every MRTR retry. What does the spec require of servers when this state influences authorization or business logic?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Nothing - clients are trusted to echo it faithfully"
-        },
-        {
-          "letter": "B",
-          "text": "Treat it as attacker-controlled input: protect its integrity (e.g., HMAC or AEAD) and reject state that fails verification; bind principal, TTL, and originating request inside the protected payload to bound replay"
-        },
-        {
-          "letter": "C",
-          "text": "Encrypt it with the client's public key"
-        },
-        {
-          "letter": "D",
-          "text": "Store a copy server-side and compare on retry"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Servers MUST treat requestState as attacker-controlled. If it affects authorization, resource access, or business logic they MUST integrity-protect it and reject failures; they SHOULD embed the authenticated principal, a short TTL, and an identifier of the originating request. Single-use invariants still need server-side enforcement. (Spec basic/patterns/mrtr, server requirements 4-5.)",
-      "tags": [
-        "mrtr",
-        "request-state",
-        "security"
-      ]
-    },
-    {
-      "id": "ch4-q24",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "A client's retry omits one of the answers the server asked for, and the server cannot proceed without it. What SHOULD the server do?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Return -32602 Invalid params"
-        },
-        {
-          "letter": "B",
-          "text": "Return a new InputRequiredResult requesting the missing information again"
-        },
-        {
-          "letter": "C",
-          "text": "Complete the request with default values"
-        },
-        {
-          "letter": "D",
-          "text": "Close the connection to reset the flow"
-        }
-      ],
-      "answer": "B",
-      "explanation": "If necessary information is missing, the server SHOULD respond with a fresh InputRequiredResult re-requesting it rather than erroring; unexpected extra fields in InputResponses are simply ignored. Servers may loop like this across multiple attempts. (Spec basic/patterns/mrtr, error handling.)",
-      "tags": [
-        "mrtr",
-        "error-handling"
-      ]
-    },
-    {
-      "id": "ch4-q25",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Why does MRTR let stateless server fleets handle elicitation without sticky routing or shared storage?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Load balancers pin MRTR retries to the original instance via a cookie"
-        },
-        {
-          "letter": "B",
-          "text": "The server encodes everything it needs into requestState, which the client echoes back - so any instance can reconstitute the state from the retry alone"
-        },
-        {
-          "letter": "C",
-          "text": "The client stores the server's internal state in localStorage"
-        },
-        {
-          "letter": "D",
-          "text": "MRTR requires a Redis-compatible shared cache"
-        }
-      ],
-      "answer": "B",
-      "explanation": "The retry is self-contained: the instance handling it needs nothing beyond the request itself, because the prior context travels in the opaque requestState. That removes shared-storage and stateful load-balancing requirements. (Spec basic/patterns/mrtr, basic workflow.)",
-      "tags": [
-        "mrtr",
-        "statelessness",
-        "scaling"
-      ]
-    },
-    {
-      "id": "ch4-q26",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "An InputRequiredResult arrives carrying only requestState and no inputRequests. What may the client do?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Treat it as a protocol error"
-        },
-        {
-          "letter": "B",
-          "text": "Retry the original request immediately, echoing the requestState"
-        },
-        {
-          "letter": "C",
-          "text": "Prompt the user with a generic form"
-        },
-        {
-          "letter": "D",
-          "text": "Send tasks/get to fetch the pending questions"
-        }
-      ],
-      "answer": "B",
-      "explanation": "If inputRequests is absent the client MAY retry the original request immediately (with the echoed requestState). Only when inputRequests is present must the client construct the requested inputs first. (Spec basic/patterns/mrtr, client requirement 1.)",
-      "tags": [
-        "mrtr",
-        "flow"
-      ]
-    },
-    {
-      "id": "ch4-q27",
-      "chapter": 4,
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "Which resultType value marks an MRTR interim result?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "\"pending\""
-        },
-        {
-          "letter": "B",
-          "text": "\"input_required\""
-        },
-        {
-          "letter": "C",
-          "text": "\"task\""
-        },
-        {
-          "letter": "D",
-          "text": "\"incomplete\""
-        }
-      ],
-      "answer": "B",
-      "explanation": "An InputRequiredResult is identified by resultType \"input_required\". \"complete\" is a normal final result and \"task\" belongs to the Tasks extension. (Spec basic/index, ResultType.)",
-      "tags": [
-        "mrtr",
-        "result-type"
-      ]
-    },
-    {
-      "id": "ch4-scenario-extra-1",
-      "chapter": 4,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "A modern client sends tools/call with protocolVersion in _meta but omits clientCapabilities entirely. The server returns -32602 with HTTP 400. Is that consistent with the study material?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "No; missing clientCapabilities must be -32021"
-        },
-        {
-          "letter": "B",
-          "text": "Yes; a required _meta field is missing, so the request itself is malformed"
-        },
-        {
-          "letter": "C",
-          "text": "No; it must be -32601"
-        },
-        {
-          "letter": "D",
-          "text": "Yes, but only for stdio"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Distinguish malformed metadata from an undeclared needed capability. Missing required _meta fields such as clientCapabilities => -32602/HTTP 400. If capabilities are present but a needed capability is undeclared => -32021.",
-      "tags": [
-        "client",
-        "meta",
-        "errors",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch4-scenario-extra-2",
-      "chapter": 4,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A client declares clientCapabilities, but not the capability needed for an input request the server wants to use. What should the tester expect rather than a generic malformed-request error?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "-32021 MissingRequiredClientCapability"
-        },
-        {
-          "letter": "B",
-          "text": "-32700 Parse error"
-        },
-        {
-          "letter": "C",
-          "text": "-32601 Method not found"
-        },
-        {
-          "letter": "D",
-          "text": "A successful complete result"
-        }
-      ],
-      "answer": "A",
-      "explanation": "The request can be structurally valid while lacking a capability needed for the operation. That maps to -32021, with requiredCapabilities identifying what is missing.",
-      "tags": [
-        "client",
-        "capabilities",
-        "errors",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch4-scenario-extra-3",
-      "chapter": 4,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A client receives serverInfo in a result and uses the self-reported product name as proof that the server is trusted for authorization. What should a security test assert?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "This is correct if the name contains modelcontextprotocol"
-        },
-        {
-          "letter": "B",
-          "text": "serverInfo is display/logging metadata and must not be used as a security identity decision"
-        },
-        {
-          "letter": "C",
-          "text": "Trust it only on stdio"
-        },
-        {
-          "letter": "D",
-          "text": "Trust it if resultType is complete"
-        }
-      ],
-      "answer": "B",
-      "explanation": "serverInfo is self-reported informational metadata. It is useful for display/logging, not for authentication or authorization decisions.",
-      "tags": [
-        "client",
-        "server-info",
-        "security",
-        "tester-scenario"
-      ]
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/client/elicitation",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     }
   ]
 }

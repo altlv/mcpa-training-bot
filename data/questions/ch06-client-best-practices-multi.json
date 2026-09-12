@@ -1,43 +1,54 @@
 {
+  "meta": {
+    "title": "MCP Question Bank — Chapter 6: Client Best Practices (multi-select)",
+    "protocolVersion": "2026-07-28",
+    "chapter": 6,
+    "chapterName": "Client Best Practices",
+    "examDomain": "Interactions & Execution",
+    "mode": "multi_select",
+    "questionCount": 3,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
+  },
   "questions": [
     {
       "id": "ch6-m1",
       "chapter": 6,
       "type": "multi_select",
       "difficulty": "medium",
-      "question": "Which implementation guidelines apply to progressive tool discovery? (Select all that apply.)",
+      "question": "Which client-side practices does the guidance endorse? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "Offer multiple detail levels (name-only, name+description, full schema)"
+          "text": "Validate tool results against outputSchema before passing them to the model"
         },
         {
           "letter": "B",
-          "text": "Cache tool definitions host-side once fetched"
+          "text": "Trust readOnlyHint annotations to decide which calls can skip confirmation"
         },
         {
           "letter": "C",
-          "text": "Refresh the search catalog when notifications/tools/list_changed arrives"
+          "text": "Follow $ref URLs in tool schemas so validation is always complete"
         },
         {
           "letter": "D",
-          "text": "Group tools by their source server"
+          "text": "Apply timeouts to tool calls and log usage for audit"
         },
         {
           "letter": "E",
-          "text": "Re-sort the tools array on every turn to keep it alphabetical"
+          "text": "Show the user a tool's inputs before sending the call"
         }
       ],
+      "explanation": "A, B and C are the client SHOULDs in the tools spec. Implementations MUST NOT automatically dereference network $refs, and annotations are untrusted unless the server is trusted, so they cannot by themselves justify skipping consent.",
+      "tags": [
+        "client-best-practices"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "docs/2026-07-28/tutorials · specification/2026-07-28/server/tools",
+      "protocolVersion": "2026-07-28",
       "answers": [
         "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "The first four are the documented guidelines. Re-sorting the tools array mid-conversation is an anti-pattern — it invalidates provider prompt caches.",
-      "tags": [
-        "client-best-practices",
-        "progressive-discovery"
+        "D",
+        "E"
       ]
     },
     {
@@ -45,279 +56,83 @@
       "chapter": 6,
       "type": "multi_select",
       "difficulty": "hard",
-      "question": "Which security considerations apply to programmatic tool calling (code mode)? (Select all that apply.)",
+      "question": "Which results may a client cache? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "Per-call authorization: approving the script does not grant blanket approval for every runtime call"
+          "text": "A resources/read result for a specific uri, keyed by that uri"
         },
         {
           "letter": "B",
-          "text": "The sandbox should have no direct network access"
+          "text": "The result of a retry that carried inputResponses and requestState"
         },
         {
           "letter": "C",
-          "text": "API keys and tokens stay with the host broker, never exposed to generated code"
+          "text": "A server/discover result carrying ttlMs and cacheScope"
         },
         {
           "letter": "D",
-          "text": "Tool results from one server can be trusted as clean input to another server"
+          "text": "An InputRequiredResult, so the client can replay the prompt offline"
         },
         {
           "letter": "E",
-          "text": "Set timeouts and memory limits, and validate/truncate sandbox output before returning it to the model"
+          "text": "A tools/list result with resultType complete and ttlMs 300000"
         }
       ],
+      "explanation": "Cacheable results are the complete results of server/discover, the three list methods, resources/templates/list and resources/read, keyed by method plus the params that affect them. Interim input_required results carry no caching hints, and results produced by an MRTR retry MUST NOT be cached.",
+      "tags": [
+        "caching",
+        "mrtr"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/server/utilities/caching",
+      "protocolVersion": "2026-07-28",
       "answers": [
         "A",
-        "B",
         "C",
         "E"
-      ],
-      "explanation": "All listed protections are documented except D: cross-server data flow is explicitly untrusted — tool results from one server are untrusted input to another, and the broker applies the same review policy as for direct calls.",
-      "tags": [
-        "client-best-practices",
-        "code-mode",
-        "security"
       ]
     },
     {
       "id": "ch6-m3",
       "chapter": 6,
       "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which discovery strategies does the guide list for implementing a search_tools meta-tool? (Select all that apply.)",
+      "difficulty": "hard",
+      "question": "Your client connects six servers. Which practices does the client guidance endorse around presenting and executing tool calls? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "Keyword-based matching (BM25, regex)"
+          "text": "Show the user the tool and its arguments before a call is executed"
         },
         {
           "letter": "B",
-          "text": "Embedding-based vector similarity"
+          "text": "Re-fetch every list on each turn so the model never sees stale data"
         },
         {
           "letter": "C",
-          "text": "Subagent-based selection using a small fast model"
+          "text": "Apply a timeout and cancel the request when it is exceeded"
         },
         {
           "letter": "D",
-          "text": "Hybrid combinations of the above"
+          "text": "Treat a tool's description as untrusted text from the server"
         },
         {
           "letter": "E",
-          "text": "Round-robin rotation through all tools"
+          "text": "Auto-approve every call to servers the user installed themselves"
         }
       ],
+      "explanation": "Visible arguments, bounded waits with notifications/cancelled, and scepticism about server-supplied text are all endorsed. Installation is not standing approval, and re-fetching each turn ignores ttlMs and list_changed and wrecks prompt caching.",
+      "tags": [
+        "client-practices",
+        "execution"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/client",
+      "protocolVersion": "2026-07-28",
       "answers": [
         "A",
-        "B",
         "C",
         "D"
-      ],
-      "explanation": "Keyword, embedding, subagent, and hybrid are the four strategies; providers' built-in tool search may be preferred when available. Round-robin isn't a strategy.",
-      "tags": [
-        "client-best-practices",
-        "progressive-discovery",
-        "strategies"
-      ]
-    },
-    {
-      "id": "ch6-m4",
-      "chapter": 6,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "To preserve provider prompt caching while doing progressive discovery, which practices does the guide recommend? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Append newly discovered definitions after the cache breakpoint instead of re-sorting the tools array"
-        },
-        {
-          "letter": "B",
-          "text": "Route every call through a single stable call_tool({name, args}) meta-tool so the array never changes"
-        },
-        {
-          "letter": "C",
-          "text": "Treat server disconnection as a conversation-boundary operation rather than per-turn"
-        },
-        {
-          "letter": "D",
-          "text": "Remove and re-add tool definitions each turn to keep context minimal"
-        },
-        {
-          "letter": "E",
-          "text": "Consult the provider's caching documentation"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "E"
-      ],
-      "explanation": "Adding/removing definitions mid-conversation invalidates the cached prompt prefix and can cost more than it saves — exactly what option D would cause.",
-      "tags": [
-        "client-best-practices",
-        "prompt-caching"
-      ]
-    },
-    {
-      "id": "ch6-m5",
-      "chapter": 6,
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "When does the client-best-practices guide say progressive tool discovery pays off? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "When connected servers expose large tool catalogs that would consume a noticeable share of the context window (roughly the 1–5%+ territory)"
-        },
-        {
-          "letter": "B",
-          "text": "When tool definitions crowd out room for actual conversation"
-        },
-        {
-          "letter": "C",
-          "text": "When most tools are irrelevant to any single task"
-        },
-        {
-          "letter": "D",
-          "text": "When the host connects to exactly one server exposing two tools"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Progressive discovery trades latency for context savings — worthwhile for large catalogs, pointless overhead for two tools.",
-      "tags": [
-        "client-best-practices",
-        "progressive-discovery"
-      ]
-    },
-    {
-      "id": "ch6-m6",
-      "chapter": 6,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "In the code-mode architecture, which security properties does the guide require or recommend? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The sandbox has no direct network access — all tool calls go through the host broker"
-        },
-        {
-          "letter": "B",
-          "text": "Credentials live with the broker and are never injected into generated code"
-        },
-        {
-          "letter": "C",
-          "text": "Each runtime tool call is authorized individually; approving the script is not blanket approval"
-        },
-        {
-          "letter": "D",
-          "text": "isError tool results surface as exceptions the generated code can handle"
-        },
-        {
-          "letter": "E",
-          "text": "The sandbox may make direct HTTP calls if the host approves them upfront"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "All four are the documented pillars of safe programmatic tool calling, so E is genuinely correct.",
-      "tags": [
-        "client-best-practices",
-        "code-mode",
-        "security"
-      ]
-    },
-    {
-      "id": "ch6-m7",
-      "chapter": 6,
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which practices protect provider prompt caches during a long agentic session? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Keeping the tools array byte-stable and appending new definitions only after the cache breakpoint"
-        },
-        {
-          "letter": "B",
-          "text": "Relying on servers returning tools/list in deterministic order"
-        },
-        {
-          "letter": "C",
-          "text": "Routing execution through one stable call_tool meta-tool so definitions never churn"
-        },
-        {
-          "letter": "D",
-          "text": "Re-shuffling tool order each turn to surface the most relevant tools first"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Re-ordering is the classic cache-killer — the spec even added the deterministic-order recommendation (minor change 3) for exactly this reason.",
-      "tags": [
-        "client-best-practices",
-        "prompt-caching"
-      ]
-    },
-    {
-      "id": "ch6-m8",
-      "chapter": 6,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "Which steps make up the progressive-discovery loop? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Catalog: fetch lightweight tool identities (names, short descriptions)"
-        },
-        {
-          "letter": "B",
-          "text": "Inspect: pull the full schema only for candidate tools"
-        },
-        {
-          "letter": "C",
-          "text": "Execute: call the chosen tool with validated arguments"
-        },
-        {
-          "letter": "D",
-          "text": "Retrain: fine-tune the model on the tool schemas"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Catalog → inspect → execute is the loop; no fine-tuning is involved anywhere in MCP.",
-      "tags": [
-        "client-best-practices",
-        "progressive-discovery"
       ]
     }
   ]

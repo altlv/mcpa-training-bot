@@ -4,734 +4,216 @@
     "protocolVersion": "2026-07-28",
     "chapter": 11,
     "chapterName": "JSON-RPC 2.0 Fundamentals",
-    "source": "https://www.jsonrpc.org/specification",
-    "questionCount": 23
+    "examDomain": "Architecture & Components",
+    "mode": "single_select",
+    "questionCount": 6,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
   },
   "questions": [
     {
       "id": "ch11-q1",
       "chapter": 11,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "easy",
-      "question": "How is JSON-RPC described in the opening of its specification?",
+      "question": "Your server receives a JSON-RPC notification it cannot process. What is the correct behaviour?",
       "options": [
         {
           "letter": "A",
-          "text": "A stateless, light-weight remote procedure call (RPC) protocol that is transport agnostic"
+          "text": "Send no JSON-RPC response at all; on HTTP the POST itself may be answered with an error status"
         },
         {
           "letter": "B",
-          "text": "A stateful streaming protocol tied to HTTP/2"
+          "text": "Return a JSON-RPC error response that echoes the notification's method name in place of the missing id"
         },
         {
           "letter": "C",
-          "text": "A binary serialization format"
+          "text": "Queue the notification and answer it once the client sends its next request"
         },
         {
           "letter": "D",
-          "text": "A database query language"
+          "text": "Return a JSON-RPC error response with id null so the client can correlate it"
         }
       ],
-      "answer": "A",
-      "explanation": "JSON-RPC is a stateless, light-weight RPC protocol using JSON as its data format. It is transport agnostic — usable in-process, over sockets, over HTTP, or in other message-passing environments — which is why MCP can run it over both stdio and Streamable HTTP.",
+      "explanation": "The receiver MUST NOT send a JSON-RPC response to a notification. Over Streamable HTTP an accepted notification gets 202 with no body; one the server cannot accept gets an HTTP error status, whose body MAY carry a JSON-RPC error with no id.",
       "tags": [
         "json-rpc",
-        "basics"
-      ]
+        "notifications"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/basic",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch11-q2",
       "chapter": 11,
       "type": "mcq",
-      "difficulty": "easy",
-      "question": "What value must the jsonrpc member of every request and response contain?",
+      "difficulty": "medium",
+      "question": "A client sends {\"jsonrpc\":\"2.0\",\"id\":null,\"method\":\"tools/list\"}. How must an MCP server treat it?",
       "options": [
         {
           "letter": "A",
-          "text": "Exactly the String \"2.0\""
+          "text": "As a notification, since a null id signals that no response is expected"
         },
         {
           "letter": "B",
-          "text": "The number 2"
+          "text": "As a valid request, assigning it the next unused integer id when the response is built"
         },
         {
           "letter": "C",
-          "text": "Any version string the server prefers"
+          "text": "As a valid request, answering with a response whose id is also null"
         },
         {
           "letter": "D",
-          "text": "It is optional"
+          "text": "As an invalid request: MCP forbids null ids, which base JSON-RPC merely discourages"
         }
       ],
-      "answer": "A",
-      "explanation": "The jsonrpc member MUST be exactly \"2.0\". This is also how 2.0 messages are distinguished from JSON-RPC 1.0, which lacks the member.",
+      "explanation": "MCP tightens JSON-RPC here: request ids MUST be a string or integer and MUST NOT be null. A notification is a message with no id member at all, which is different from an id whose value is null.",
       "tags": [
         "json-rpc",
-        "format"
-      ]
+        "ids"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/basic",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch11-q3",
       "chapter": 11,
       "type": "mcq",
-      "difficulty": "easy",
-      "question": "Which members can a JSON-RPC 2.0 Request object contain?",
+      "difficulty": "medium",
+      "question": "Which standard JSON-RPC code does an MCP server use when the JSON body cannot be parsed at all?",
       "options": [
         {
           "letter": "A",
-          "text": "jsonrpc, method, params (optional), and id"
+          "text": "-32700 Parse error"
         },
         {
           "letter": "B",
-          "text": "url, headers, and body"
+          "text": "-32602 Invalid params"
         },
         {
           "letter": "C",
-          "text": "type, payload, and checksum"
+          "text": "-32603 Internal error"
         },
         {
           "letter": "D",
-          "text": "jsonrpc, function, and args"
+          "text": "-32600 Invalid Request"
         }
       ],
-      "answer": "A",
-      "explanation": "A request carries jsonrpc (\"2.0\"), method (a String naming the method), optional params (a Structured value), and id (String, Number, or Null) — omit the id and the request becomes a notification.",
+      "explanation": "-32700 is for invalid JSON. -32600 is for JSON that parses but is not a valid request object, such as a wrong jsonrpc value or a null id in MCP. -32602 covers bad params, including a missing required _meta field.",
       "tags": [
         "json-rpc",
-        "request"
-      ]
+        "errors"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/basic",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch11-q4",
       "chapter": 11,
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "What is a JSON-RPC Notification?",
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "While debugging you find a response object that carries both a result member and an error member. What is wrong with it?",
       "options": [
         {
           "letter": "A",
-          "text": "A response the server sends without being asked"
+          "text": "Nothing: result carries the payload and error carries any warnings raised"
         },
         {
           "letter": "B",
-          "text": "A Request object without an id member — the client isn't interested in a response, and the server MUST NOT reply"
+          "text": "A response may carry both, but the client must then ignore the result"
         },
         {
           "letter": "C",
-          "text": "Any message with id: 0"
+          "text": "A response may carry both, but only when the id member is null"
         },
         {
           "letter": "D",
-          "text": "A batch of exactly one request"
+          "text": "A response must contain exactly one of result or error, never both"
         }
       ],
-      "answer": "B",
-      "explanation": "A notification is a request with no id. No response is returned — even for errors — so notifications are not confirmable. MCP uses this for messages like notifications/tools/list_changed.",
+      "explanation": "JSON-RPC 2.0 makes result and error mutually exclusive: exactly one must be present. There is no warnings channel on a success response, and the id member has no bearing on which one appears.",
       "tags": [
         "json-rpc",
-        "notifications"
-      ]
+        "response-shape"
+      ],
+      "domain": "Architecture & Components",
+      "source": "jsonrpc.org/specification",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch11-q5",
       "chapter": 11,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "What are the two allowed parameter structures for params?",
+      "difficulty": "hard",
+      "question": "A client built for 2026-07-28 receives a result object with no resultType field. What must it do?",
       "options": [
         {
           "letter": "A",
-          "text": "By-position (an Array in the server's expected order) or by-name (an Object with exactly-matching, case-sensitive member names)"
+          "text": "Re-issue the request with a new id, because the result was truncated"
         },
         {
           "letter": "B",
-          "text": "Comma-separated strings or XML"
+          "text": "Reject it as invalid, since resultType is required on every result"
         },
         {
           "letter": "C",
-          "text": "Only flat key=value pairs"
+          "text": "Treat it as \"complete\", as earlier-protocol servers had no resultType"
         },
         {
           "letter": "D",
-          "text": "Positional integers only"
+          "text": "Treat it as \"input_required\" and wait for the inputRequests to arrive"
         }
       ],
-      "answer": "A",
-      "explanation": "If present, params MUST be Structured: an Array for by-position calls, or an Object for by-name calls whose names must match the method's expected parameters exactly, including case. MCP uses by-name params.",
+      "explanation": "resultType is required in this revision, but for backwards compatibility clients MUST treat an absent resultType as \"complete\". By contrast, a resultType value the client does not recognise MUST be considered invalid.",
       "tags": [
         "json-rpc",
-        "params"
-      ]
+        "results",
+        "resultType"
+      ],
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/basic",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch11-q6",
       "chapter": 11,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which rule governs the result and error members of a Response object?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Both must always be present"
-        },
-        {
-          "letter": "B",
-          "text": "Exactly one must be included: result is required on success, error on failure, and both MUST NOT appear together"
-        },
-        {
-          "letter": "C",
-          "text": "result may contain an error object"
-        },
-        {
-          "letter": "D",
-          "text": "error is optional even on failure"
-        }
-      ],
-      "answer": "B",
-      "explanation": "A response contains either result (success) or error (failure), never both. The response also echoes the request's id so the client can correlate them.",
-      "tags": [
-        "json-rpc",
-        "response"
-      ]
-    },
-    {
-      "id": "ch11-q7",
-      "chapter": 11,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "What are the members of a JSON-RPC Error object?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "code (an integer), message (a concise String), and optional data with additional information"
-        },
-        {
-          "letter": "B",
-          "text": "status, reason, and stacktrace"
-        },
-        {
-          "letter": "C",
-          "text": "errno and strerror"
-        },
-        {
-          "letter": "D",
-          "text": "level, source, and detail"
-        }
-      ],
-      "answer": "A",
-      "explanation": "The error object has code (MUST be an integer), message (a short single-sentence description), and optional data (Primitive or Structured, server-defined). MCP uses data e.g. to list supported versions in an UnsupportedProtocolVersionError.",
-      "tags": [
-        "json-rpc",
-        "errors"
-      ]
-    },
-    {
-      "id": "ch11-q8",
-      "chapter": 11,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Match the reserved error code to its meaning: -32700, -32600, -32601, -32602, -32603.",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Parse error, Invalid Request, Method not found, Invalid params, Internal error"
-        },
-        {
-          "letter": "B",
-          "text": "Internal error, Parse error, Invalid params, Method not found, Invalid Request"
-        },
-        {
-          "letter": "C",
-          "text": "Timeout, Overload, Not found, Bad gateway, Unavailable"
-        },
-        {
-          "letter": "D",
-          "text": "They are all synonyms for 'server error'"
-        }
-      ],
-      "answer": "A",
-      "explanation": "-32700 Parse error (invalid JSON), -32600 Invalid Request, -32601 Method not found, -32602 Invalid params, -32603 Internal error. -32000 to -32099 are reserved for implementation-defined server errors, and the whole -32768..-32000 range is reserved.",
-      "tags": [
-        "json-rpc",
-        "error-codes"
-      ]
-    },
-    {
-      "id": "ch11-q9",
-      "chapter": 11,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which range of error codes is reserved for implementation-defined server errors?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "-32000 to -32099"
-        },
-        {
-          "letter": "B",
-          "text": "400 to 599"
-        },
-        {
-          "letter": "C",
-          "text": "-1 to -99"
-        },
-        {
-          "letter": "D",
-          "text": "1000 to 1999"
-        }
-      ],
-      "answer": "A",
-      "explanation": "-32000 to -32099 is reserved for implementation-defined server errors within the larger reserved range -32768 to -32000. MCP defines codes such as -32021 and -32022 for protocol-specific failures. The remainder of the space is available for application-defined errors.",
-      "tags": [
-        "json-rpc",
-        "error-codes"
-      ]
-    },
-    {
-      "id": "ch11-q10",
-      "chapter": 11,
-      "type": "mcq",
       "difficulty": "hard",
-      "question": "What restrictions and recommendations apply to the id member of a Request?",
+      "question": "A client POSTs a JSON array containing two requests to an MCP endpoint. What should happen?",
       "options": [
         {
           "letter": "A",
-          "text": "It must be a UUID"
+          "text": "The server answers with an array of two responses, in any order, matched by id"
         },
         {
           "letter": "B",
-          "text": "It MUST be a String, Number, or Null if included; Null is discouraged (it's used for responses with unknown id), and Numbers SHOULD NOT contain fractional parts"
+          "text": "The server rejects it: an MCP POST body must be a single request or notification"
         },
         {
           "letter": "C",
-          "text": "It must increase monotonically"
+          "text": "The server answers with an array of two responses, in the order received"
         },
         {
           "letter": "D",
-          "text": "Booleans are allowed"
+          "text": "The server processes the first request and ignores the rest of the array"
         }
       ],
-      "answer": "B",
-      "explanation": "The id is client-established and echoed back by the server. Null is discouraged because error responses to unparseable requests use id: null, and fractional numbers are discouraged since many decimal fractions can't be represented exactly in binary.",
+      "explanation": "Base JSON-RPC allows batches, but MCP does not use them: each Streamable HTTP POST body is exactly one request or notification, and each stdio line is one message.",
       "tags": [
         "json-rpc",
-        "id",
-        "correlation"
-      ]
-    },
-    {
-      "id": "ch11-q11",
-      "chapter": 11,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "SCENARIO: A server receives {\"jsonrpc\": \"2.0\", \"method\": \"foobar\", \"id\": \"1\"} but has no method named foobar. What does it return?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "{\"jsonrpc\": \"2.0\", \"error\": {\"code\": -32601, \"message\": \"Method not found\"}, \"id\": \"1\"}"
-        },
-        {
-          "letter": "B",
-          "text": "An empty 200 response"
-        },
-        {
-          "letter": "C",
-          "text": "{\"result\": null, \"id\": \"1\"}"
-        },
-        {
-          "letter": "D",
-          "text": "Nothing; unknown methods are ignored"
-        }
+        "batching"
       ],
-      "answer": "A",
-      "explanation": "A call to a non-existent method returns error -32601 Method not found, echoing the request's id — this example appears verbatim in the specification.",
-      "tags": [
-        "json-rpc",
-        "scenario",
-        "errors"
-      ]
-    },
-    {
-      "id": "ch11-q12",
-      "chapter": 11,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "SCENARIO: A server receives text that is not valid JSON at all. What id does the error response carry, and why?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The id from the broken request, recovered heuristically"
-        },
-        {
-          "letter": "B",
-          "text": "id: null — because the id could not be detected in the malformed request, the spec mandates Null (with error -32700 Parse error)"
-        },
-        {
-          "letter": "C",
-          "text": "A freshly generated id"
-        },
-        {
-          "letter": "D",
-          "text": "No response is ever sent for parse errors"
-        }
-      ],
-      "answer": "B",
-      "explanation": "When there is an error detecting the id (Parse error / Invalid Request), the response id MUST be Null. This is also why using Null as a request id is discouraged — it's reserved for 'unknown id' responses.",
-      "tags": [
-        "json-rpc",
-        "scenario",
-        "errors",
-        "id"
-      ]
-    },
-    {
-      "id": "ch11-q13",
-      "chapter": 11,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "Which statements about batch calls are correct?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Responses must be returned in the same order as the requests"
-        },
-        {
-          "letter": "B",
-          "text": "The server may process batch requests concurrently and return responses in any order; clients match them by id. Notifications in a batch get no response, and a batch of all notifications returns nothing at all"
-        },
-        {
-          "letter": "C",
-          "text": "Batches may contain at most 10 requests"
-        },
-        {
-          "letter": "D",
-          "text": "An empty array [] is a valid no-op batch"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Batch responses MAY come back in any order (match by id), notifications get no response objects, and if no responses remain the server returns nothing rather than an empty array. An empty array is invalid and yields a single -32600 error.",
-      "tags": [
-        "json-rpc",
-        "batch"
-      ]
-    },
-    {
-      "id": "ch11-q14",
-      "chapter": 11,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which method names are reserved in JSON-RPC 2.0?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Names beginning with 'rpc.' (rpc followed by a period) — reserved for rpc-internal methods and extensions"
-        },
-        {
-          "letter": "B",
-          "text": "Names containing underscores"
-        },
-        {
-          "letter": "C",
-          "text": "Names longer than 32 characters"
-        },
-        {
-          "letter": "D",
-          "text": "Names beginning with capital letters"
-        }
-      ],
-      "answer": "A",
-      "explanation": "Method names beginning with rpc. are reserved for system extensions and MUST NOT be used for anything else. MCP's method names (tools/list, server/discover, etc.) use slash-separated namespaces, avoiding the reserved prefix.",
-      "tags": [
-        "json-rpc",
-        "methods",
-        "reserved"
-      ]
-    },
-    {
-      "id": "ch11-q15",
-      "chapter": 11,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "SCENARIO: In an MCP session you observe the message {\"jsonrpc\": \"2.0\", \"method\": \"notifications/tools/list_changed\", \"params\": {...}} with no id field, and the client sends nothing back. Is this correct JSON-RPC behavior?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "No; every message requires a response"
-        },
-        {
-          "letter": "B",
-          "text": "Yes: a request without an id is a notification, and per JSON-RPC 2.0 the receiver MUST NOT reply — exactly how MCP delivers change notifications"
-        },
-        {
-          "letter": "C",
-          "text": "No; the server should have used id: null"
-        },
-        {
-          "letter": "D",
-          "text": "Only if the transport is HTTP"
-        }
-      ],
-      "answer": "B",
-      "explanation": "This ties MCP back to its JSON-RPC foundation: notifications omit the id, expect no response, and receivers must not reply. MCP's notifications/* messages follow these semantics precisely.",
-      "tags": [
-        "json-rpc",
-        "scenario",
-        "notifications",
-        "mcp"
-      ]
-    },
-    {
-      "id": "ch11-q16",
-      "chapter": 11,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Match the MCP-specific error codes introduced in 2026-07-28: -32020, -32021, -32022.",
-      "options": [
-        {
-          "letter": "A",
-          "text": "HeaderMismatch, MissingRequiredClientCapability, UnsupportedProtocolVersion"
-        },
-        {
-          "letter": "B",
-          "text": "UnsupportedProtocolVersion, HeaderMismatch, MissingRequiredClientCapability"
-        },
-        {
-          "letter": "C",
-          "text": "MissingRequiredClientCapability, UnsupportedProtocolVersion, HeaderMismatch"
-        },
-        {
-          "letter": "D",
-          "text": "ParseError, InvalidRequest, MethodNotFound"
-        }
-      ],
-      "answer": "A",
-      "explanation": "Memory hook: '20-21-22 = Header, Capability, Version'. -32020 HeaderMismatch, -32021 MissingRequiredClientCapability, -32022 UnsupportedProtocolVersion. (Spec basic/index, error codes.)",
-      "tags": [
-        "error-codes",
-        "mcp-errors"
-      ]
-    },
-    {
-      "id": "ch11-q17",
-      "chapter": 11,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "How does 2026-07-28 partition the JSON-RPC implementation-defined server-error range (-32000 to -32099)?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The whole range is now reserved for the MCP specification"
-        },
-        {
-          "letter": "B",
-          "text": "-32000 to -32019 is legacy implementation territory (grandfathered; no NEW codes may be allocated there), while -32020 to -32099 is reserved exclusively for the MCP specification"
-        },
-        {
-          "letter": "C",
-          "text": "-32000 to -32049 for clients, -32050 to -32099 for servers"
-        },
-        {
-          "letter": "D",
-          "text": "The range is deprecated; all errors must use positive codes"
-        }
-      ],
-      "answer": "B",
-      "explanation": "New codes MUST NOT be allocated in -32000..-32019, and implementations MUST NOT emit undefined codes from the spec-reserved -32020..-32099 sub-range. Codes for new purposes SHOULD live outside the JSON-RPC reserved range entirely. (Spec basic/index, error code allocation policy.)",
-      "tags": [
-        "error-codes",
-        "allocation-policy"
-      ]
-    },
-    {
-      "id": "ch11-q18",
-      "chapter": 11,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "A modern client requests a nonexistent resource URI. Which error should the server emit, and how should the client treat -32002?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Emit -32002; clients must reject -32602"
-        },
-        {
-          "letter": "B",
-          "text": "Emit -32602 (Invalid params); the server MUST NOT emit -32002, but clients SHOULD still accept -32002 from servers on earlier protocol versions"
-        },
-        {
-          "letter": "C",
-          "text": "Emit -32601 (Method not found)"
-        },
-        {
-          "letter": "D",
-          "text": "Emit HTTP 404 with no JSON-RPC body"
-        }
-      ],
-      "answer": "B",
-      "explanation": "SEP-2164 moved resource-not-found from -32002 to -32602 to align with JSON-RPC. -32002 (and -32042) remain reserved-but-forbidden for modern servers, while clients keep accepting them for backward compatibility. Trap 10 material. (Spec basic/index and changelog.)",
-      "tags": [
-        "error-codes",
-        "resources",
-        "backward-compat"
-      ]
-    },
-    {
-      "id": "ch11-q19",
-      "chapter": 11,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "Which statement about JSON-RPC request IDs is specific to MCP and stricter than base JSON-RPC 2.0?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "IDs may be floats"
-        },
-        {
-          "letter": "B",
-          "text": "The ID MUST NOT be null, MUST be a string or integer, and MUST NOT match any other request the sender has issued and not yet received a response for"
-        },
-        {
-          "letter": "C",
-          "text": "IDs must be UUIDv4 strings"
-        },
-        {
-          "letter": "D",
-          "text": "IDs are optional on requests"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Base JSON-RPC merely discourages null IDs; MCP forbids them outright and requires uniqueness among the sender's outstanding requests. Notifications still carry no ID at all. (Spec basic/index, Requests.)",
-      "tags": [
-        "error-codes",
-        "json-rpc",
-        "request-id"
-      ]
-    },
-    {
-      "id": "ch11-q20",
-      "chapter": 11,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "A client sends a request pinned to protocol version 2025-11-25 to a server that only supports 2026-07-28. What does the modern spec say happens?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The server silently answers in its own version"
-        },
-        {
-          "letter": "B",
-          "text": "The server returns UnsupportedProtocolVersionError (-32022); the client could have avoided this by checking supportedVersions via server/discover first"
-        },
-        {
-          "letter": "C",
-          "text": "The server downgrades and emulates the legacy handshake"
-        },
-        {
-          "letter": "D",
-          "text": "The transport layer rejects the TCP connection"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Version mismatches surface as UnsupportedProtocolVersionError. Negotiation detects mismatch - it does not bridge eras; a dual-era server routes per request, but a modern-only server errors. (Spec 2026-07-28 changelog, major change 2; server/discover.)",
-      "tags": [
-        "error-codes",
-        "versioning"
-      ]
-    },
-    {
-      "id": "ch11-scenario-extra-1",
-      "chapter": 11,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A JSON-RPC notification includes \"id\": 7 and the receiver sends a response. Which issue should the tester identify first?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "No issue; notifications require IDs"
-        },
-        {
-          "letter": "B",
-          "text": "A notification must have no id and must not receive a response; with an id it is request-shaped"
-        },
-        {
-          "letter": "C",
-          "text": "The id must be null instead"
-        },
-        {
-          "letter": "D",
-          "text": "The method must start with rpc."
-        }
-      ],
-      "answer": "B",
-      "explanation": "Notifications have no id and receivers do not reply. MCP also forbids null request IDs, so id:null is not a workaround.",
-      "tags": [
-        "json-rpc",
-        "notifications",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch11-scenario-extra-2",
-      "chapter": 11,
-      "type": "scenario",
-      "difficulty": "easy",
-      "question": "A response object contains both result and error for the same id. What should a protocol conformance test conclude?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Valid if resultType is complete"
-        },
-        {
-          "letter": "B",
-          "text": "Invalid: a JSON-RPC response has result XOR error, never both"
-        },
-        {
-          "letter": "C",
-          "text": "Valid only over SSE"
-        },
-        {
-          "letter": "D",
-          "text": "Valid if the error code is -32603"
-        }
-      ],
-      "answer": "B",
-      "explanation": "JSON-RPC responses are mutually exclusive: success uses result, failure uses error.",
-      "tags": [
-        "json-rpc",
-        "responses",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch11-scenario-extra-3",
-      "chapter": 11,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "Two requests are outstanding with IDs 10 and 11. Responses arrive in the opposite order. The client reports a failure because it expected FIFO ordering. What is the bug?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The server; responses must preserve request order"
-        },
-        {
-          "letter": "B",
-          "text": "The client; it should correlate responses by id rather than arrival order"
-        },
-        {
-          "letter": "C",
-          "text": "Both IDs should be null"
-        },
-        {
-          "letter": "D",
-          "text": "Batching is required"
-        }
-      ],
-      "answer": "B",
-      "explanation": "JSON-RPC correlation is by id. Responses, including batch responses, can arrive in a different order from requests.",
-      "tags": [
-        "json-rpc",
-        "ids",
-        "tester-scenario"
-      ]
+      "domain": "Architecture & Components",
+      "source": "specification/2026-07-28/basic/transports",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     }
   ]
 }

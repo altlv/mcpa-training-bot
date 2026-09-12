@@ -1,5 +1,10 @@
 # MCPA Exam Cheat Sheet
+> **Revised 2026-09-11. Checked line by line against the MCP spec 2026-07-28, the JSON-RPC 2.0 spec, the official MCP docs (Inspector, Registry, Extensions, Governance) and the Linux Foundation exam page.** Lines marked **[FIXED]** were wrong; lines marked **[ADDED]** were missing. See "Revision log" at the end.
+
 ---
+
+## ⭐ EXAM FORMAT [ADDED]
+- Online, proctored, multiple choice · **90 minutes** · certification valid 2 years · 1 retake · 12-month exam eligibility
 
 ## ⭐ EXAM DOMAIN WEIGHTS (study time allocator!)
 
@@ -21,7 +26,7 @@
 - **MCP** = Model Context Protocol (USB for AI)
 - **Purpose** = Standardize how AI apps connect to tools/data
 - **Created by** = Anthropic (announced **November 2024**)
-- **Status** = Open standard, growing ecosystem
+- **Status** = Open standard; since Dec 2025 hosted by the **Agentic AI Foundation (AAIF)** at the Linux Foundation ("Model Context Protocol, a Series of LF Projects, LLC")
 - **Current spec version** = **2026-07-28** (YYYY-MM-DD = last date of breaking changes)
 - **Inspired by** = Language Server Protocol (LSP)
 - **Solves** = M×N integration problem → M+N (5 apps × 8 systems = 40 connectors → 13 implementations)
@@ -49,7 +54,9 @@
 4. `io.modelcontextprotocol/logLevel` (optional — per-request log level)
 
 > ⚠️ Missing a REQUIRED field = malformed request → **-32602 + HTTP 400**.
-> Fields present but a needed *capability* undeclared → **-32021** (`data.requiredCapabilities` lists what's missing). Don't confuse the two!
+> Fields present but a needed *capability* undeclared → **-32021 + HTTP 400** (`data.requiredCapabilities` lists what's missing). Don't confuse the two! **[FIXED: added the HTTP status]**
+> Version present but not supported by the server → **-32022 + HTTP 400** (`data.supported` lists versions, `data.requested` echoes yours). **[ADDED]**
+> There is **no** separate "invalid protocol version" error code. **[FIXED]**
 > Every *result* SHOULD carry `io.modelcontextprotocol/serverInfo` in its `_meta` — self-reported, display/logging only, NEVER for security decisions.
 
 ### `server/discover` (servers MUST implement — clients MAY call)
@@ -149,13 +156,21 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 | **Sessions** | N/A | **Removed in 2026-07-28** (was Mcp-Session-Id) |
 
 #### Streamable HTTP vs legacy HTTP+SSE (EXAM TRAP!)
-- **HTTP+SSE** = two endpoints (GET/SSE for server→client + POST for client→server) → **Deprecated** 2026-07-28
+- **HTTP+SSE** = two endpoints (GET/SSE for server→client + POST for client→server) → **Deprecated since 2025-03-26**; 2026-07-28 only re-classified it under the SEP-2596 lifecycle policy. Earliest removal: **3 months after SEP-2596 reaches Final** (not the usual 12 months). **[FIXED]**
 - **Streamable HTTP** = single endpoint, POST carries client messages, optional SSE streaming on response
 - **Key removals in 2026-07-28:** sessions, Last-Event-ID resumability, standalone GET endpoint
-- **Broken stream = re-issue as new request** (no resume, no replay)
+- **Broken stream = re-issue as new request with a new id** (no resume, no replay)
+- **Modern-only server receiving legacy traffic [ADDED]:** GET or DELETE → **405**; `Mcp-Session-Id` header → ignore (never mint/echo); `Last-Event-ID` → ignore
+- **Other HTTP rules [ADDED]:** every client message = its own POST · `Accept` must list both `application/json` and `text/event-stream` · accepted notification → **202** (no body) · invalid `Origin` header → **403** (DNS-rebinding defence) · unknown method → **404 + -32601** · local servers SHOULD bind 127.0.0.1, not 0.0.0.0
+- **Cancellation [ADDED]:** HTTP = close the SSE response stream · stdio = send `notifications/cancelled` (the only client→server notification in core)
+
+#### MCP-Protocol-Version header — REQUIRED on every POST [ADDED]
+- Must equal `_meta["io.modelcontextprotocol/protocolVersion"]` in the body
+- Missing or mismatched → **400 + HeaderMismatch (-32020)** · not supported by the server → **400 + UnsupportedProtocolVersion (-32022)**
+- A server that still supports pre-2025-06-18 clients MAY treat a missing header as `2025-03-26`
 
 #### Mcp-Method / Mcp-Name headers (SEP-2243) — NEW EXAM MATERIAL
-- `Mcp-Method` required on **every request AND notification** (e.g., `tools/call`)
+- `Mcp-Method` required on **all requests** (e.g., `tools/call`). This revision defines no header rules for notification POSTs. **[FIXED: was "every request AND notification"]**
 - `Mcp-Name` required for `tools/call`, `resources/read`, `prompts/get` (the target name)
 - **Purpose:** Gateway routing, WAF policies, rate limiting — without parsing JSON body
 - **Mismatch = 400 + HeaderMismatch (-32020)** — headers and body must agree
@@ -172,17 +187,21 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 | **Streamable HTTP** | Client sends each JSON-RPC message as an HTTP POST |
 | **Streamable HTTP** | Server responds with either a single JSON object or a per-request SSE stream |
 | **Streamable HTTP** | Supports remote/networked deployments |
-| **HTTP+SSE (legacy)** | ❌ DEPRECATED — two-endpoint design replaced by Streamable HTTP (2025-03-26) |
+| **HTTP+SSE (legacy)** | ❌ DEPRECATED since 2025-03-26 — two-endpoint design replaced by Streamable HTTP |
 
 ### Required HTTP headers (SEP-2243) — NEW EXAM MATERIAL
 | Header | When | Purpose |
 |--------|------|---------|
-| `Mcp-Method` | **Every request AND notification** | Gateway routing without body parsing |
+| `MCP-Protocol-Version` | **Every POST** — must match `_meta` protocolVersion **[ADDED]** | Version routing; mismatch → 400 + -32020 |
+| `Mcp-Method` | **All requests** **[FIXED]** | Gateway routing without body parsing |
 | `Mcp-Name` | `tools/call` (`params.name`), `resources/read` (`params.uri`), `prompts/get` (`params.name`) | Names the target |
 | `Mcp-Param-*` | Params annotated `x-mcp-header` | Surface arg values to infra |
 | Header ≠ body / missing / bad Base64? | → **400 + HeaderMismatch (-32020)** | Anti-spoofing |
 
-- ⚠️ HeaderMismatch was **-32001 in the SEP text** — renumbered to **-32020** in the final spec (distractor alert!)
+- ⚠️ HeaderMismatch was **-32001 in the drafts** — the 2026-07-28 changelog renumbered it to **-32020** (and -32003 → -32021, -32004 → -32022). -32001 means **nothing** in the final spec (distractor alert!) **[FIXED]**
+- Missing required header (`MCP-Protocol-Version`, `Mcp-Method`, `Mcp-Name`) also → **400 + -32020** **[ADDED]**
+- Servers **decode** Base64-sentinel values before comparing to the body; integers compared numerically (`42.0` = `42`) **[ADDED]**
+- Clients **MUST** support `x-mcp-header` (it's optional for servers); stdio clients MAY ignore it **[ADDED]**
 - `x-mcp-header`: **primitive types only** — string/integer/boolean, `number` explicitly excluded; names case-insensitively unique; violating tool def → client drops **that one tool** from `tools/list` (not the whole list)
 - Non-ASCII / leading-trailing-space values → Base64 with sentinel `=?base64?...?=` (lowercase, case-sensitive markers)
 - Header **names** case-insensitive; method **values** case-sensitive (`TOOLS/CALL` = reject)
@@ -190,13 +209,19 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 
 ### subscriptions/listen (replaces GET endpoint + resources/subscribe/unsubscribe)
 - Long-lived **POST**-response stream; opt-in types: `toolsListChanged` · `promptsListChanged` · `resourcesListChanged` · `resourceSubscriptions`
-- Server acknowledges the subscription, then MUST tag every delivered notification with `io.modelcontextprotocol/subscriptionId` in its `_meta` (correlates to the originating listen request) — *(the exact ack method name / "id = listen request's id" claim is NOT stated in the spec pages — don't bet on it)*
+- First message MUST be **`notifications/subscriptions/acknowledged`** (it lists the subset of the filter the server agreed to honour); nothing may be sent before it **[FIXED: now confirmed]**
+- Every notification on the stream MUST carry `_meta["io.modelcontextprotocol/subscriptionId"]` = **the JSON-RPC `id` of the `subscriptions/listen` request** **[FIXED: now confirmed]**
+- Server MUST NOT send notification types the client did not request · a client MAY hold several subscriptions at once (demultiplexed by subscriptionId) **[ADDED]**
+- Client cancels: HTTP = close the stream · stdio = `notifications/cancelled` with the listen request's id. After a stdio restart the client MUST re-send `subscriptions/listen` (server keeps no subscription state) **[ADDED]**
 - Graceful close: server sends the empty `subscriptions/listen` JSON-RPC result before closing; stream drop **without** a result = unexpected disconnect → re-listen
 - Delivery = **best-effort** (no replay — poll as backup); its state is scoped to the *request*, not the connection
 - ⚠️ `notifications/progress` AND `notifications/message` do NOT ride here — they flow only on the originating request's response stream
 
 ### Caching (SEP-2549)
-- `ttlMs` + `cacheScope` (`public`/`private`) required on: `tools/list`, `prompts/list`, `resources/list`, `resources/templates/list`, `resources/read`
+- `ttlMs` + `cacheScope` (`public`/`private`) required on: `server/discover` **[ADDED]**, `tools/list`, `prompts/list`, `resources/list`, `resources/templates/list`, `resources/read`
+- `input_required` results carry **no** cache hints; results of MRTR retries (with `inputResponses`/`requestState`) **MUST NOT** be cached **[ADDED]**
+- `ttlMs`: 0 or absent → immediately stale · negative → treat as 0 · it's a freshness hint, not a polling interval (if you poll anyway: jitter + backoff) **[ADDED]**
+- `private` cache MUST NOT be shared across authorization contexts (different token = different cache); same `cacheScope` on every page of a list **[ADDED]**
 - `list_changed` notification **beats** an unexpired TTL
 - Return tools in **deterministic order** (protects LLM prompt caches)
 
@@ -217,7 +242,10 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 - Notification = **no id** → receiver MUST NOT reply
 - ⚠️ **MCP is stricter than base JSON-RPC on ids**: request id MUST be string or integer, **MUST NOT be `null`** (base JSON-RPC only *discourages* null — MCP forbids it), and MUST be unique among the sender's outstanding requests
 - Method names starting `rpc.` = reserved
-- Empty batch `[]` = invalid → single `-32600` error; batch responses arrive in any order, match by id
+- Base JSON-RPC only: empty batch `[]` = invalid → single `-32600` error; batch responses arrive in any order, match by id
+- ⚠️ **MCP does not use batches**: each HTTP POST body MUST be exactly one request or notification, and each stdio line is one message **[ADDED]**
+- Error response whose id couldn't be read (parse error) → id omitted / null — the only case an error may lack the request id **[ADDED]**
+- Results MUST carry `resultType`; a missing `resultType` (legacy server) = treat as `"complete"`; an unknown value = invalid **[ADDED]**
 
 ### Error Codes (MEMORIZE!)
 | Code | Name | Meaning |
@@ -229,14 +257,15 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 | `-32603` | Internal error | Server bug |
 
 ### MCP-specific Error Codes (NEW — MEMORIZE!)
-| Code | Name | Trigger |
-|------|------|---------|
-| `-32001` | InvalidProtocolVersion | Protocol version in `_meta` is invalid/malformed |
-| `-32020` | HeaderMismatch | HTTP headers disagree with body |
-| `-32021` | MissingRequiredClientCapability | Request `_meta` lacks a needed capability |
-| `-32022` | UnsupportedProtocolVersion | `data` field lists supported versions |
-| `-32000..-32019` | Implementation-defined | Grandfathered SDK/app errors — **no NEW codes here** |
-| `-32020..-32099` | **Reserved for MCP spec** | Only spec-defined codes may be emitted |
+| Code | Name | Trigger | HTTP |
+|------|------|---------|------|
+| `-32020` | HeaderMismatch | HTTP headers disagree with body, or a required header is missing/malformed | 400 |
+| `-32021` | MissingRequiredClientCapability | `_meta` is present but lacks a capability this request needs (`data.requiredCapabilities`) | 400 |
+| `-32022` | UnsupportedProtocolVersion | Server doesn't support the requested version (`data.supported`, `data.requested`) | 400 |
+| `-32000..-32019` | Legacy / implementation-defined | Grandfathered SDK errors — **no NEW codes here**; receivers MUST NOT assume any meaning (except -32002) | — |
+| `-32020..-32099` | **Reserved for MCP spec** | Only spec-defined codes may be emitted | — |
+
+> **[FIXED]** The old row "`-32001` InvalidProtocolVersion" was wrong — that error does not exist. These three are the **only** MCP-defined codes. Version field *missing* → -32602 (malformed request); version *unsupported* → -32022. The drafts used -32001/-32003/-32004; the 2026-07-28 changelog renumbered them to -32020/-32021/-32022.
 
 - `-32002` (old resource-not-found) & `-32042` (old URL-elicitation): modern servers **MUST NOT emit**, but clients **SHOULD still accept** `-32002` from legacy servers
 - New app-specific codes → allocate **outside** the JSON-RPC reserved range (`-32768..-32000`)
@@ -267,7 +296,11 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 ```
 **Key:** Tools are FUNCTIONS the AI can call
 - Name unique **per server** (cross-server collisions = host's problem)
-- Execution failure → `isError: true` in the RESULT (not a protocol error!)
+- Execution failure (API error, bad date, business rule) → `isError: true` in the RESULT (not a protocol error!) — clients SHOULD pass it to the model so it can self-correct
+- **Unknown tool / request that fails the CallToolRequest schema → JSON-RPC error -32602** **[ADDED]**
+- `tools/list` MUST NOT vary per connection; MAY vary by the caller's authorization (scopes) **[ADDED]**
+- Tool annotations are **untrusted** unless the server is trusted · `outputSchema` given → server MUST return conforming `structuredContent` **[ADDED]**
+- Stateful tools: no protocol session → return an explicit **handle** (e.g. `basket_id`) and take it as an argument; a handle is a name, not a credential **[ADDED]**
 - Human oversight: UI visibility · per-call approval · pre-approval settings · activity logs
 
 ### Resources
@@ -281,6 +314,8 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 **Key:** Resources are DATA the AI can read
 - Direct (fixed URI) vs Templates (`weather://forecast/{city}/{date}`, support completion)
 - Watch changes: `subscriptions/listen` + `resourceSubscriptions` filter
+- Not found → **-32602** (clients SHOULD still accept legacy -32002) · internal error → -32603 · MUST NOT answer a missing resource with an empty `contents` array **[ADDED]**
+- Servers MUST sanitize `file://` paths (directory traversal) **[ADDED]**
 
 ### Prompts
 ```json
@@ -293,6 +328,8 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 }
 ```
 **Key:** Prompts are TEMPLATES for AI interactions
+- "User-controlled" = the user decides *when* a prompt is used; the *server* authors the content **[ADDED]**
+- Unknown prompt name or missing required argument → **-32602** · internal → -32603 **[ADDED]**
 
 ---
 
@@ -308,8 +345,14 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 ### Elicitation — two modes (EXAM FAVORITE)
 | Mode | For | Rules |
 |------|-----|-------|
-| **Form** | Ordinary structured data (schema-validated) | ❌ NEVER passwords/API keys/tokens/payment data |
+| **Form** | Ordinary structured data (schema-validated) | ❌ NEVER passwords/API keys/tokens/payment data · flat objects with primitive fields only |
 | **URL** | Credentials, third-party OAuth | Show full URL · explicit consent · NEVER auto-fetch · client learns only consent outcome |
+
+- Three response actions: **accept** (form: with `content`) · **decline** (explicit no) · **cancel** (dismissed) **[ADDED]**
+- `elicitation: {}` in client capabilities = form mode only; a request without `mode` = form **[ADDED]**
+- URL mode is **not** for authorizing the client to the MCP server (that's MCP auth) — it's for the server getting third-party credentials. Third-party tokens stay on the server; never passed to the client **[ADDED]**
+- URL elicitation phishing defence: the server MUST check that the user who opens the URL is the same user who triggered it **[ADDED]**
+- Removed in 2026-07-28: `notifications/elicitation/complete` and `elicitationId` (the client learns the outcome by retrying). Code -32042 (URL elicitation required) is retired **[ADDED]**
 
 ---
 
@@ -325,7 +368,7 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 - No `port` key — stdio has no TCP!
 
 ### Requirements
-- Python quickstart: **Python 3.10+, SDK 2.0.0+** · TypeScript: **Node 20+** · Inspector: **Node 22.19.0+**
+- Python quickstart: **Python 3.10+, SDK 2.0.0+** · TypeScript: **Node 20+** · Inspector: **Node 22.19.0+** *(course material — could not be verified against the public docs)*
 
 ### Log locations
 | OS | Path |
@@ -389,44 +432,67 @@ Remote server --> Many Clients | Local stdio server --> typically 1 client
 ### OAuth 2.1 Flow (EXAM HEAVY!)
 ```
 1. Client -> MCP Server: request (no token)
-2. MCP Server -> Client: 401 + WWW-Authenticate (points to PRM)
-3. Client fetches Protected Resource Metadata (RFC 9728)
-4. Client fetches Authorization Server Metadata (RFC 8414 / OIDC)
-5. Client registers (static | DCR [deprecated] | CIMD [recommended])
-6. User authorizes at auth endpoint (PKCE required!)
-7. Client exchanges code for token (validate iss if present - MUST)
-8. Client -> MCP Server: Authorization: Bearer <token>
-9. Server validates signature + exp + AUD + iss -> serves request
+2. MCP Server -> Client: 401 + WWW-Authenticate (resource_metadata URL, SHOULD include scope)
+3. Client fetches Protected Resource Metadata (RFC 9728) — servers MUST implement it
+4. Client fetches Authorization Server Metadata (RFC 8414 or OIDC Discovery — clients MUST support both)
+   PKCE check: code_challenge_methods_supported absent -> client MUST refuse to proceed
+5. Client gets a client_id, in this priority order:            [FIXED]
+     a) pre-registered credentials (if it has them)
+     b) CIMD — HTTPS URL as client_id (if AS advertises client_id_metadata_document_supported)
+     c) DCR (deprecated fallback, if AS has registration_endpoint)
+     d) ask the user to enter client details
+6. Record the AS issuer; generate PKCE (S256); send `resource` = canonical MCP server URI
+7. User authorizes at auth endpoint; redirect back with code (+ iss)
+8. Validate iss (RFC 9207) BEFORE redeeming the code; exchange code + code_verifier + resource
+9. Client -> MCP Server: Authorization: Bearer <token> on EVERY request (never in the query string)
+10. Server validates the token per OAuth 2.1 §5.2 incl. AUDIENCE = this server -> serves request
 ```
+- **`resource` parameter (RFC 8707)**: MUST be in both the authorization and token requests, even if the AS ignores it. Canonical URI examples: `https://mcp.example.com/mcp` ✓ · `mcp.example.com` ✗ (no scheme) · `...#frag` ✗ **[ADDED]**
+- **`iss` validation table (RFC 9207) [ADDED]:** AS advertises `authorization_response_iss_parameter_supported: true` and `iss` is absent → **reject**; `iss` present → compare to the recorded issuer by exact string match (no normalisation); neither advertised nor present → proceed
+- **Scope selection:** use `scope` from the 401 challenge; if absent → all of `scopes_supported` from PRM (omit `scope` if that's undefined too)
+- Authorization is **optional**; HTTP transports SHOULD follow it; **stdio SHOULD NOT** (get credentials from the environment)
 
 ### HTTP status decision table (EXAM FAVORITE)
 | Situation | Status | Client reaction |
 |-----------|--------|-----------------|
-| No/invalid/expired token | **401** + `WWW-Authenticate` | Run/redo OAuth flow |
-| Valid token, missing scope | **403** `insufficient_scope` | Step-up: request **union** of old + new scopes |
-| Headers contradict body | **400** + HeaderMismatch | Fix the request |
+| No/invalid/expired token — **including a token minted for another audience** | **401** + `WWW-Authenticate` | Run/redo OAuth flow |
+| Valid token, missing scope | **403** `insufficient_scope` (+ `scope`, `resource_metadata`) | Step-up: request **union** of old + new scopes; cap retries |
+| Invalid `Origin` header **[ADDED]** | **403** | — (DNS-rebinding protection) |
+| Headers contradict body / required header missing | **400** + HeaderMismatch (-32020) | Fix the request |
+| Required `_meta` field missing **[ADDED]** | **400** + -32602 | Fix the request |
+| Needed capability not declared **[ADDED]** | **400** + -32021 | Declare it (if supported) |
+| Protocol version unsupported **[ADDED]** | **400** + -32022 | Retry with a version from `data.supported` |
+| Unknown method **[ADDED]** | **404** + -32601 | (A 404 *without* a JSON-RPC body = maybe a legacy server) |
+| GET / DELETE on a modern-only endpoint **[ADDED]** | **405** | Legacy client — no fall-forward |
+| Notification accepted **[ADDED]** | **202** (no body) | — |
+| Malformed authorization request | **400** | Fix the request |
 | Empty scope challenge | — | Fall back to full `scopes_supported` |
 
 ### Token rules
 | Type | Purpose | Lifetime |
 |------|---------|----------|
-| **Access Token** | Access resources | Short (hours) |
-| **Refresh Token** | Get new access token | Long (days) |
-| **ID Token** | User identity | One-time use |
+| **Access Token** | Access resources (the only token an MCP server accepts) | Short — AS SHOULD issue short-lived tokens |
+| **Refresh Token** | Get new access token | Longer — AS **MUST rotate** them for public clients; client MUST NOT assume one is issued |
 
-- Validate: **signature + exp + aud + iss** (aud = THIS server!)
-- **Token passthrough = FORBIDDEN** (never accept/forward tokens minted for another audience)
-- Credentials keyed **per issuer** — never reuse across auth servers
+- **[FIXED]** Removed the "ID Token = one-time use" row — ID tokens aren't part of MCP authorization and that description was inaccurate.
+- Validate: **signature + exp + aud + iss** (aud = THIS server!) — wrong audience → **401**
+- **Token passthrough = FORBIDDEN** (never accept/forward tokens minted for another audience). Calling an upstream API? The MCP server gets **its own** token from the upstream AS.
+- Client credentials keyed **per issuer** — never reuse across auth servers; re-register when the AS changes (CIMD client IDs are portable)
+- Refresh: `offline_access` scope MAY be requested if listed in the AS `scopes_supported`; MCP servers SHOULD NOT put `offline_access` in their challenges/PRM **[ADDED]**
+- Transport rules: all AS endpoints over HTTPS; redirect URIs must be `localhost` or HTTPS; exact redirect-URI matching **[ADDED]**
 
 ### Attack patterns (know the mitigation!)
 | Attack | Mitigation |
 |--------|------------|
-| **Confused deputy** | **Proxy servers using static client IDs** MUST obtain user consent for each dynamically registered client before forwarding to third-party AS. Never trust a consent cookie from another client ID. OAuth `state`: crypto-random, **set only AFTER consent approval**, single-use, short expiry, exact match at callback |
+| **Confused deputy** | **Proxy servers using static client IDs** MUST obtain user consent for each dynamically registered client before forwarding to third-party AS. Never trust a consent cookie from another client ID. OAuth `state`: crypto-random, **set only AFTER consent approval**, single-use, short expiry, exact match at callback *(verified — this is the proxy-server rule from the Security Best Practices page)*. Consent cookies: `__Host-` prefix, Secure, HttpOnly, SameSite=Lax, bound to the client_id |
 | **Token passthrough** | MUST NOT accept tokens not issued **to this server** (aud validation); never forward client tokens downstream |
 | **SSRF** | MUST consider + mitigate; individual mitigations are SHOULDs: HTTPS (http loopback-only in dev), block private/reserved ranges (10/8, 172.16/12, 192.168/16, 127/8, **169.254/16 incl. 169.254.169.254**, `fc00::/7`, `fe80::/10`), no manual IP parsing (octal/hex/IPv6-mapped tricks), validate redirect hops, egress proxies (e.g. Smokescreen), pin DNS vs TOCTOU rebinding. Attacker-controlled inputs: `resource_metadata` (WWW-Authenticate) · `authorization_servers` (PRM) · AS-metadata endpoints |
 | **State-handle hijacking** | Handle ≠ auth! Random handles, bind `user_id:handle`, authorize via token every request |
 | **Malicious one-click config** | MUSTs: show full command · flag as dangerous · explicit approval · cancellable |
-| **URL scheme abuse** | Open only `http(s)://`, never pass to shell, reject `javascript:`/custom schemes |
+| **URL scheme abuse** | Open only `http(s)://` (http only for loopback in dev), never pass to shell, reject `javascript:`/`data:`/`file:`/`vbscript:`; allowlist, not blocklist |
+| **Mix-up attack [ADDED]** | Record the AS `issuer` before redirecting; validate `iss` in the response (RFC 9207). PKCE alone does NOT stop it |
+| **DNS rebinding on local HTTP servers [ADDED]** | Validate `Origin` (invalid → 403), bind to 127.0.0.1, require auth |
+| **Localhost redirect impersonation (CIMD) [ADDED]** | AS shows extra warnings for localhost-only redirect URIs and displays the redirect hostname |
 
 ### Scope design mistakes
 Publishing all scopes in `scopes_supported` · wildcard scopes (`*`, `all`) · bundling privileges · trusting claimed scopes without server-side authz
@@ -509,35 +575,38 @@ Publishing all scopes in `scopes_supported` · wildcard scopes (`*`, `all`) · b
 - "Nothing breaks on July 28"
 
 ### Deprecated vs Removed (2026-07-28) — TRAP MATERIAL
-| ❌ Deprecated (still works 12 mo) | 🗑️ Removed (gone in modern era) |
-|----------------------------------|-------------------------------|
-| Roots, Sampling, Logging | `initialize` handshake, sessions/`Mcp-Session-Id` |
-| HTTP+SSE transport | `ping`, `logging/setLevel`, `notifications/roots/list_changed` |
-| DCR (→ CIMD) | SSE resumability, GET endpoint, `resources/subscribe` |
+| ❌ Deprecated (still works) | Deprecated in | Earliest removal | 🗑️ Removed (gone in modern era) |
+|---------------------------|---------------|------------------|-------------------------------|
+| Roots, Sampling, Logging (SEP-2577) | 2026-07-28 | first revision on/after **2027-07-28** | `initialize` + `notifications/initialized` handshake, sessions/`Mcp-Session-Id` |
+| DCR → CIMD (PR #2858) | 2026-07-28 | first revision on/after 2027-07-28 | `ping`, `logging/setLevel`, `notifications/roots/list_changed` |
+| HTTP+SSE transport **[FIXED]** | **2025-03-26** | **3 months after SEP-2596 reaches Final** | SSE resumability (`Last-Event-ID`), GET endpoint, `resources/subscribe`/`unsubscribe` |
+| `includeContext: "thisServer"/"allServers"` **[ADDED]** | 2025-11-25 | no later than Sampling itself | `tasks/list`, blocking `tasks/result` (Tasks moved to an extension) · `notifications/elicitation/complete`, `elicitationId` **[ADDED]** |
+
+> Migrations: Roots → tool params / resource URIs / server config · Sampling → call LLM provider APIs directly · Logging → stderr (stdio) or OpenTelemetry. Security risks can shorten the 12-month floor, but never below **90 days**. **[ADDED]**
 
 ---
 
 ## AAIF (Ch10)
 
 ### What is AAIF?
-- **Agentic AI Foundation** - Non-profit
-- **Purpose** - Govern MCP standard
-- **Members** - Anthropic, Google, Microsoft, etc.
+- **Agentic AI Foundation** - Non-profit directed fund under the Linux Foundation, announced **9 December 2025**
+- **Purpose** - Neutral home for open agentic-AI projects, MCP among them
+- **Platinum members at launch [FIXED]** - AWS, Anthropic, Block, Bloomberg, Cloudflare, Google, Microsoft, OpenAI
 
 ### Key Projects
-| Project | What It Does |
-|---------|--------------|
-| **MCP** | The protocol itself |
-| **Goose** | Open-source AI agent |
-| **AGENTS.md** | Agent configuration standard |
-| **agentgateway** | MCP gateway/proxy |
+| Project | What It Does | Contributed by |
+|---------|--------------|----------------|
+| **MCP** | The protocol itself | Anthropic (founding, Dec 2025) |
+| **goose** | Open-source, local-first AI agent framework | Block (founding, Dec 2025) |
+| **AGENTS.md** | Agent instructions/configuration standard | OpenAI (founding, Dec 2025) |
+| **agentgateway** | MCP/agent gateway/proxy | Solo.io — joined **June 2026** **[ADDED]** |
 
 
 
 ### AGENTS.md — agent configuration standard (Ch17)
 - **What:** Universal standard giving AI coding agents consistent project-specific guidance
-- **Contributed by:** OpenAI to the AAIF (August 2025)
-- **Adoption:** Tens of thousands of open-source projects; integrated by Cursor, GitHub Copilot, VS Code
+- **Released by OpenAI in August 2025; contributed to the AAIF at its launch on 9 Dec 2025** **[FIXED]**
+- **Adoption:** 60,000+ open-source projects and agent frameworks (per the AAIF launch announcement); integrated by Cursor, GitHub Copilot, VS Code
 - **Purpose:** Repos hand project-specific instructions to coding agents → agents operate reliably across repositories and toolchains
 - **NOT:** A changelog, a registry of agents, or an authorization config file
 
@@ -614,7 +683,8 @@ Publishing all scopes in `scopes_supported` · wildcard scopes (`*`, `all`) · b
 > "Server never calls you back — it hands you a form (input_required) and waits for the retry"
 
 ### For MCP error codes:
-> "20-21-22: Header, Capability, Version" (-32020/-32021/-32022) + "01: Invalid Version" (-32001)
+> "20-21-22: Header, Capability, Version" (-32020/-32021/-32022) — and that's ALL of them. **[FIXED: removed the non-existent "01: Invalid Version"]**
+> "Missing = malformed (-32602); present but unsupported = -32022"
 
 ---
 
@@ -630,8 +700,8 @@ Publishing all scopes in `scopes_supported` · wildcard scopes (`*`, `all`) · b
 - `id: null` is NOT a notification — and in MCP it's not a valid request either: **null ids are forbidden** (base JSON-RPC only discourages them)
 
 ### Trap 3: Transport Security
-- stdio = OS-level security (not OAuth)
-- HTTP = Needs OAuth 2.1
+- stdio = OS-level security (not OAuth) — stdio SHOULD NOT use the MCP auth spec; take credentials from the environment
+- HTTP = OAuth 2.1 when authorization is used (authorization itself is OPTIONAL; HTTP implementations SHOULD conform) **[FIXED: "needs" was too strong]**
 
 ### Trap 4: Sampling Direction
 - Sampling = Server asks Client's AI (not the other way!)
@@ -661,7 +731,22 @@ Publishing all scopes in `scopes_supported` · wildcard scopes (`*`, `all`) · b
 - The retry gets a NEW JSON-RPC id (correlation via requestState, not id)
 
 ### Trap 12: HeaderMismatch numbering
-- SEP-2243 text says -32001; the final spec renumbered it to **-32020** — answer -32020 unless the question explicitly quotes the SEP
+- The drafts used -32001; the final spec renumbered it to **-32020**. Answer -32020 unless the question explicitly quotes the draft
+- There is **no** "InvalidProtocolVersion" code at all **[FIXED]**
+
+### Trap 15: Which header? [ADDED]
+- `MCP-Protocol-Version` = every POST, must equal `_meta` protocolVersion
+- `Mcp-Method` = all requests · `Mcp-Name` = tools/call, resources/read, prompts/get
+- Any of them missing or mismatched → 400 + -32020
+
+### Trap 16: HTTP+SSE deprecation date [ADDED]
+- Deprecated since **2025-03-26**, not 2026-07-28 — and its removal clock is 3 months after SEP-2596 is Final, not 12 months
+
+### Trap 17: MCP has no batching [ADDED]
+- JSON-RPC allows arrays of requests; MCP transports carry exactly one message per POST / per stdio line
+
+### Trap 18: Cancellation differs by transport [ADDED]
+- stdio → `notifications/cancelled` with the request id · Streamable HTTP → close the SSE response stream (no notification)
 
 ### Trap 13: Missing _meta vs missing capability
 - Missing required _meta field → -32602 + HTTP 400
@@ -707,9 +792,36 @@ Rate yourself 1-5 after studying each topic:
 4. **Control model** - Model→Tools, App→Resources, User→Prompts?
 5. **OAuth flow** - 401 → PRM → AS metadata → PKCE → aud validation?
 6. **401 vs 403 vs 400** - authenticate / step-up scope union / header mismatch?
-7. **Error codes** - -32601 = ? (Method not found) · -32001 = InvalidProtocolVersion · -32020/21/22 = Header/Capability/Version?
+7. **Error codes** - -32601 = ? (Method not found) · -32020/21/22 = Header/Capability/Version — the only MCP codes; all three are HTTP 400? **[FIXED]**
 8. **Deprecated trio** - Roots, Sampling, Logging (12-month window)?
 9. **Task terminal statuses** - completed, failed, cancelled?
 10. **Registry markers** - mcpName / mcp-name / OCI label / fileSha256?
 11. **JSON-RPC id in MCP** - string or int, never null, unique among outstanding requests?
-12. **-32001 vs -32020** - HeaderMismatch is -32020 in the final spec (SEP text said -32001)?
+12. **-32001 vs -32020** - HeaderMismatch is -32020 in the final spec (the drafts said -32001)?
+13. **Headers** - MCP-Protocol-Version on every POST + Mcp-Method on all requests + Mcp-Name on the 3 named methods? **[ADDED]**
+14. **Exam clock** - 90 minutes? **[ADDED]**
+
+---
+
+## Revision log (2026-09-11)
+Checked against: modelcontextprotocol.io/specification/2026-07-28 (basic, architecture, MRTR, subscriptions, caching, versioning, changelog, deprecated, tools, resources, prompts, elicitation, stdio, Streamable HTTP, authorization + client registration + security considerations), the Security Best Practices page, jsonrpc.org/specification, the Inspector / Registry / Tasks / Governance / Security Policy docs, the LF exam page, and the AAIF launch announcement.
+
+| # | What changed |
+|---|--------------|
+| 1 | **Removed the non-existent `-32001 InvalidProtocolVersion`** (error table, memory hook, review item 7). The only MCP codes are -32020/-32021/-32022 |
+| 2 | **Added the `MCP-Protocol-Version` header** (required on every POST) |
+| 3 | `Mcp-Method`: "all requests", not "every request AND notification" |
+| 4 | HTTP+SSE: deprecated since 2025-03-26; removal clock is 3 months after SEP-2596 is Final |
+| 5 | HTTP status table: added 202, 403 (Origin), 404 + -32601, 405, and 400 for -32021/-32022/-32602 |
+| 6 | OAuth: client-registration priority order; `resource` parameter; `iss` validation table; PKCE refuse rule |
+| 7 | Removed the "ID Token = one-time use" row; added refresh-token rotation and the wrong-audience → 401 rule |
+| 8 | Subscriptions: acknowledgment name and subscriptionId = listen request id are now confirmed |
+| 9 | Caching: server/discover added; MRTR interim results and retries are not cacheable |
+| 10 | JSON-RPC: MCP carries no batches |
+| 11 | Elicitation: three actions; removed `notifications/elicitation/complete` / `elicitationId` |
+| 12 | Deprecated table: dates, earliest removals, `includeContext` values, 90-day expedited floor |
+| 13 | AAIF: launch date, founding projects and contributors, members; AGENTS.md dates; agentgateway joined June 2026 |
+| 14 | Exam format block: 90 minutes |
+
+**Confirmed correct and unchanged:** domain weights, MRTR rules, -32602 for resource not found, x-mcp-header rules, Base64 sentinel, Tasks methods/states, Inspector flags/ports/exit codes, Registry ownership markers, governance roles, 12-month deprecation floor, confused-deputy `state` rule, SSRF ranges, scope-design mistakes, security-policy scope.
+**Could not verify (course-only, kept as-is):** SDK/Node minimum versions, the mcp-server-dev plugin details, the Security Interest Group delegation list.

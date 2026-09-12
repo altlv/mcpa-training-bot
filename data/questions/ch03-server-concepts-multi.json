@@ -1,42 +1,54 @@
 {
+  "meta": {
+    "title": "MCP Question Bank — Chapter 3: Server Concepts (multi-select)",
+    "protocolVersion": "2026-07-28",
+    "chapter": 3,
+    "chapterName": "Server Concepts",
+    "examDomain": "Interactions & Execution",
+    "mode": "multi_select",
+    "questionCount": 3,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
+  },
   "questions": [
     {
       "id": "ch3-m1",
       "chapter": 3,
       "type": "multi_select",
       "difficulty": "medium",
-      "question": "Which method/primitive pairings are correct? (Select all that apply.)",
+      "question": "Which statements about subscriptions/listen are correct? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "tools/list and tools/call for tools"
+          "text": "A graceful server shutdown simply drops the stream without a response"
         },
         {
           "letter": "B",
-          "text": "resources/list, resources/templates/list, and resources/read for resources"
+          "text": "The first message on the stream is notifications/subscriptions/acknowledged"
         },
         {
           "letter": "C",
-          "text": "prompts/list and prompts/get for prompts"
+          "text": "It replaces resources/subscribe, which remains available for single-resource watches"
         },
         {
           "letter": "D",
-          "text": "prompts/call for executing prompts"
+          "text": "The acknowledgment lists only the notification types the server agreed to honour"
         },
         {
           "letter": "E",
-          "text": "resources/write for updating resources"
+          "text": "The subscriptionId in each notification equals the JSON-RPC id of the listen request"
         }
       ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Tools are discovered and executed (list/call); resources are listed, template-listed, and read (read-only); prompts are listed and retrieved with prompts/get. There is no prompts/call or resources/write.",
+      "explanation": "A, B and C are the mechanics. subscriptions/listen fully replaces resources/subscribe and resources/unsubscribe, which no longer exist, and a graceful close sends the listen request's own result before closing: a drop without that result signals an unexpected disconnect.",
       "tags": [
-        "server-features",
-        "methods"
+        "subscriptions"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/basic/patterns/subscriptions",
+      "protocolVersion": "2026-07-28",
+      "answers": [
+        "B",
+        "D",
+        "E"
       ]
     },
     {
@@ -44,40 +56,41 @@
       "chapter": 3,
       "type": "multi_select",
       "difficulty": "medium",
-      "question": "Which fields appear in a tool definition returned by tools/list? (Select all that apply.)",
+      "question": "Which statements about resources and prompts are correct? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "name — the unique identifier within the server's namespace"
+          "text": "Servers must list every resource a tool might return as a resource_link"
         },
         {
           "letter": "B",
-          "text": "title — a human-readable display name"
+          "text": "Resource templates use RFC 6570 URI templates and support argument completion"
         },
         {
           "letter": "C",
-          "text": "description — what the tool does and when to use it"
+          "text": "A missing required prompt argument is reported as -32602 Invalid params"
         },
         {
           "letter": "D",
-          "text": "inputSchema — a JSON Schema for the expected parameters"
+          "text": "Resources are model-controlled: the model chooses which URIs to read"
         },
         {
           "letter": "E",
-          "text": "transport — the transport the tool requires"
+          "text": "prompts/get may return an InputRequiredResult if the server needs more input"
         }
       ],
+      "explanation": "Templates support completion, prompts/get is one of the three MRTR-eligible requests, and bad prompt arguments are -32602. Resources are application-controlled, and resource links returned by tools are not guaranteed to appear in resources/list.",
+      "tags": [
+        "resources",
+        "prompts"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/server",
+      "protocolVersion": "2026-07-28",
       "answers": [
-        "A",
         "B",
         "C",
-        "D"
-      ],
-      "explanation": "Tool objects carry name, title, description, and inputSchema (optionally an outputSchema). Transport is a connection-level concern, not per-tool metadata.",
-      "tags": [
-        "server-features",
-        "tools",
-        "schemas"
+        "E"
       ]
     },
     {
@@ -85,419 +98,41 @@
       "chapter": 3,
       "type": "multi_select",
       "difficulty": "hard",
-      "question": "Which statements about resources are true? (Select all that apply.)",
+      "question": "Your server needs a shopping cart to survive across tool calls. Which practices match the spec's guidance? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "Each resource has a unique URI and declares a MIME type"
+          "text": "Generate the handle with a secure random source and give it a bounded lifetime"
         },
         {
           "letter": "B",
-          "text": "Direct resources use fixed URIs; resource templates use parameterized URIs like weather://forecast/{city}/{date}"
+          "text": "Treat possession of the handle as proof of identity for unauthenticated callers"
         },
         {
           "letter": "C",
-          "text": "Resource templates support parameter completion"
+          "text": "Authorize the caller against the handle on every call, keyed by the verified user"
         },
         {
           "letter": "D",
-          "text": "Resources are model-controlled: the LLM decides when to fetch them"
+          "text": "Return an explicit handle from a creation tool and accept it as an argument later"
         },
         {
           "letter": "E",
-          "text": "Watching a resource for changes uses subscriptions/listen with a resourceSubscriptions filter"
+          "text": "Keep the cart in memory keyed by the connection, since one client owns one connection"
         }
       ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "E"
-      ],
-      "explanation": "Resources are application-driven (the host decides retrieval and usage), not model-controlled — that's tools. Everything else is accurate, including the 2026-07-28 subscription mechanism.",
+      "explanation": "MCP has no protocol session, so cross-call state uses explicit handles. A handle is a name, not a credential: servers MUST NOT treat possession as authentication and SHOULD bind state to the authenticated user. Keying by connection is exactly what statelessness forbids.",
       "tags": [
-        "server-features",
-        "resources",
-        "templates"
-      ]
-    },
-    {
-      "id": "ch3-m4",
-      "chapter": 3,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "Which human-oversight mechanisms do the docs suggest applications implement around tools? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Displaying available tools in the UI so users can scope what's available"
-        },
-        {
-          "letter": "B",
-          "text": "Approval dialogs for individual tool executions"
-        },
-        {
-          "letter": "C",
-          "text": "Permission settings for pre-approving certain safe operations"
-        },
-        {
-          "letter": "D",
-          "text": "Activity logs showing tool executions with their results"
-        },
-        {
-          "letter": "E",
-          "text": "A mandatory cooling-off delay before any tool runs"
-        }
+        "tools",
+        "state-handles"
       ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/server/tools",
+      "protocolVersion": "2026-07-28",
       "answers": [
         "A",
-        "B",
         "C",
         "D"
-      ],
-      "explanation": "The four suggested mechanisms are UI visibility, per-execution approval, pre-approval permissions, and activity logs. No mandatory delay exists in the protocol or guidance.",
-      "tags": [
-        "server-features",
-        "tools",
-        "trust-safety"
-      ]
-    },
-    {
-      "id": "ch3-m5",
-      "chapter": 3,
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Match the interaction model: which pairings are correct per the spec? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Tools are model-controlled — the LLM decides when to invoke them (with user approval)"
-        },
-        {
-          "letter": "B",
-          "text": "Resources are application-controlled — the host decides when to fetch and use them"
-        },
-        {
-          "letter": "C",
-          "text": "Prompts are user-controlled — explicitly selected, e.g., as slash commands"
-        },
-        {
-          "letter": "D",
-          "text": "Prompts are model-controlled — the LLM injects them automatically"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "The control triad is tools→model, resources→application, prompts→user. D contradicts C, so 'All of the above' is a trap.",
-      "tags": [
-        "server-features",
-        "control-model"
-      ]
-    },
-    {
-      "id": "ch3-m6",
-      "chapter": 3,
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which fields can a resource returned by resources/list carry? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "uri — the unique identifier"
-        },
-        {
-          "letter": "B",
-          "text": "name and title"
-        },
-        {
-          "letter": "C",
-          "text": "mimeType"
-        },
-        {
-          "letter": "D",
-          "text": "ttlMs and cacheScope on the surrounding list result"
-        },
-        {
-          "letter": "E",
-          "text": "sessionToken — required for subsequent resource reads"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "Resources carry uri, name/title, description, and mimeType, and since SEP-2549 the list result itself is a CacheableResult with ttlMs and cacheScope. Everything listed is true.",
-      "tags": [
-        "server-features",
-        "resources",
-        "caching"
-      ]
-    },
-    {
-      "id": "ch3-m7",
-      "chapter": 3,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "Which statements about tools/call results are correct in 2026-07-28? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The result carries a required resultType field"
-        },
-        {
-          "letter": "B",
-          "text": "resultType: \"input_required\" signals an MRTR interim result whose inputRequests need answering"
-        },
-        {
-          "letter": "C",
-          "text": "A tool failure is reported with isError rather than a JSON-RPC protocol error"
-        },
-        {
-          "letter": "D",
-          "text": "resultType: \"task\" is reserved for the Tasks extension"
-        },
-        {
-          "letter": "E",
-          "text": "The server MUST reject any result without a resultType field as a protocol error"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ],
-      "explanation": "All four are accurate: resultType is mandatory (SEP-2322), input_required drives MRTR, execution failures use isError inside the result, and 'task' is reserved for io.modelcontextprotocol/tasks.",
-      "tags": [
-        "server-features",
-        "tools",
-        "resulttype"
-      ]
-    },
-    {
-      "id": "ch3-m8",
-      "chapter": 3,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "Which statements about tool naming and schemas are true? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "A tool's name must be unique within its server's namespace"
-        },
-        {
-          "letter": "B",
-          "text": "inputSchema is JSON Schema; since SEP-2106 any JSON Schema 2020-12 keywords are allowed"
-        },
-        {
-          "letter": "C",
-          "text": "On Streamable HTTP, the called tool's name is mirrored in the Mcp-Name header"
-        },
-        {
-          "letter": "D",
-          "text": "Two servers connected to one host may not expose tools with the same name"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Name uniqueness is per server — collisions across servers are the host's problem to disambiguate, so D is false and E falls with it.",
-      "tags": [
-        "server-features",
-        "tools",
-        "schemas",
-        "headers"
-      ]
-    },
-    {
-      "id": "ch3-m9",
-      "chapter": 3,
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which statements about tool-result content blocks are correct? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "A single result may mix multiple block types (e.g., text plus an image)"
-        },
-        {
-          "letter": "B",
-          "text": "Image and audio blocks carry base64 data with a mimeType"
-        },
-        {
-          "letter": "C",
-          "text": "A resource link lets the client fetch large data on demand instead of inlining it"
-        },
-        {
-          "letter": "D",
-          "text": "Every result must contain exactly one text block"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Results are arrays — mixing types is the point, and there's no exactly-one-text-block rule (structured-only or media-only results are fine).",
-      "tags": [
-        "server-features",
-        "content-blocks"
-      ]
-    },
-    {
-      "id": "ch3-m10",
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which of the following are methods used to interact with server primitives?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "tools/list"
-        },
-        {
-          "letter": "B",
-          "text": "resources/read"
-        },
-        {
-          "letter": "C",
-          "text": "prompts/get"
-        },
-        {
-          "letter": "D",
-          "text": "tools/execute"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "The valid methods are tools/list, resources/read, and prompts/get. There is no tools/execute method - tools are invoked via tools/call.",
-      "tags": [
-        "control-model",
-        "methods"
-      ]
-    },
-    {
-      "id": "ch3-m11",
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which statements about the control model are correct?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Tools are controlled by the model (LLM decides)"
-        },
-        {
-          "letter": "B",
-          "text": "Resources are controlled by the application (host decides)"
-        },
-        {
-          "letter": "C",
-          "text": "Prompts are controlled by the user (explicit selection)"
-        },
-        {
-          "letter": "D",
-          "text": "All three primitives are controlled by the server"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Tools = model-controlled, Resources = application-controlled, Prompts = user-controlled. The server exposes primitives but does not control who uses them.",
-      "tags": [
-        "control-model",
-        "do-vs-is"
-      ]
-    },
-    {
-      "id": "ch3-m12",
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "Which scenarios demonstrate correct use of the control model?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "User types /summarize to trigger a prompt"
-        },
-        {
-          "letter": "B",
-          "text": "Model decides to call get_weather to answer a question"
-        },
-        {
-          "letter": "C",
-          "text": "Host automatically includes project README as context"
-        },
-        {
-          "letter": "D",
-          "text": "Server sends a notification to the client"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "/summarize is user-controlled (Prompt), get_weather is model-controlled (Tool), README is application-controlled (Resource). Server notifications are not part of the control model.",
-      "tags": [
-        "control-model",
-        "tools",
-        "resources",
-        "prompts"
-      ]
-    },
-    {
-      "id": "ch3-m13",
-      "type": "multi_select",
-      "difficulty": "easy",
-      "question": "What are the two interaction paradigms in the control model?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "DO - model executes actions"
-        },
-        {
-          "letter": "B",
-          "text": "IS - model reads information"
-        },
-        {
-          "letter": "C",
-          "text": "RUN - server processes requests"
-        },
-        {
-          "letter": "D",
-          "text": "GET - client retrieves data"
-        }
-      ],
-      "answers": [
-        "A",
-        "B"
-      ],
-      "explanation": "The control model has two paradigms: DO (model executes actions via Tools) and IS (model reads information via Resources). RUN and GET are not official terms.",
-      "tags": [
-        "control-model",
-        "do-vs-is"
       ]
     }
   ]

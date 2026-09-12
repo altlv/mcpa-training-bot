@@ -1,10 +1,13 @@
 {
   "meta": {
-    "title": "MCP Question Bank — Chapter 17: AAIF & the Agentic Ecosystem",
+    "title": "MCP Question Bank — Chapter 17: AAIF & Agentic Ecosystem",
     "protocolVersion": "2026-07-28",
     "chapter": 17,
-    "chapterName": "AAIF & the Agentic Ecosystem",
-    "questionCount": 13
+    "chapterName": "AAIF & Agentic Ecosystem",
+    "examDomain": "Use Cases & Ecosystem",
+    "mode": "single_select",
+    "questionCount": 8,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
   },
   "questions": [
     {
@@ -12,415 +15,272 @@
       "chapter": 17,
       "type": "mcq",
       "difficulty": "easy",
-      "question": "What is the Agentic AI Foundation (AAIF)?",
+      "question": "Which projects anchored the Agentic AI Foundation at its December 2025 launch, and who contributed them?",
       "options": [
         {
           "letter": "A",
-          "text": "A commercial marketplace for AI agents"
+          "text": "MCP and goose from Anthropic, AGENTS.md from the Linux Foundation"
         },
         {
           "letter": "B",
-          "text": "A vendor-neutral foundation under the Linux Foundation, announced December 9, 2025, that serves as the open-governance home for the agentic AI stack"
+          "text": "MCP from Anthropic, goose from Block, AGENTS.md from OpenAI"
         },
         {
           "letter": "C",
-          "text": "Anthropic's internal research division"
+          "text": "MCP from Anthropic, LangChain from LangChain Inc, AGENTS.md from GitHub"
         },
         {
           "letter": "D",
-          "text": "A certification body that licenses AI models"
+          "text": "MCP from Anthropic, agentgateway from Solo.io, AGENTS.md from OpenAI"
         }
       ],
-      "answer": "B",
-      "explanation": "The Linux Foundation announced the AAIF on December 9, 2025 as a neutral home where the open standard agentic AI stack is built — governing core standards and protocols so agents can interoperate across platforms, with no single company dominating.",
+      "explanation": "The AAIF launched on 9 December 2025 anchored by MCP (Anthropic), goose (Block) and AGENTS.md (OpenAI). agentgateway, from Solo.io, joined later, in June 2026.",
       "tags": [
         "aaif",
-        "ecosystem",
-        "linux-foundation"
-      ]
+        "projects"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "linuxfoundation.org press · aaif.io",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch17-q2",
       "chapter": 17,
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "Which projects anchored the AAIF at its founding?",
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "A teammate adds an AGENTS.md file to your repository and asks you to keep it current. What role does that file play?",
       "options": [
         {
           "letter": "A",
-          "text": "Kubernetes, Docker, and Terraform"
+          "text": "An authorization config that scopes what an agent may do in a given repository"
         },
         {
           "letter": "B",
-          "text": "MCP (contributed by Anthropic), goose (Block), AGENTS.md (OpenAI), and agentgateway"
+          "text": "A markdown convention that hands coding agents project-specific instructions"
         },
         {
           "letter": "C",
-          "text": "TensorFlow and PyTorch"
+          "text": "A registry file listing the agents allowed to open pull requests"
         },
         {
           "letter": "D",
-          "text": "Only MCP"
+          "text": "A changelog format that records which agents modified a repository"
         }
       ],
-      "answer": "B",
-      "explanation": "The founding project contributions were Anthropic's Model Context Protocol, Block's goose, and OpenAI's AGENTS.md, with agentgateway also among the founding projects — uniting competing vendors' key agentic projects under one neutral roof.",
+      "explanation": "AGENTS.md is a convention for giving AI coding agents consistent, project-specific guidance, released by OpenAI in August 2025 and contributed to the AAIF at launch, with adoption across tens of thousands of projects. It is not a changelog, a registry or an auth config.",
       "tags": [
         "aaif",
-        "projects",
-        "founding"
-      ]
+        "agents-md"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "linuxfoundation.org press",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch17-q3",
       "chapter": 17,
       "type": "mcq",
       "difficulty": "medium",
-      "question": "What is goose?",
+      "question": "Which practical benefit does the ecosystem get from MCP being a shared standard rather than a vendor API?",
       "options": [
         {
           "letter": "A",
-          "text": "A benchmark suite for LLMs"
+          "text": "A server written once works with any MCP client, with no vendor lock-in"
         },
         {
           "letter": "B",
-          "text": "Block's open-source, local-first AI agent framework that combines language models, extensible tools, and standardized MCP-based integration"
+          "text": "Servers can assume all clients implement sampling and roots"
         },
         {
           "letter": "C",
-          "text": "An MCP server for bird-watching data"
+          "text": "Every host is guaranteed to support the same set of extensions and primitives"
         },
         {
           "letter": "D",
-          "text": "OpenAI's coding assistant"
+          "text": "Hosts can execute a server's tools without asking the user"
         }
       ],
-      "answer": "B",
-      "explanation": "goose is Block's contribution: an open-source, local-first agent framework whose tool integration is standardized on MCP — also a canonical example of an MCP host application.",
+      "explanation": "Portability is the point: write the server once and any compliant client can use it. Extension support varies by client, sampling and roots are deprecated and were always optional, and consent requirements do not go away.",
       "tags": [
-        "aaif",
-        "goose",
-        "host"
-      ]
+        "ecosystem",
+        "portability"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "specification/2026-07-28",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch17-q4",
       "chapter": 17,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "medium",
-      "question": "What is AGENTS.md?",
+      "question": "Your architecture board asks what MCP's move under a foundation changes for a company betting on it. What is the substantive answer?",
       "options": [
         {
           "letter": "A",
-          "text": "The changelog file of the MCP repository"
+          "text": "Governance is neutral and open, so no single vendor can unilaterally change or withdraw it"
         },
         {
           "letter": "B",
-          "text": "A simple, universal standard (contributed by OpenAI) giving AI coding agents a consistent source of project-specific guidance so they operate reliably across repositories and toolchains"
+          "text": "The foundation hosts the registry's servers, so availability is underwritten"
         },
         {
           "letter": "C",
-          "text": "A registry of approved AI agents"
+          "text": "The foundation indemnifies adopters against any licensing claim brought over the specification"
         },
         {
           "letter": "D",
-          "text": "MCP's authorization configuration file"
+          "text": "The foundation certifies conforming servers, so compatibility is guaranteed"
         }
       ],
-      "answer": "B",
-      "explanation": "AGENTS.md (initially released August 2025, contributed by OpenAI to the AAIF) standardizes how repos hand project-specific instructions to coding agents; it's been adopted by tens of thousands of open-source projects and integrated by tools like Cursor, GitHub Copilot, and VS Code.",
+      "explanation": "Foundation stewardship is about neutral, open governance under known licences and a public process, which is the risk an adopter cares about. There is no conformance certification, no hosting guarantee and no indemnity.",
       "tags": [
         "aaif",
-        "agents-md",
-        "standards"
-      ]
+        "neutrality"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "linuxfoundation.org press",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch17-q5",
       "chapter": 17,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "medium",
-      "question": "What is agentgateway?",
+      "question": "A teammate proposes replacing your MCP server with an AGENTS.md file. Why do the two not substitute for each other?",
       "options": [
         {
           "letter": "A",
-          "text": "An MCP gateway/proxy project in the AAIF for mediating agent and MCP traffic"
+          "text": "AGENTS.md is a registry manifest; MCP is the protocol that reads that manifest at runtime"
         },
         {
           "letter": "B",
-          "text": "A paid API rate limiter from Anthropic"
+          "text": "AGENTS.md is the legacy format that MCP's prompts primitive replaced in 2026-07-28"
         },
         {
           "letter": "C",
-          "text": "The Registry's REST endpoint"
+          "text": "AGENTS.md gives an agent static repository instructions; MCP gives it live context and tools"
         },
         {
           "letter": "D",
-          "text": "A browser extension for MCP Apps"
+          "text": "AGENTS.md configures the host's model choice; MCP configures which servers it connects to"
         }
       ],
-      "answer": "A",
-      "explanation": "agentgateway (originally from Solo.io) is the AAIF's gateway/proxy project — infrastructure that sits in front of agent/MCP traffic, exactly the layer that benefits from 2026-07-28's Mcp-Method/Mcp-Name header routing.",
+      "explanation": "AGENTS.md is a markdown convention telling coding agents how to work in a repository. MCP is a wire protocol for reaching data and actions at runtime. Both are AAIF projects, and they solve adjacent rather than overlapping problems.",
       "tags": [
-        "aaif",
-        "agentgateway",
-        "infrastructure"
-      ]
+        "agents-md",
+        "mcp"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "linuxfoundation.org press",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch17-q6",
       "chapter": 17,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "medium",
-      "question": "Why did Anthropic donate MCP to a foundation rather than keep sole control?",
+      "question": "Your data team already has a Python library that queries the warehouse. What does wrapping it in an MCP server actually buy?",
       "options": [
         {
           "letter": "A",
-          "text": "Regulatory requirements forced the transfer"
+          "text": "The warehouse's access control is replaced by MCP's own permission model"
         },
         {
           "letter": "B",
-          "text": "Neutral, open governance ensures the protocol evolves by community consensus rather than one company's roadmap — protecting downstream developers from unilateral changes and encouraging competitors to adopt a standard no rival controls"
+          "text": "The model can execute the library's code directly inside the host process"
         },
         {
           "letter": "C",
-          "text": "To sell the trademark"
+          "text": "Query results are automatically cached and shared between all connected hosts"
         },
         {
           "letter": "D",
-          "text": "Because MCP was feature-complete and needed no further development"
+          "text": "Every MCP host can use it without bespoke integration code on each side"
         }
       ],
-      "answer": "B",
-      "explanation": "The AAIF rationale: when connection protocols are owned by a single vendor, every downstream developer is exposed to unilateral pricing/compatibility/deprecation decisions. Neutral stewardship under the Linux Foundation model is what lets AWS, Google, Microsoft, and OpenAI all invest in the same standard.",
+      "explanation": "The value is the many-to-many problem: one server speaks a standard protocol that any host already knows, so each new application costs nothing extra. MCP does not execute your library in the host, cache across hosts, or replace your backend's authorization.",
       "tags": [
-        "aaif",
-        "governance",
-        "neutrality"
-      ]
+        "use-cases",
+        "adoption"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "specification/2026-07-28/architecture",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch17-q7",
       "chapter": 17,
       "type": "mcq",
       "difficulty": "hard",
-      "question": "Which companies were platinum members of the AAIF at launch?",
+      "question": "Why does a gateway such as agentgateway benefit specifically from the 2026-07-28 header requirements?",
       "options": [
         {
           "letter": "A",
-          "text": "Only Anthropic and Block"
+          "text": "The headers carry the OAuth token, so the gateway can authorize without reading the body"
         },
         {
           "letter": "B",
-          "text": "Amazon Web Services, Anthropic, Block, Bloomberg, Cloudflare, Google, Microsoft, and OpenAI"
+          "text": "MCP-Protocol-Version lets it rewrite requests into whichever version the server prefers"
         },
         {
           "letter": "C",
-          "text": "Apple, Meta, and Netflix"
+          "text": "Mcp-Session-Id lets it pin each client to one backend replica"
         },
         {
           "letter": "D",
-          "text": "The foundation has no corporate members"
+          "text": "Mcp-Method and Mcp-Name let it route, meter and authorize without parsing the JSON body"
         }
       ],
-      "answer": "B",
-      "explanation": "The launch platinum tier spanned the competitive landscape: AWS, Anthropic, Block, Bloomberg, Cloudflare, Google, Microsoft, and OpenAI — rivals cooperating on shared agentic infrastructure.",
+      "explanation": "Mirroring the method and target into headers is exactly what lets intermediaries apply per-tool rate limits, WAF policy and routing cheaply. Sessions were removed, gateways do not rewrite versions, and the token stays in the Authorization header, which is not new.",
       "tags": [
-        "aaif",
-        "members"
-      ]
+        "agentgateway",
+        "headers"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "aaif.io · specification/2026-07-28/basic/transports/streamable-http",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch17-q8",
       "chapter": 17,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "SCENARIO: On the exam, you're asked which ecosystem role each party plays: a database company shipping an MCP server, a startup building an AI assistant, and Claude Desktop / goose. Match them.",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Tool provider → builds MCP servers; app developer → builds MCP clients; Claude Desktop and goose → host applications"
-        },
-        {
-          "letter": "B",
-          "text": "All three are hosts"
-        },
-        {
-          "letter": "C",
-          "text": "The database company builds clients; the startup builds servers"
-        },
-        {
-          "letter": "D",
-          "text": "Hosts are only built by Anthropic"
-        }
-      ],
-      "answer": "A",
-      "explanation": "The who-builds-what triad: tool/data providers expose servers, application developers implement clients inside their products, and hosts (Claude Desktop, goose, IDEs) coordinate clients and the LLM.",
-      "tags": [
-        "ecosystem",
-        "use-cases",
-        "scenario"
-      ]
-    },
-    {
-      "id": "ch17-q9",
-      "chapter": 17,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "What is the core portability benefit MCP gives the ecosystem?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Servers run faster on ARM processors"
-        },
-        {
-          "letter": "B",
-          "text": "Write a server once and it works in any compliant MCP client/host — no vendor lock-in, and each new server or client enriches the whole ecosystem"
-        },
-        {
-          "letter": "C",
-          "text": "Free hosting for all servers"
-        },
-        {
-          "letter": "D",
-          "text": "Automatic translation of tools into every programming language"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Because the protocol is the contract, a weather server built for Claude Desktop also works in goose, Cursor, or VS Code — the M+N economics compound as the ecosystem grows.",
-      "tags": [
-        "ecosystem",
-        "portability",
-        "use-cases"
-      ]
-    },
-    {
-      "id": "ch17-q10",
-      "chapter": 17,
-      "type": "scenario",
       "difficulty": "hard",
-      "question": "SCENARIO: An exam question claims 'MCP is governed by Anthropic, which holds final authority over the specification.' What's wrong with that statement in 2026?",
+      "question": "A support desk wants the assistant to read tickets, draft a reply, and offer a one-click triage workflow. Which mapping fits MCP's primitives?",
       "options": [
         {
           "letter": "A",
-          "text": "Nothing — Anthropic owns MCP"
+          "text": "All three as tools, since anything reached over the network is a tool call"
         },
         {
           "letter": "B",
-          "text": "MCP was contributed to the AAIF under the Linux Foundation; it's governed by the community model (SEPs, Working Groups, individual-based maintainer hierarchy) — Anthropic created MCP but no company holds governance seats or final authority"
+          "text": "Tickets as prompts, sending the reply as a tool, the workflow as a resource"
         },
         {
           "letter": "C",
-          "text": "Google holds final authority"
+          "text": "Tickets as resources, sending the reply as a tool, the workflow as a prompt"
         },
         {
           "letter": "D",
-          "text": "The Linux Foundation writes all SEPs itself"
+          "text": "Tickets as tools, sending the reply as a resource, the workflow as a prompt"
         }
       ],
-      "answer": "B",
-      "explanation": "Post-donation, governance is vendor-neutral: maintainer membership is individual (explicitly not corporate), Lead Maintainers hold BDFL authority within the community model, and the AAIF/LF provides the legal umbrella. 'Created by Anthropic' remains true; 'governed by Anthropic' does not.",
+      "explanation": "Read-only context the application attaches is a resource; an action with effects the model invokes is a tool; a user-chosen workflow template is a prompt. The split follows who controls the primitive, not whether a network call is involved.",
       "tags": [
-        "aaif",
-        "governance",
-        "trap"
-      ]
-    },
-    {
-      "id": "ch17-scenario-extra-1",
-      "chapter": 17,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A gateway wants to apply a per-tool rate limit without parsing every JSON body. Which modern MCP feature is most directly useful?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Mcp-Method and Mcp-Name headers"
-        },
-        {
-          "letter": "B",
-          "text": "Mcp-Session-Id"
-        },
-        {
-          "letter": "C",
-          "text": "Last-Event-ID"
-        },
-        {
-          "letter": "D",
-          "text": "notifications/initialized"
-        }
+        "use-cases",
+        "primitives"
       ],
-      "answer": "A",
-      "explanation": "The modern headers expose method and target information to gateways/WAFs for routing, metering, and policy without body parsing.",
-      "tags": [
-        "agentgateway",
-        "headers",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch17-scenario-extra-2",
-      "chapter": 17,
-      "type": "scenario",
-      "difficulty": "easy",
-      "question": "A repository contains AGENTS.md. A tester assumes it is an MCP authorization policy that grants tools/call permissions. What is the correction?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Correct; AGENTS.md is the OAuth scope file"
-        },
-        {
-          "letter": "B",
-          "text": "AGENTS.md provides project-specific guidance to coding agents; it is not an authorization configuration"
-        },
-        {
-          "letter": "C",
-          "text": "AGENTS.md is the MCP Registry database"
-        },
-        {
-          "letter": "D",
-          "text": "AGENTS.md replaces server/discover"
-        }
-      ],
-      "answer": "B",
-      "explanation": "AGENTS.md is an agent configuration/instruction standard for repository guidance, not an MCP authorization mechanism.",
-      "tags": [
-        "agents-md",
-        "aaif",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch17-scenario-extra-3",
-      "chapter": 17,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A change to MCP is proposed informally in chat and a team treats it as part of the specification immediately. Which governance concept should the tester remember?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Specification changes go through the SEP/PR governance process; informal discussion alone is not the specification"
-        },
-        {
-          "letter": "B",
-          "text": "Any maintainer chat message changes the protocol"
-        },
-        {
-          "letter": "C",
-          "text": "Only vendors can propose changes"
-        },
-        {
-          "letter": "D",
-          "text": "Registry publication changes the core protocol"
-        }
-      ],
-      "answer": "A",
-      "explanation": "MCP changes are governed through Specification Enhancement Proposals and the project process. Discussion can inform a proposal but does not itself amend the spec.",
-      "tags": [
-        "governance",
-        "sep",
-        "tester-scenario"
-      ]
+      "domain": "Use Cases & Ecosystem",
+      "source": "specification/2026-07-28/server",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     }
   ]
 }

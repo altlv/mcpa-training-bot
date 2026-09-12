@@ -4,874 +4,284 @@
     "protocolVersion": "2026-07-28",
     "chapter": 9,
     "chapterName": "MCP Inspector",
-    "questionCount": 27
+    "examDomain": "Use Cases & Ecosystem",
+    "mode": "single_select",
+    "questionCount": 8,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
   },
   "questions": [
     {
       "id": "ch9-q1",
       "chapter": 9,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "easy",
-      "question": "The MCP Inspector ships as a single package with three clients. Which are they?",
+      "question": "You want to inspect a colleague's config file without the Inspector ever modifying it. Which flag, and what happens if the file is missing?",
       "options": [
         {
           "letter": "A",
-          "text": "Web, CLI, and TUI"
+          "text": "--catalog with --read-only, and a missing file is an error"
         },
         {
           "letter": "B",
-          "text": "Desktop, Mobile, and Web"
+          "text": "--config: it is writable but backed up first, and a missing file is seeded"
         },
         {
           "letter": "C",
-          "text": "GUI, REPL, and Daemon"
+          "text": "--config: it is never written or seeded, and a missing file is an error"
         },
         {
           "letter": "D",
-          "text": "Chrome, Firefox, and Safari extensions"
+          "text": "--catalog: it is read-only by default, and a missing file is created empty"
         }
       ],
-      "answer": "A",
-      "explanation": "@modelcontextprotocol/inspector provides three clients behind one binary: the Web UI (default), the CLI (--cli, scriptable for CI and agents), and the TUI (--tui, an interactive terminal UI). All share the same core, transports, config files, and OAuth state.",
+      "explanation": "--config is served as-is: never written, seeded or migrated, and it errors if the file does not exist. --catalog is the writable working set, defaulting to ~/.mcp-inspector/mcp.json, created and seeded when missing. The two are mutually exclusive.",
       "tags": [
         "inspector",
-        "overview"
-      ]
+        "catalog-config"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "docs/2026-07-28/tools/inspector/configuration",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch9-q2",
       "chapter": 9,
       "type": "mcq",
-      "difficulty": "easy",
-      "question": "How do you launch the MCP Inspector against a local stdio server without installing anything globally?",
+      "difficulty": "medium",
+      "question": "A CI job runs the Inspector CLI against a protected server and exits with code 3. What happened, and which flag makes this deterministic?",
       "options": [
         {
           "letter": "A",
-          "text": "pip install mcp-inspector && mcp-inspector"
+          "text": "Authentication is required; --stored-auth-only fails fast instead of waiting"
         },
         {
           "letter": "B",
-          "text": "npx @modelcontextprotocol/inspector node path/to/server/index.js"
+          "text": "The server was unreachable; --connect-timeout shortens how long it waits"
         },
         {
           "letter": "C",
-          "text": "docker run mcp/inspector"
+          "text": "A tool returned isError: true; --format json makes the failure parseable"
         },
         {
           "letter": "D",
-          "text": "cargo install inspector && inspector serve"
+          "text": "Usage was wrong; --help prints the flags that this client accepts"
         }
       ],
-      "answer": "B",
-      "explanation": "The Inspector runs directly through npx (requiring Node 22.19.0+). The command prints a URL containing a one-time session token to open in the browser.",
+      "explanation": "Exit 3 means the server requires authentication (401/403, WWW-Authenticate, OAuth). --stored-auth-only never starts interactive OAuth and never opens a browser: it uses a stored token if present and otherwise fails immediately with auth_required. 4 is unreachable, 5 is a tool error, 1 is usage.",
       "tags": [
         "inspector",
-        "quickstart"
-      ]
+        "ci",
+        "exit-codes"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "docs/2026-07-28/tools/inspector/cli",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch9-q3",
       "chapter": 9,
       "type": "mcq",
       "difficulty": "medium",
-      "question": "Which flags does the mcp-inspector launcher itself own?",
+      "question": "Why must the Inspector's OAuth callback URL stay on loopback, and what is the default?",
       "options": [
         {
           "letter": "A",
-          "text": "All flags; it validates everything before forwarding"
+          "text": "The authorization server requires a registered public URL; default https://localhost:6276"
         },
         {
           "letter": "B",
-          "text": "Only the mode flag (--web/--cli/--tui) and -h/--help; everything else is defined by the selected client"
+          "text": "The code arrives over plaintext http, so only loopback is accepted; default port 6276"
         },
         {
           "letter": "C",
-          "text": "--method and --format"
+          "text": "Browsers block cross-origin redirects, so only localhost works; default port 6274"
         },
         {
           "letter": "D",
-          "text": "--catalog and --config"
+          "text": "It need not be loopback: --callback-url accepts any host reachable by the browser"
         }
       ],
-      "answer": "B",
-      "explanation": "The launcher is thin: it owns the mode flag and help. Mode flags are recognized only at the front of the command line; the first unowned token ends launcher parsing and everything after it is forwarded to the client unchanged.",
+      "explanation": "The local callback listener receives the authorization code over plaintext http, so any non-loopback host is rejected and there is no flag to override it. The default is http://127.0.0.1:6276/oauth/callback; 6274 is the web UI port.",
       "tags": [
         "inspector",
-        "configuration",
-        "flags"
-      ]
+        "oauth"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "docs/2026-07-28/tools/inspector/configuration",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch9-q4",
       "chapter": 9,
       "type": "mcq",
-      "difficulty": "hard",
-      "question": "What is the key difference between the Inspector's --catalog and --config flags?",
+      "difficulty": "medium",
+      "question": "A catalog entry omits protocolEra and modernLogLevel. Which defaults apply?",
       "options": [
         {
           "letter": "A",
-          "text": "--catalog is for HTTP servers and --config is for stdio servers"
+          "text": "protocolEra modern, modernLogLevel off unless the server advertises logging"
         },
         {
           "letter": "B",
-          "text": "--catalog is a writable server list (created and seeded if missing, default ~/.mcp-inspector/mcp.json); --config is read-only, never written, and errors if the file is missing"
+          "text": "protocolEra auto-detected per connection, modernLogLevel debug"
         },
         {
           "letter": "C",
-          "text": "They are aliases of each other"
+          "text": "protocolEra modern, modernLogLevel info"
         },
         {
           "letter": "D",
-          "text": "--config can be combined with --catalog to merge lists"
+          "text": "protocolEra legacy, modernLogLevel debug"
         }
       ],
-      "answer": "B",
-      "explanation": "--catalog is the Inspector's own editable working set; --config serves someone else's file as-is and guarantees the Inspector will not touch it. They are mutually exclusive and neither combines with an ad-hoc target.",
+      "explanation": "Per-server settings default to protocolEra legacy and modernLogLevel debug, and fields equal to their default are omitted when the Inspector writes the catalog back, keeping diffs small.",
       "tags": [
         "inspector",
-        "configuration",
-        "catalog"
-      ]
+        "protocol-era"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "docs/2026-07-28/tools/inspector/configuration",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch9-q5",
       "chapter": 9,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "In the Inspector CLI, what does exit code 3 mean?",
+      "difficulty": "hard",
+      "question": "A fresh catalog is created by the CLI and by the web client. How do the two differ?",
       "options": [
         {
           "letter": "A",
-          "text": "The tool returned isError: true"
+          "text": "The CLI seeds two sample servers; the web client starts empty so nothing is created silently"
         },
         {
           "letter": "B",
-          "text": "The server requires authentication (401/403, WWW-Authenticate, OAuth)"
+          "text": "Both seed the same two sample servers, so sessions are reproducible"
         },
         {
           "letter": "C",
-          "text": "The server was unreachable"
+          "text": "The web client seeds two sample servers; the CLI and TUI seed an empty mcpServers object"
         },
         {
           "letter": "D",
-          "text": "No MCP App was found on the tool"
+          "text": "Neither seeds anything: seeding only happens when --seed is passed"
         }
       ],
-      "answer": "B",
-      "explanation": "CLI exit codes are stable failure classes: 0 success, 1 usage/unexpected, 2 no MCP App on the tool, 3 auth required, 4 server unreachable, 5 tool error or tool not found. On non-zero exits the CLI also writes a single JSON error line to stderr.",
+      "explanation": "Seeding happens only when the file does not exist. The web backend seeds a filesystem and an everything server so a first launch has something to connect to, while the CLI and TUI, being non-interactive or list-driven, seed { \"mcpServers\": {} }.",
       "tags": [
         "inspector",
-        "cli",
-        "exit-codes"
-      ]
+        "seeding"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "docs/2026-07-28/tools/inspector/configuration",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch9-q6",
       "chapter": 9,
       "type": "mcq",
       "difficulty": "hard",
-      "question": "How do --tool-arg and --tool-args-json differ when passing tool arguments in the Inspector CLI?",
+      "question": "A pipeline probes a tool with --app-info. The tool name is misspelled. Which exit code distinguishes that from 'the tool has no MCP App'?",
       "options": [
         {
           "letter": "A",
-          "text": "They are identical except for quoting style"
+          "text": "4 for a missing tool, 0 for a tool with no app"
         },
         {
           "letter": "B",
-          "text": "--tool-arg coerces values by JSON-parsing them (so \"012\" becomes 12), while --tool-args-json passes the whole object verbatim with no coercion; the two are mutually exclusive"
+          "text": "1 for a missing tool, 2 for a tool with no app"
         },
         {
           "letter": "C",
-          "text": "--tool-args-json only works over HTTP transports"
+          "text": "2 for a missing tool, 5 for a tool with no app"
         },
         {
           "letter": "D",
-          "text": "--tool-arg supports at most one argument"
+          "text": "5 for a missing tool, 2 for a tool with no app"
         }
       ],
-      "answer": "B",
-      "explanation": "--tool-arg key=value JSON-parses each value (count=1 becomes a number), which can surprise you with strings like \"012\". --tool-args-json takes the entire argument object at once and passes it verbatim. They cannot be combined.",
+      "explanation": "A tool with an app exits 0, one with no app exits 2, and a missing tool exits 5, so a typo is not mistaken for 'no app'. Every non-zero exit also writes a single JSON error line to stderr.",
       "tags": [
         "inspector",
-        "cli",
-        "arguments"
-      ]
+        "exit-codes"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "docs/2026-07-28/tools/inspector/cli",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch9-q7",
       "chapter": 9,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which CLI flag is recommended for CI runs so the Inspector never starts interactive OAuth and fails fast if no stored token exists?",
+      "difficulty": "hard",
+      "question": "Why does the documentation single out combining DANGEROUSLY_OMIT_AUTH with DANGEROUSLY_BIND_ALL_INTERFACES?",
       "options": [
         {
           "letter": "A",
-          "text": "--use-stored-auth"
+          "text": "The combination is rejected at startup, so the Inspector will not run at all"
         },
         {
           "letter": "B",
-          "text": "--stored-auth-only"
+          "text": "The backend spawns processes and holds OAuth tokens, so anyone who can reach it can drive it"
         },
         {
           "letter": "C",
-          "text": "--relogin"
+          "text": "Omitting auth resets the catalog, letting any remote user overwrite the stored server definitions"
         },
         {
           "letter": "D",
-          "text": "--wait-for-auth 0"
+          "text": "Binding all interfaces disables TLS, exposing tokens on the wire"
         }
       ],
-      "answer": "B",
-      "explanation": "--stored-auth-only never starts interactive OAuth or step-up and never opens a browser: it uses tokens from the shared store if present and otherwise fails immediately with auth_required — exactly what CI wants.",
+      "explanation": "Either flag alone is a development convenience; together they expose an unauthenticated service that spawns processes and holds tokens to the whole network. The documentation warns never to combine them rather than blocking it.",
       "tags": [
         "inspector",
-        "cli",
-        "oauth",
-        "ci"
-      ]
+        "dangerous-flags"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "docs/2026-07-28/tools/inspector/configuration",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch9-q8",
       "chapter": 9,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "Why must the Inspector's OAuth callback URL bind a loopback host (localhost, 127.0.0.0/8, or [::1])?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Authorization servers only allow loopback redirect URIs"
-        },
-        {
-          "letter": "B",
-          "text": "The local callback listener receives the authorization code over plaintext http, so any non-loopback host is rejected — and there is no flag to override this"
-        },
-        {
-          "letter": "C",
-          "text": "DNS resolution is disabled in the Inspector"
-        },
-        {
-          "letter": "D",
-          "text": "IPv6 is not supported"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Because the code arrives over plaintext http, binding anything but loopback would expose it on the network. The web client listens on http://localhost:6274/oauth/callback and the CLI/TUI share http://127.0.0.1:6276/oauth/callback; if your browser is on another machine, forward the port instead.",
-      "tags": [
-        "inspector",
-        "oauth",
-        "callback"
-      ]
-    },
-    {
-      "id": "ch9-q9",
-      "chapter": 9,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which pair of web-backend environment variables should NEVER be combined?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "HOST and CLIENT_PORT"
-        },
-        {
-          "letter": "B",
-          "text": "DANGEROUSLY_OMIT_AUTH and DANGEROUSLY_BIND_ALL_INTERFACES"
-        },
-        {
-          "letter": "C",
-          "text": "ALLOWED_ORIGINS and NO_PROXY"
-        },
-        {
-          "letter": "D",
-          "text": "MCP_DEBUG and DEBUG"
-        }
-      ],
-      "answer": "B",
-      "explanation": "DANGEROUSLY_OMIT_AUTH disables the API token check and DANGEROUSLY_BIND_ALL_INTERFACES exposes the backend on all interfaces. Combined, anyone who can reach the backend can drive it — and it spawns processes and holds OAuth tokens.",
-      "tags": [
-        "inspector",
-        "security",
-        "environment"
-      ]
-    },
-    {
-      "id": "ch9-q10",
-      "chapter": 9,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "What does the bare -- separator do in an Inspector web/CLI invocation like mcp-inspector node build/index.js -- --config /etc/myserver.conf?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "It comments out the rest of the line"
-        },
-        {
-          "letter": "B",
-          "text": "Everything after -- is passed to the target server command as its own arguments, so flags like --config aren't eaten by the Inspector"
-        },
-        {
-          "letter": "C",
-          "text": "It switches the Inspector into verbose mode"
-        },
-        {
-          "letter": "D",
-          "text": "It separates multiple servers"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Web and CLI split arguments at a bare --: everything after it goes to the target command. Without it, --config would be read as the Inspector's own read-only-session flag.",
-      "tags": [
-        "inspector",
-        "cli",
-        "flags"
-      ]
-    },
-    {
-      "id": "ch9-q11",
-      "chapter": 9,
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "What is the minimum Node.js version required to run the MCP Inspector?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Node 14"
-        },
-        {
-          "letter": "B",
-          "text": "Node 22.19.0 or newer"
-        },
-        {
-          "letter": "C",
-          "text": "Node 16.0.0"
-        },
-        {
-          "letter": "D",
-          "text": "Any version with npx"
-        }
-      ],
-      "answer": "B",
-      "explanation": "The Inspector requires Node 22.19.0 or newer and runs directly through npx with no installation required.",
-      "tags": [
-        "inspector",
-        "requirements"
-      ]
-    },
-    {
-      "id": "ch9-q12",
-      "chapter": 9,
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "What is the default port of the Inspector's web UI?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "3000"
-        },
-        {
-          "letter": "B",
-          "text": "6274 (configurable via CLIENT_PORT)"
-        },
-        {
-          "letter": "C",
-          "text": "8080"
-        },
-        {
-          "letter": "D",
-          "text": "443"
-        }
-      ],
-      "answer": "B",
-      "explanation": "The web UI defaults to port 6274 (CLIENT_PORT env var changes it), binding to localhost by default; its OAuth callback is http://localhost:6274/oauth/callback, while CLI/TUI use port 6276.",
-      "tags": [
-        "inspector",
-        "web",
-        "ports"
-      ]
-    },
-    {
-      "id": "ch9-q13",
-      "chapter": 9,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "SCENARIO: Your CI pipeline must fail the build if the server doesn't expose a tool named get_weather, without any interactive login. Which invocation matches the docs' recipe?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "mcp-inspector --web and a human checks the browser"
-        },
-        {
-          "letter": "B",
-          "text": "mcp-inspector --cli --config ./ci-servers.json --server my-server --stored-auth-only --method tools/list --format json | jq -e '.result.tools | map(.name) | index(\"get_weather\")'"
-        },
-        {
-          "letter": "C",
-          "text": "curl the server directly with no protocol handshake"
-        },
-        {
-          "letter": "D",
-          "text": "mcp-inspector --tui with expect scripts"
-        }
-      ],
-      "answer": "B",
-      "explanation": "The CI recipe uses the CLI with --stored-auth-only (fail fast if no stored token), --method tools/list, --format json for clean piping, and jq -e to make the exit code reflect whether the tool exists.",
-      "tags": [
-        "inspector",
-        "cli",
-        "ci",
-        "scenario"
-      ]
-    },
-    {
-      "id": "ch9-q14",
-      "chapter": 9,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "What does the CLI's --app-info flag do?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Prints the Inspector's version"
-        },
-        {
-          "letter": "B",
-          "text": "Reports whether a tool ships an MCP App UI (its ui:// resource, CSP, permissions) WITHOUT calling the tool, so pipelines can decide if a browser is needed"
-        },
-        {
-          "letter": "C",
-          "text": "Installs the app locally"
-        },
-        {
-          "letter": "D",
-          "text": "Opens the app in the default browser"
-        }
-      ],
-      "answer": "B",
-      "explanation": "--app-info probes tools for MCP App UIs without invoking them. With tools/call it emits one JSON line; with tools/list it emits NDJSON per tool. Exit codes distinguish outcomes: 0 has app, 2 no app, 5 missing tool.",
-      "tags": [
-        "inspector",
-        "cli",
-        "mcp-apps"
-      ]
-    },
-    {
-      "id": "ch9-q15",
-      "chapter": 9,
       "type": "scenario",
       "difficulty": "hard",
-      "question": "SCENARIO: Two CLI OAuth flows run concurrently on one machine and the second fails with EADDRINUSE. Why, and what are the documented workarounds?",
+      "question": "You add a modern-only server to a fresh Inspector catalog entry and every request fails before reaching your handler. What is the likely cause?",
       "options": [
         {
           "letter": "A",
-          "text": "The OAuth state file is corrupted; delete ~/.mcp-inspector"
+          "text": "protocolEra was left at its default of legacy, so the Inspector speaks the old revision"
         },
         {
           "letter": "B",
-          "text": "Only one process can hold the default callback port (6276) at a time; use a different fixed port per instance via --callback-url, or http://127.0.0.1:0/... for an OS-assigned ephemeral port if the auth server supports dynamic redirect-URI registration"
+          "text": "The catalog was seeded read-only, so the Inspector cannot record the new connection at all"
         },
         {
           "letter": "C",
-          "text": "The server blocked the client's IP"
+          "text": "modernLogLevel defaults to debug, so the server rejects the noisy log level"
         },
         {
           "letter": "D",
-          "text": "Node 22 removed concurrent sockets"
+          "text": "The Inspector defaults to port 6276, which is reserved for the OAuth callback"
         }
       ],
-      "answer": "B",
-      "explanation": "The CLI and TUI share the loopback callback listener on port 6276, and only one process can bind it. Workarounds: distinct fixed ports per instance, or port 0 for an ephemeral port — remembering redirect URIs must exactly match what's registered.",
+      "explanation": "protocolEra defaults to legacy, so an entry that omits it talks to a modern-only server in the wrong dialect and fails at the transport. modernLogLevel defaults to debug and is harmless; 6274 is the web UI and 6276 the loopback OAuth callback.",
       "tags": [
         "inspector",
-        "oauth",
-        "callback",
-        "scenario"
-      ]
-    },
-    {
-      "id": "ch9-q16",
-      "chapter": 9,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "What does the Inspector's 'protocol era' setting control?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The UI color theme"
-        },
-        {
-          "letter": "B",
-          "text": "Whether the connection negotiates legacy MCP (initialize handshake, ≤2025-11-25) or modern MCP (2026-07-28: per-request metadata, server/discover, sessionless), with an auto mode that probes"
-        },
-        {
-          "letter": "C",
-          "text": "Whether logs are shown"
-        },
-        {
-          "letter": "D",
-          "text": "The OAuth grant type"
-        }
+        "protocol-era"
       ],
-      "answer": "B",
-      "explanation": "All three Inspector clients share protocol-era negotiation: legacy uses the initialize handshake, modern uses per-request _meta and server/discover with sessionless HTTP, and protocolEra can be set to auto, modern, or legacy (defaulting to legacy in catalog files).",
-      "tags": [
-        "inspector",
-        "protocol-eras"
-      ]
-    },
-    {
-      "id": "ch9-q17",
-      "chapter": 9,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which client configs can the Inspector's web client import to populate its catalog?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Only its own catalog format"
-        },
-        {
-          "letter": "B",
-          "text": "Existing configs from Claude Desktop, Cursor, Cline, or VS Code — or a registry server.json"
-        },
-        {
-          "letter": "C",
-          "text": "Only Docker Compose files"
-        },
-        {
-          "letter": "D",
-          "text": "Kubernetes manifests"
-        }
-      ],
-      "answer": "B",
-      "explanation": "You don't have to hand-write catalog files: the web client can import an existing client config from Claude Desktop, Cursor, Cline, or VS Code, or a registry server.json (covered in the Recipes page).",
-      "tags": [
-        "inspector",
-        "recipes",
-        "configuration"
-      ]
-    },
-    {
-      "id": "ch9-q18",
-      "chapter": 9,
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "Where in the Inspector's web client can you review OAuth discovery results, the registered client, granted scopes, and clear OAuth state?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The Connection Info panel"
-        },
-        {
-          "letter": "B",
-          "text": "The browser's address bar"
-        },
-        {
-          "letter": "C",
-          "text": "A separate desktop app"
-        },
-        {
-          "letter": "D",
-          "text": "Only in the server's logs"
-        }
-      ],
-      "answer": "A",
-      "explanation": "The web client's Connection Info panel shows discovery results, the registered client, granted scopes, and token state, and offers a 'Clear OAuth state' action. The TUI exposes the same fields in its Auth tab (opened with 'a').",
-      "tags": [
-        "inspector",
-        "web",
-        "oauth"
-      ]
-    },
-    {
-      "id": "ch9-q19",
-      "chapter": 9,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "SCENARIO: Mid-session, a request to a connected server fails with 403 insufficient_scope. What does the Inspector do?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Drops the connection and requires a full restart"
-        },
-        {
-          "letter": "B",
-          "text": "Handles step-up without dropping the connection: it re-authorizes for the union of held and required scopes (banner in web, y/N prompt on stderr in CLI), so the new token covers everything the old one did plus the new scopes"
-        },
-        {
-          "letter": "C",
-          "text": "Silently retries with the same token forever"
-        },
-        {
-          "letter": "D",
-          "text": "Deletes the stored OAuth state"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Mid-session re-authorization covers both cases: 401 (expired/revoked → re-run flow and retry) and 403 insufficient_scope (step-up for the scope union). Enterprise-managed step-up re-mints silently with no prompt.",
-      "tags": [
-        "inspector",
-        "oauth",
-        "step-up",
-        "scenario"
-      ]
-    },
-    {
-      "id": "ch9-q20",
-      "chapter": 9,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "How does the TUI differ from the web and CLI clients in server selection from a catalog/config file?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The TUI cannot read files at all"
-        },
-        {
-          "letter": "B",
-          "text": "The --server flag is web/CLI-only; the TUI loads every server in the file and lets you choose interactively"
-        },
-        {
-          "letter": "C",
-          "text": "The TUI only supports HTTP servers"
-        },
-        {
-          "letter": "D",
-          "text": "The TUI requires a separate catalog format"
-        }
-      ],
-      "answer": "B",
-      "explanation": "The shared server-selection flags note this divergence: --server <name> picks one named server on web and CLI, whereas the TUI loads all servers from the file for interactive selection.",
-      "tags": [
-        "inspector",
-        "tui",
-        "flags"
-      ]
-    },
-    {
-      "id": "ch9-q21",
-      "chapter": 9,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "What is the key difference between the Inspector's --catalog and --config flags?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "--catalog is CLI-only; --config is web-only"
-        },
-        {
-          "letter": "B",
-          "text": "--catalog is the Inspector's own writable server list (default ~/.mcp-inspector/mcp.json, created and seeded if missing); --config is read-only, never written or seeded, and errors if the file is missing - and the two are mutually exclusive"
-        },
-        {
-          "letter": "C",
-          "text": "--config supports HTTP servers; --catalog supports only stdio"
-        },
-        {
-          "letter": "D",
-          "text": "They are aliases for the same behavior"
-        }
-      ],
-      "answer": "B",
-      "explanation": "--catalog = your working set (web-editable, seeded with samples in the web client, empty {} for CLI/TUI). --config = a read-only session against a file you did not write, guaranteed untouched. Passing both is rejected by all three clients. (Inspector docs, Configuration and flags.)",
-      "tags": [
-        "inspector",
-        "catalog",
-        "config"
-      ]
-    },
-    {
-      "id": "ch9-q22",
-      "chapter": 9,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "An Inspector CLI run in CI exits with code 3. Another exits with code 5. What happened?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "3 = server unreachable; 5 = usage error"
-        },
-        {
-          "letter": "B",
-          "text": "3 = server requires authentication (401/403, OAuth); 5 = tools/call returned isError: true or the tool was not found"
-        },
-        {
-          "letter": "C",
-          "text": "3 = no MCP App on the tool; 5 = success with warnings"
-        },
-        {
-          "letter": "D",
-          "text": "3 = timeout; 5 = malformed catalog"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Exit codes: 0 success, 1 usage/unexpected, 2 no MCP App (--app-info), 3 auth required, 4 server unreachable, 5 tool error/not found. Each non-zero exit also writes one JSON error line to stderr for branching. (Inspector docs, CLI client.)",
-      "tags": [
-        "inspector",
-        "cli",
-        "exit-codes"
-      ]
-    },
-    {
-      "id": "ch9-q23",
-      "chapter": 9,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which flag makes Inspector CLI authentication predictable in CI, and what does it do?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "--relogin: forces a fresh browser OAuth flow"
-        },
-        {
-          "letter": "B",
-          "text": "--stored-auth-only: never starts interactive OAuth or step-up and never auto-opens a browser; uses tokens from the shared store if present, otherwise fails immediately with auth_required"
-        },
-        {
-          "letter": "C",
-          "text": "--wait-for-auth: blocks for 15 minutes on the callback"
-        },
-        {
-          "letter": "D",
-          "text": "--print-handoff: disables auth entirely"
-        }
-      ],
-      "answer": "B",
-      "explanation": "--stored-auth-only is the CI flag: fail fast instead of hanging on a localhost OAuth callback nobody will complete. --use-stored-auth reuses (and refreshes) tokens the web Inspector already obtained. (Inspector docs, CLI authorization.)",
-      "tags": [
-        "inspector",
-        "cli",
-        "auth",
-        "ci"
-      ]
-    },
-    {
-      "id": "ch9-q24",
-      "chapter": 9,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "Why must DANGEROUSLY_OMIT_AUTH never be combined with DANGEROUSLY_BIND_ALL_INTERFACES on the Inspector web backend?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The flags conflict and crash the process"
-        },
-        {
-          "letter": "B",
-          "text": "The backend spawns processes and holds OAuth tokens; removing the session-token check while binding 0.0.0.0 lets anyone who can reach the port drive it - effectively remote code execution plus token theft"
-        },
-        {
-          "letter": "C",
-          "text": "It disables the MCP Apps sandbox port"
-        },
-        {
-          "letter": "D",
-          "text": "It breaks the ALLOWED_ORIGINS allow-list"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Individually each flag has narrow uses; together they expose an unauthenticated process-spawning, token-holding backend to the network. Relatedly, the OAuth callback URL must stay on loopback (default 127.0.0.1:6276) because the code arrives over plaintext http; the web UI defaults to port 6274. (Inspector docs, Configuration and flags.)",
-      "tags": [
-        "inspector",
-        "security",
-        "environment-variables"
-      ]
-    },
-    {
-      "id": "ch9-scenario-extra-1",
-      "chapter": 9,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A tester launches MCP Inspector with --config pointing to a file that does not exist and expects Inspector to create it with sample servers. What should actually happen?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "It should create and seed it"
-        },
-        {
-          "letter": "B",
-          "text": "--config is read-only and should error if the file is missing; --catalog is the writable/seeding mode"
-        },
-        {
-          "letter": "C",
-          "text": "It should silently switch to --catalog"
-        },
-        {
-          "letter": "D",
-          "text": "It should create an OAuth token instead"
-        }
-      ],
-      "answer": "B",
-      "explanation": "The cheat sheet distinguishes writable --catalog from read-only --config. --config is never written/seeded and errors when the file is absent.",
-      "tags": [
-        "inspector",
-        "config",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch9-scenario-extra-2",
-      "chapter": 9,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A CI job uses Inspector against a server requiring OAuth, but interactive browser login is impossible. Which option is designed to make this fail fast instead of hanging for interaction?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "--stored-auth-only"
-        },
-        {
-          "letter": "B",
-          "text": "--bind-all"
-        },
-        {
-          "letter": "C",
-          "text": "--seed-oauth"
-        },
-        {
-          "letter": "D",
-          "text": "--last-event-id"
-        }
-      ],
-      "answer": "A",
-      "explanation": "The study material calls out --stored-auth-only for CI so the run fails quickly if stored authentication is unavailable.",
-      "tags": [
-        "inspector",
-        "ci",
-        "oauth",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch9-scenario-extra-3",
-      "chapter": 9,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A security review finds Inspector configured with both DANGEROUSLY_OMIT_AUTH and DANGEROUSLY_BIND_ALL_INTERFACES. What is the correct test disposition?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Accept; the two settings cancel each other out"
-        },
-        {
-          "letter": "B",
-          "text": "Reject the configuration; the material explicitly warns never to combine them"
-        },
-        {
-          "letter": "C",
-          "text": "Accept only on port 6274"
-        },
-        {
-          "letter": "D",
-          "text": "Convert the server to stdio automatically"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Disabling auth while binding broadly can expose the Inspector interface. The cheat sheet explicitly says never combine these dangerous settings.",
-      "tags": [
-        "inspector",
-        "security",
-        "tester-scenario"
-      ]
+      "domain": "Use Cases & Ecosystem",
+      "source": "modelcontextprotocol.io/docs/tools/inspector",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     }
   ]
 }

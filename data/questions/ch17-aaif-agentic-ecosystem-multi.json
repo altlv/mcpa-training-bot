@@ -1,161 +1,97 @@
 {
+  "meta": {
+    "title": "MCP Question Bank — Chapter 17: AAIF & Agentic Ecosystem (multi-select)",
+    "protocolVersion": "2026-07-28",
+    "chapter": 17,
+    "chapterName": "AAIF & Agentic Ecosystem",
+    "examDomain": "Use Cases & Ecosystem",
+    "mode": "multi_select",
+    "questionCount": 2,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
+  },
   "questions": [
     {
       "id": "ch17-m1",
       "chapter": 17,
       "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which project–contributor pairings at the AAIF founding are correct? (Select all that apply.)",
+      "difficulty": "hard",
+      "question": "Which statements about MCP's place in the AAIF are correct? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "MCP — Anthropic"
+          "text": "Contributors keep their copyright; no assignment to the foundation is required"
         },
         {
           "letter": "B",
-          "text": "goose — Block"
+          "text": "The foundation's board approves each specification revision before release"
         },
         {
           "letter": "C",
-          "text": "AGENTS.md — OpenAI"
+          "text": "Foundation membership replaced the maintainer roles with elected seats"
         },
         {
           "letter": "D",
-          "text": "goose — Google"
+          "text": "MCP runs as 'Model Context Protocol, a Series of LF Projects, LLC'"
         },
         {
           "letter": "E",
-          "text": "All of the above"
+          "text": "agentgateway joined the foundation after the launch, in June 2026"
         }
       ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "The founding contributions were Anthropic's MCP, Block's goose, and OpenAI's AGENTS.md (plus agentgateway). Google is a platinum member but didn't contribute goose.",
+      "explanation": "The legal entity, contributor copyright retention and agentgateway's later arrival are all accurate. Revisions are approved through the project's own SEP and Core Maintainer process, and the maintainer ladder is unchanged and individual-based.",
       "tags": [
         "aaif",
-        "projects"
+        "governance"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "aaif.io · community/governance",
+      "protocolVersion": "2026-07-28",
+      "answers": [
+        "A",
+        "D",
+        "E"
       ]
     },
     {
       "id": "ch17-m2",
       "chapter": 17,
       "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which statements about the AAIF are true? (Select all that apply.)",
+      "difficulty": "hard",
+      "question": "Which statements about rolling MCP out across an enterprise are accurate? (Select all that apply.)",
       "options": [
         {
           "letter": "A",
-          "text": "It operates under the Linux Foundation"
+          "text": "MCP defines the audit log format that connected servers must emit"
         },
         {
           "letter": "B",
-          "text": "It was announced on December 9, 2025"
+          "text": "A gateway can enforce policy centrally, helped by the routing headers"
         },
         {
           "letter": "C",
-          "text": "It is a vendor-neutral home where no single company dominates"
+          "text": "A registry entry helps teams discover a server but does not vouch for it"
         },
         {
           "letter": "D",
-          "text": "Launch platinum members included AWS, Google, Microsoft, and OpenAI alongside Anthropic and Block"
+          "text": "One server can serve many hosts, so integrations are written once"
         },
         {
           "letter": "E",
-          "text": "The AAIF was founded by a single company and later opened to others"
+          "text": "MCP supplies the identity provider, so no separate SSO is needed"
         }
       ],
+      "explanation": "Reuse across hosts, central policy at a gateway using Mcp-Method and Mcp-Name, and discovery without endorsement are all real. MCP builds on OAuth 2.1 rather than providing an identity provider, and it defines no audit log format.",
+      "tags": [
+        "ecosystem",
+        "enterprise"
+      ],
+      "domain": "Use Cases & Ecosystem",
+      "source": "specification/2026-07-28/architecture",
+      "protocolVersion": "2026-07-28",
       "answers": [
-        "A",
         "B",
         "C",
         "D"
-      ],
-      "explanation": "All four facts come from the founding announcement — a legitimate 'All of the above'.",
-      "tags": [
-        "aaif",
-        "facts"
-      ]
-    },
-    {
-      "id": "ch17-m3",
-      "chapter": 17,
-      "type": "multi_select",
-      "difficulty": "medium",
-      "question": "Which are host applications in the MCP ecosystem? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Claude Desktop"
-        },
-        {
-          "letter": "B",
-          "text": "goose"
-        },
-        {
-          "letter": "C",
-          "text": "Visual Studio Code (with MCP support)"
-        },
-        {
-          "letter": "D",
-          "text": "The MCP Registry"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Hosts are AI applications that coordinate MCP clients — Claude Desktop, goose, and MCP-enabled IDEs qualify. The Registry is discovery infrastructure, not a host.",
-      "tags": [
-        "ecosystem",
-        "hosts"
-      ]
-    },
-    {
-      "id": "ch17-m4",
-      "chapter": 17,
-      "type": "multi_select",
-      "difficulty": "hard",
-      "question": "Which benefits does neutral foundation governance give the MCP ecosystem? (Select all that apply.)",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Competing vendors (AWS, Google, Microsoft, OpenAI) can all invest in one standard no rival controls"
-        },
-        {
-          "letter": "B",
-          "text": "Downstream developers are protected from unilateral pricing/compatibility/deprecation decisions"
-        },
-        {
-          "letter": "C",
-          "text": "Evolution happens by community consensus via SEPs and Working Groups"
-        },
-        {
-          "letter": "D",
-          "text": "It guarantees every MCP server is free of vulnerabilities"
-        },
-        {
-          "letter": "E",
-          "text": "All of the above"
-        }
-      ],
-      "answers": [
-        "A",
-        "B",
-        "C"
-      ],
-      "explanation": "Governance neutrality delivers cooperation, protection from unilateral change, and consensus-driven evolution — it does not (and cannot) guarantee implementation security.",
-      "tags": [
-        "aaif",
-        "governance",
-        "benefits"
       ]
     }
   ]

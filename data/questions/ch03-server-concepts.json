@@ -1,995 +1,288 @@
 {
   "meta": {
-    "title": "MCP Question Bank — Chapter 3: Server Features (Tools, Resources, Prompts)",
+    "title": "MCP Question Bank — Chapter 3: Server Concepts",
     "protocolVersion": "2026-07-28",
     "chapter": 3,
-    "chapterName": "Server Features (Tools, Resources, Prompts)",
-    "questionCount": 31
+    "chapterName": "Server Concepts",
+    "examDomain": "Interactions & Execution",
+    "mode": "single_select",
+    "questionCount": 8,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
   },
   "questions": [
     {
       "id": "ch3-q1",
       "chapter": 3,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "easy",
-      "question": "What are the three core primitives that MCP servers can expose?",
+      "question": "A tools/call reaches your booking tool, which calls an airline API that answers 503. What does a conformant server return?",
       "options": [
         {
           "letter": "A",
-          "text": "Tools, Resources, and Prompts"
+          "text": "A result with resultType input_required, asking the user to retry later"
         },
         {
           "letter": "B",
-          "text": "Functions, Files, and Formats"
+          "text": "A result with isError: true and text the model can act on"
         },
         {
           "letter": "C",
-          "text": "Actions, Events, and Streams"
+          "text": "A JSON-RPC error -32603, because the failure happened inside the server"
         },
         {
           "letter": "D",
-          "text": "Tools, Agents, and Memories"
+          "text": "A JSON-RPC error -32602, because the arguments could not be fulfilled"
         }
       ],
-      "answer": "A",
-      "explanation": "Servers expose Tools (executable functions), Resources (read-only data sources providing context), and Prompts (reusable interaction templates).",
+      "explanation": "API failures, validation failures and business-rule failures are tool execution errors: they are reported inside a normal result with isError: true, so the model can self-correct. JSON-RPC errors are for problems with the request itself, such as an unknown tool.",
       "tags": [
-        "server-concepts",
-        "primitives"
-      ]
+        "tools",
+        "errors",
+        "isError"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/server/tools",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch3-q2",
       "chapter": 3,
       "type": "mcq",
       "difficulty": "medium",
-      "question": "Who 'controls' each server primitive according to the interaction model in the docs?",
+      "question": "A client calls tools/call with name 'serch_flights', a typo. What should the server return?",
       "options": [
         {
           "letter": "A",
-          "text": "Tools: user, Resources: model, Prompts: application"
+          "text": "A JSON-RPC error -32603 Internal error, since no handler matched"
         },
         {
           "letter": "B",
-          "text": "Tools: model, Resources: application, Prompts: user"
+          "text": "A result with isError: true so the model can retry with a corrected name"
         },
         {
           "letter": "C",
-          "text": "Tools: application, Resources: user, Prompts: model"
+          "text": "A JSON-RPC error -32601 Method not found, since the tool name names the method"
         },
         {
           "letter": "D",
-          "text": "All three are controlled by the model"
+          "text": "A JSON-RPC error -32602 Invalid params: the tool does not exist"
         }
       ],
-      "answer": "B",
-      "explanation": "Tools are model-controlled (the LLM decides when to invoke them), resources are application-driven (the host decides how to retrieve and use them), and prompts are user-controlled (requiring explicit invocation, e.g., via slash commands).",
+      "explanation": "Unknown tool and requests that fail the CallToolRequest schema are protocol errors, reported as -32602. -32601 is for an unknown JSON-RPC method such as tools/cal, not an unknown tool name.",
       "tags": [
-        "server-concepts",
-        "control-model"
-      ]
+        "tools",
+        "errors",
+        "protocol"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/server/tools",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch3-q3",
       "chapter": 3,
       "type": "mcq",
-      "difficulty": "easy",
-      "question": "Which pair of protocol methods is used to discover and execute tools?",
+      "difficulty": "medium",
+      "question": "A resources/read result carries cacheScope: \"private\". What does that permit?",
       "options": [
         {
           "letter": "A",
-          "text": "tools/find and tools/run"
+          "text": "No reuse at all: the response must be re-fetched on every access"
         },
         {
           "letter": "B",
-          "text": "tools/list and tools/call"
+          "text": "Reuse only in memory and never on disk, regardless of which caller the result is served to"
         },
         {
           "letter": "C",
-          "text": "tools/get and tools/invoke"
+          "text": "Reuse within the same authorization context only, never across different tokens"
         },
         {
           "letter": "D",
-          "text": "list/tools and call/tools"
+          "text": "Reuse by any client, but never storage by a shared gateway or proxy"
         }
       ],
-      "answer": "B",
-      "explanation": "Clients discover tools with tools/list (returning definitions with JSON Schemas) and execute a specific tool with tools/call.",
+      "explanation": "private means the response contains data that must not be shared between callers: caches MUST NOT be shared across authorization contexts, so a different access token needs a different cache entry. public means any client or shared proxy may serve it to anyone.",
       "tags": [
-        "server-concepts",
-        "tools",
-        "methods"
-      ]
+        "caching",
+        "scope"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/server/utilities/caching",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch3-q4",
       "chapter": 3,
       "type": "mcq",
       "difficulty": "medium",
-      "question": "What schema language does MCP use to define and validate tool inputs?",
+      "question": "A tool declares an outputSchema. What does that oblige each side to do?",
       "options": [
         {
           "letter": "A",
-          "text": "Protocol Buffers"
+          "text": "The server MUST return structuredContent conforming to it; clients SHOULD validate it"
         },
         {
           "letter": "B",
-          "text": "XML Schema (XSD)"
+          "text": "The server SHOULD validate it, and the client MUST ignore results that fail"
         },
         {
           "letter": "C",
-          "text": "JSON Schema"
+          "text": "The client MUST reject any result that also contains unstructured content blocks"
         },
         {
           "letter": "D",
-          "text": "GraphQL SDL"
+          "text": "The server MUST return only structuredContent, with no text content at all"
         }
       ],
-      "answer": "C",
-      "explanation": "Each tool declares an inputSchema in JSON Schema, which enables type validation and documents required and optional parameters. Tools may also declare an optional outputSchema.",
+      "explanation": "With an output schema, servers MUST provide conforming structured results and clients SHOULD validate them. For backwards compatibility a tool returning structured content should also return the serialized JSON in a text block.",
       "tags": [
-        "server-concepts",
         "tools",
-        "schemas"
-      ]
+        "output-schema"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/server/tools",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch3-q5",
       "chapter": 3,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "medium",
-      "question": "How is a Resource uniquely identified in MCP?",
+      "question": "Your server ships a prompt template that needs an incident id. How does a client find out the argument exists, and how does it supply one?",
       "options": [
         {
           "letter": "A",
-          "text": "By a sequential integer ID assigned by the client"
+          "text": "prompts/list declares the arguments; prompts/get is called with values for them"
         },
         {
           "letter": "B",
-          "text": "By a unique URI, e.g., file:///path/to/document.md"
+          "text": "Arguments are declared in server/discover and passed in the request _meta"
         },
         {
           "letter": "C",
-          "text": "By its SHA-256 content hash"
+          "text": "prompts/get declares the arguments on a first call and accepts them on a second"
         },
         {
           "letter": "D",
-          "text": "By a (server name, index) tuple"
+          "text": "The client reads the arguments from the prompt text and infers them itself"
         }
       ],
-      "answer": "B",
-      "explanation": "Each resource has a unique URI (such as file:///path/to/document.md) and declares its MIME type for appropriate content handling.",
+      "explanation": "prompts/list returns each prompt with its declared arguments, and prompts/get takes the name plus argument values and returns the resulting messages. Nothing about prompt arguments lives in server/discover or in _meta.",
       "tags": [
-        "server-concepts",
-        "resources"
-      ]
+        "prompts",
+        "arguments"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/server/prompts",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch3-q6",
       "chapter": 3,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "What distinguishes a Resource Template from a Direct Resource?",
+      "difficulty": "hard",
+      "question": "A client reads file:///reports/q3.pdf, which was deleted. Which response is conformant in 2026-07-28?",
       "options": [
         {
           "letter": "A",
-          "text": "Templates are write-enabled while direct resources are read-only"
+          "text": "Error -32002 Resource not found, which clients still accept from modern servers"
         },
         {
           "letter": "B",
-          "text": "Templates use dynamic URIs with parameters (e.g., travel://activities/{city}/{category}) while direct resources have fixed URIs"
+          "text": "A result whose contents array is empty, letting the client decide what it means"
         },
         {
           "letter": "C",
-          "text": "Templates can only return JSON"
+          "text": "Error -32602 Invalid params, with the uri in error.data"
         },
         {
           "letter": "D",
-          "text": "Templates are discovered via tools/list"
+          "text": "A result with isError: true, since the file's absence is a business condition"
         }
       ],
-      "answer": "B",
-      "explanation": "Direct resources are fixed URIs pointing to specific data; resource templates are dynamic URIs with parameters that enable flexible queries, discovered via resources/templates/list, and they support parameter completion.",
+      "explanation": "Resource-not-found moved from -32002 to -32602 to align with JSON-RPC. Clients SHOULD still accept -32002 from servers on earlier revisions, but modern servers MUST NOT emit it, and MUST NOT answer with an empty contents array, which is ambiguous.",
       "tags": [
-        "server-concepts",
         "resources",
-        "templates"
-      ]
+        "errors"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/server/resources",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch3-q7",
       "chapter": 3,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which protocol method retrieves the full definition of a specific prompt, including its arguments?",
+      "type": "scenario",
+      "difficulty": "hard",
+      "question": "Your client cached tools/list with ttlMs 300000. Two minutes later notifications/tools/list_changed arrives. What should it do?",
       "options": [
         {
           "letter": "A",
-          "text": "prompts/get"
+          "text": "Halve the remaining TTL, re-fetching only if the notification repeats"
         },
         {
           "letter": "B",
-          "text": "prompts/read"
+          "text": "Treat the cached list as stale immediately and re-fetch on next use"
         },
         {
           "letter": "C",
-          "text": "prompts/call"
+          "text": "Re-fetch immediately and open a new subscriptions/listen stream"
         },
         {
           "letter": "D",
-          "text": "prompts/fetch"
+          "text": "Keep the cache until the TTL expires, then re-fetch, since the TTL is authoritative"
         }
       ],
-      "answer": "A",
-      "explanation": "prompts/list discovers available prompts, and prompts/get retrieves a full prompt definition with its arguments.",
+      "explanation": "TTL and notifications are complementary: a relevant list_changed notification invalidates a cached response even while it is still fresh. The TTL is a freshness hint, not a guarantee and not a polling interval.",
       "tags": [
-        "server-concepts",
-        "prompts",
-        "methods"
-      ]
+        "caching",
+        "list-changed"
+      ],
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/server/utilities/caching",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch3-q8",
       "chapter": 3,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "A client wants to be notified when a specific resource changes. How does it accomplish this in the 2026-07-28 protocol?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "By calling resources/subscribe with the URI"
-        },
-        {
-          "letter": "B",
-          "text": "By sending a subscriptions/listen request with the resource URIs listed in the resourceSubscriptions filter"
-        },
-        {
-          "letter": "C",
-          "text": "By re-reading the resource on a timer; there is no notification mechanism"
-        },
-        {
-          "letter": "D",
-          "text": "By setting watch: true in resources/read"
-        }
-      ],
-      "answer": "B",
-      "explanation": "To watch resources, the client sends subscriptions/listen with the URIs in the resourceSubscriptions filter; the server delivers notifications/resources/updated on the resulting stream whenever a watched resource changes.",
-      "tags": [
-        "server-concepts",
-        "resources",
-        "subscriptions"
-      ]
-    },
-    {
-      "id": "ch3-q9",
-      "chapter": 3,
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "In the tools/call response, tool output is returned in which structure?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "A single plain string field named output"
-        },
-        {
-          "letter": "B",
-          "text": "A content array of typed content objects (e.g., type: \"text\")"
-        },
-        {
-          "letter": "C",
-          "text": "A base64-encoded blob"
-        },
-        {
-          "letter": "D",
-          "text": "An HTML document"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Tool responses return a content array of content objects, each with a type field (text, images, resources, etc.), enabling rich multi-format responses.",
-      "tags": [
-        "server-concepts",
-        "tools",
-        "responses"
-      ]
-    },
-    {
-      "id": "ch3-q10",
-      "chapter": 3,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which UI patterns do applications typically use to expose user-controlled prompts?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Slash commands, command palettes, dedicated buttons, and context menus"
-        },
-        {
-          "letter": "B",
-          "text": "Only automatic invocation by the model"
-        },
-        {
-          "letter": "C",
-          "text": "Hidden system prompts the user never sees"
-        },
-        {
-          "letter": "D",
-          "text": "Email digests"
-        }
-      ],
-      "answer": "A",
-      "explanation": "Prompts require explicit invocation, and applications commonly expose them via slash commands (e.g., /plan-vacation), command palettes, dedicated UI buttons, and context menus.",
-      "tags": [
-        "server-concepts",
-        "prompts",
-        "ux"
-      ]
-    },
-    {
-      "id": "ch3-q11",
-      "chapter": 3,
       "type": "scenario",
       "difficulty": "hard",
-      "question": "SCENARIO: You're building an MCP server for a database. You want to expose (a) a way to run queries, (b) the database schema for context, and (c) few-shot examples showing how to query well. Which primitives map to (a), (b), and (c)?",
+      "question": "Your multi-tenant server wants tools/list to differ per caller. What does the spec allow?",
       "options": [
         {
           "letter": "A",
-          "text": "(a) Tool, (b) Resource, (c) Prompt"
+          "text": "It may vary freely per connection, because each client holds its own session"
         },
         {
           "letter": "B",
-          "text": "(a) Resource, (b) Prompt, (c) Tool"
+          "text": "It may vary only when the server declares listChanged: true in its declared capabilities"
         },
         {
           "letter": "C",
-          "text": "(a) Prompt, (b) Tool, (c) Resource"
+          "text": "It must be identical for every caller, so any filtering belongs in the client"
         },
         {
           "letter": "D",
-          "text": "All three should be tools"
+          "text": "It may vary by the authorization presented, but not per connection or by side effect"
         }
       ],
-      "answer": "A",
-      "explanation": "This is the exact example from the architecture docs: a database server exposes tools for querying, a resource containing the schema, and a prompt with few-shot examples for interacting with the tools.",
-      "tags": [
-        "server-concepts",
-        "scenario",
-        "primitives"
-      ]
-    },
-    {
-      "id": "ch3-q12",
-      "chapter": 3,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "SCENARIO: A tool is registered as 'calculate' on a server that may later add currency conversion and unit conversion tools. Following the naming guidance from the tool discovery docs, what should you do?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Keep 'calculate'; shorter names save tokens"
-        },
-        {
-          "letter": "B",
-          "text": "Use a clearer, namespaced-style name such as 'calculator_arithmetic' so the name uniquely and descriptively identifies the operation within the server's namespace"
-        },
-        {
-          "letter": "C",
-          "text": "Use a random UUID as the name"
-        },
-        {
-          "letter": "D",
-          "text": "Names don't matter because the title field is what the model sees"
-        }
-      ],
-      "answer": "B",
-      "explanation": "The docs recommend names follow a clear naming pattern (e.g., calculator_arithmetic rather than just calculate). The name is the unique identifier and primary key for execution within the server's namespace, so descriptive, unambiguous names improve tool selection.",
-      "tags": [
-        "server-concepts",
-        "scenario",
-        "tools",
-        "naming"
-      ]
-    },
-    {
-      "id": "ch3-q13",
-      "chapter": 3,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "SCENARIO: A user is filling in the {city} parameter of the resource template weather://forecast/{city}/{date} and types 'Par'. What MCP feature lets the application suggest 'Paris' or 'Park City'?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Sampling"
-        },
-        {
-          "letter": "B",
-          "text": "Parameter completion on resource templates (also supported by prompts)"
-        },
-        {
-          "letter": "C",
-          "text": "Tool annotations"
-        },
-        {
-          "letter": "D",
-          "text": "Progress notifications"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Dynamic resources support parameter completion: typing 'Par' can suggest 'Paris' or 'Park City', helping users discover valid values without knowing exact formats. Prompts support argument completion similarly.",
-      "tags": [
-        "server-concepts",
-        "scenario",
-        "completion",
-        "resources"
-      ]
-    },
-    {
-      "id": "ch3-q14",
-      "chapter": 3,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "Which method discovers Resource Templates specifically (as opposed to direct resources)?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "resources/list"
-        },
-        {
-          "letter": "B",
-          "text": "resources/templates/list"
-        },
-        {
-          "letter": "C",
-          "text": "templates/get"
-        },
-        {
-          "letter": "D",
-          "text": "resources/discover"
-        }
-      ],
-      "answer": "B",
-      "explanation": "resources/list returns direct resource descriptors, while resources/templates/list returns resource template definitions (uriTemplate, name, title, description, mimeType). resources/read retrieves contents.",
-      "tags": [
-        "server-concepts",
-        "resources",
-        "methods"
-      ]
-    },
-    {
-      "id": "ch3-q15",
-      "chapter": 3,
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "What human-oversight mechanisms do the docs suggest applications implement around model-controlled tools?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "None; tools should run silently"
-        },
-        {
-          "letter": "B",
-          "text": "Approval dialogs for executions, permission settings for pre-approving safe operations, UI display of available tools, and activity logs of executions"
-        },
-        {
-          "letter": "C",
-          "text": "A mandatory 24-hour delay before any tool runs"
-        },
-        {
-          "letter": "D",
-          "text": "Only server-side logging"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Because tools are model-controlled, MCP emphasizes human oversight: showing available tools in the UI, approval dialogs for individual executions, permission settings for pre-approved safe operations, and activity logs showing executions with results.",
-      "tags": [
-        "server-concepts",
-        "tools",
-        "trust-safety"
-      ]
-    },
-    {
-      "id": "ch3-q16",
-      "chapter": 3,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which content block types can appear in a tool result's content array?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Only plain text"
-        },
-        {
-          "letter": "B",
-          "text": "Text, images, audio, resource links, and embedded resources"
-        },
-        {
-          "letter": "C",
-          "text": "Text and video only"
-        },
-        {
-          "letter": "D",
-          "text": "Raw binary streams without type information"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Tool results are arrays of typed content blocks: text content, image content, audio content (both base64 with a mimeType), resource links (a URI reference without inline contents), and embedded resources (full resource contents inside the result).",
-      "tags": [
-        "server-features",
-        "tools",
-        "content-blocks"
-      ]
-    },
-    {
-      "id": "ch3-q17",
-      "chapter": 3,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "What's the difference between a resource link and an embedded resource in a tool result?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "They are synonyms"
-        },
-        {
-          "letter": "B",
-          "text": "A resource link references a resource by URI without carrying its contents (the client may fetch it via resources/read); an embedded resource carries the full resource contents inline within the result"
-        },
-        {
-          "letter": "C",
-          "text": "Resource links are only for images"
-        },
-        {
-          "letter": "D",
-          "text": "Embedded resources must be fetched separately"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Links defer the payload — useful for large or optional data the client can read on demand; embedded resources inline the payload so no follow-up read is needed.",
-      "tags": [
-        "server-features",
-        "content-blocks",
-        "resources"
-      ]
-    },
-    {
-      "id": "ch3-q18",
-      "chapter": 3,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "How are binary payloads like images and audio carried in MCP content blocks?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "As raw bytes appended after the JSON"
-        },
-        {
-          "letter": "B",
-          "text": "Base64-encoded in the block's data field, accompanied by a mimeType so the client knows how to interpret them"
-        },
-        {
-          "letter": "C",
-          "text": "As URLs only — binary data cannot travel inline"
-        },
-        {
-          "letter": "D",
-          "text": "As hexadecimal strings in the params"
-        }
-      ],
-      "answer": "B",
-      "explanation": "JSON-RPC is text-based, so image/audio content blocks carry base64 data plus a mimeType (e.g., image/png, audio/wav). Large binaries can alternatively be exposed as resources and referenced by link.",
-      "tags": [
-        "server-features",
-        "content-blocks",
-        "binary"
-      ]
-    },
-    {
-      "id": "ch3-q19",
-      "chapter": 3,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "During a conversation, the LLM decides on its own that calling get_weather would help answer the user, and the host shows an approval prompt before executing. Which primitive and control model is this?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "A Prompt - user-controlled"
-        },
-        {
-          "letter": "B",
-          "text": "A Resource - application-controlled"
-        },
-        {
-          "letter": "C",
-          "text": "A Tool - model-controlled, with human oversight via approval"
-        },
-        {
-          "letter": "D",
-          "text": "A Root - host-controlled"
-        }
-      ],
-      "answer": "C",
-      "explanation": "Tools are model-controlled: the LLM decides when to invoke them, while the host keeps a human in the loop (visibility, per-call approval, pre-approval settings, activity logs). (MCP docs, server concepts control model.)",
-      "tags": [
-        "control-model",
-        "tools"
-      ]
-    },
-    {
-      "id": "ch3-q20",
-      "chapter": 3,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "A host application automatically attaches the contents of file:///project/README.md to the model's context before a chat turn, without the model or the user asking. Which control model is exercised?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Model-controlled, because the content reaches the model"
-        },
-        {
-          "letter": "B",
-          "text": "Application-controlled - Resources are retrieved and used at the host's discretion"
-        },
-        {
-          "letter": "C",
-          "text": "User-controlled, because the user owns the file"
-        },
-        {
-          "letter": "D",
-          "text": "Server-controlled, because the server exposes the URI"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Resources are application-driven: the host decides how and when to retrieve them and how to use them. Tools are model-controlled and Prompts are user-controlled - the classic Model->Tools, App->Resources, User->Prompts mapping. (MCP docs, server concepts.)",
-      "tags": [
-        "control-model",
-        "resources"
-      ]
-    },
-    {
-      "id": "ch3-q21",
-      "chapter": 3,
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "A user types the /code-review slash command, which the client fetched from a server via prompts/list. Which control model does this demonstrate?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Model-controlled"
-        },
-        {
-          "letter": "B",
-          "text": "Application-controlled"
-        },
-        {
-          "letter": "C",
-          "text": "User-controlled"
-        },
-        {
-          "letter": "D",
-          "text": "Transport-controlled"
-        }
-      ],
-      "answer": "C",
-      "explanation": "Prompts are user-controlled templates: they require explicit user invocation, typically surfaced as slash commands or menu entries. (MCP docs, server concepts.)",
-      "tags": [
-        "control-model",
-        "prompts"
-      ]
-    },
-    {
-      "id": "ch3-q22",
-      "chapter": 3,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "A tool's downstream API returns HTTP 500 while executing tools/call. What should the MCP server return?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "A JSON-RPC error response with code -32603"
-        },
-        {
-          "letter": "B",
-          "text": "A normal result (resultType \"complete\") whose payload sets isError: true and describes the failure"
-        },
-        {
-          "letter": "C",
-          "text": "resultType \"input_required\" so the client can retry"
-        },
-        {
-          "letter": "D",
-          "text": "HTTP 500 with an empty body"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Tool *execution* failures are reported inside the result via isError: true, so the model can see and react to the failure. JSON-RPC errors are reserved for protocol-level problems (unknown tool, invalid params, server bugs). (MCP docs, tools; a classic exam trap.)",
+      "explanation": "The set MUST NOT vary per-connection or as a side effect of other requests on the connection, but it MAY vary by the authorization on the request, since credentials are per-request input rather than connection state.",
       "tags": [
         "tools",
-        "error-handling",
-        "is-error"
-      ]
-    },
-    {
-      "id": "ch3-q23",
-      "chapter": 3,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Two different servers connected to the same host both expose a tool named search. Who is responsible for disambiguating?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The spec forbids connecting both servers simultaneously"
-        },
-        {
-          "letter": "B",
-          "text": "Tool names must be globally unique across the ecosystem, so one server is non-compliant"
-        },
-        {
-          "letter": "C",
-          "text": "Tool names are unique per server; handling cross-server collisions (e.g., prefixing) is the host's responsibility"
-        },
-        {
-          "letter": "D",
-          "text": "The registry rejects duplicate tool names at publish time"
-        }
+        "list-stability"
       ],
-      "answer": "C",
-      "explanation": "Uniqueness is scoped to a single server. When multiple servers collide, the host disambiguates - commonly by prefixing tool names with a server identifier. (MCP docs, server concepts.)",
-      "tags": [
-        "tools",
-        "naming",
-        "host"
-      ]
-    },
-    {
-      "id": "ch3-q24",
-      "chapter": 3,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "Which of the following is one of the spec's Security and Trust key principles, stated correctly?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Tool descriptions and annotations are considered untrusted unless obtained from a trusted server"
-        },
-        {
-          "letter": "B",
-          "text": "Servers must sandbox every tool in a container"
-        },
-        {
-          "letter": "C",
-          "text": "Hosts may transmit resource data to third parties as long as it is encrypted"
-        },
-        {
-          "letter": "D",
-          "text": "User consent is only required for write operations, not reads"
-        }
-      ],
-      "answer": "A",
-      "explanation": "Under Tool Safety, tools represent arbitrary code execution and descriptions/annotations are untrusted unless from a trusted server. The other statements contradict the principles: hosts must not transmit resource data elsewhere without consent, and explicit consent covers all data access and operations. (Spec 2026-07-28 overview, Security and Trust.)",
-      "tags": [
-        "security-principles",
-        "tool-safety"
-      ]
-    },
-    {
-      "id": "ch3-q25",
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which method does the client use to discover available tools from a server?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "prompts/list"
-        },
-        {
-          "letter": "B",
-          "text": "resources/list"
-        },
-        {
-          "letter": "C",
-          "text": "tools/list"
-        },
-        {
-          "letter": "D",
-          "text": "tools/call"
-        }
-      ],
-      "answer": "C",
-      "explanation": "The tools/list method returns all available tools. tools/call is used to invoke a tool, not discover it.",
-      "tags": [
-        "control-model",
-        "tools",
-        "methods"
-      ]
-    },
-    {
-      "id": "ch3-q26",
-      "type": "mcq",
-      "difficulty": "easy",
-      "question": "In the control model, Tools are considered 'DO' primitives because:",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The model reads data from them"
-        },
-        {
-          "letter": "B",
-          "text": "The model executes actions through them"
-        },
-        {
-          "letter": "C",
-          "text": "The application controls them"
-        },
-        {
-          "letter": "D",
-          "text": "The user must approve them"
-        }
-      ],
-      "answer": "B",
-      "explanation": "Tools are 'DO' primitives - the model decides to execute an action. Resources are 'IS' primitives - the model reads information.",
-      "tags": [
-        "control-model",
-        "do-vs-is"
-      ]
-    },
-    {
-      "id": "ch3-q27",
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "When the model decides to call a tool, what happens before execution?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Server automatically executes"
-        },
-        {
-          "letter": "B",
-          "text": "Model sends request directly"
-        },
-        {
-          "letter": "C",
-          "text": "Host obtains user consent"
-        },
-        {
-          "letter": "D",
-          "text": "Client validates the request"
-        }
-      ],
-      "answer": "C",
-      "explanation": "The host must obtain user consent before executing a tool. This is a key security principle - human-in-the-loop.",
-      "tags": [
-        "control-model",
-        "tools",
-        "approval",
-        "security"
-      ]
-    },
-    {
-      "id": "ch3-q28",
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "A user asks the AI to 'read the README file and then fix the bug'. Which sequence of primitives is MOST likely?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Resource (read file) -> Tool (fix bug)"
-        },
-        {
-          "letter": "B",
-          "text": "Tool (read file) -> Tool (fix bug)"
-        },
-        {
-          "letter": "C",
-          "text": "Prompt (template) -> Resource (file) -> Tool (fix)"
-        },
-        {
-          "letter": "D",
-          "text": "Root (access) -> Tool (fix bug)"
-        }
-      ],
-      "answer": "A",
-      "explanation": "Reading a file is a Resource (application-controlled, IS). Fixing a bug is a Tool (model-controlled, DO). The host decides which resources to include, then the model decides which tools to call.",
-      "tags": [
-        "control-model",
-        "tools",
-        "resources",
-        "scenario"
-      ]
-    },
-    {
-      "id": "ch3-scenario-extra-1",
-      "chapter": 3,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A tool successfully runs but the downstream business API rejects the operation. The server returns a normal tools/call result with isError:true. A tester reports 'The server should have returned a JSON-RPC protocol error instead.' Which assessment is best?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "The tester is right; all tool failures are protocol errors"
-        },
-        {
-          "letter": "B",
-          "text": "The implementation is reasonable: tool execution failures belong in the tool result, while protocol errors describe protocol/request failures"
-        },
-        {
-          "letter": "C",
-          "text": "The result must be a notification"
-        },
-        {
-          "letter": "D",
-          "text": "The server must retry forever"
-        }
-      ],
-      "answer": "B",
-      "explanation": "A tool can execute at the protocol level yet fail at the application/tool level. MCP represents that with isError:true in the tool result rather than turning every business failure into a JSON-RPC protocol error.",
-      "tags": [
-        "tools",
-        "errors",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch3-scenario-extra-2",
-      "chapter": 3,
-      "type": "scenario",
-      "difficulty": "medium",
-      "question": "A host automatically invokes a destructive tool whenever the model suggests it, with no UI visibility or approval policy. Which concern should a tester raise?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Tools are user-controlled and can never be model-selected"
-        },
-        {
-          "letter": "B",
-          "text": "Tool calls may cause side effects; the host should provide appropriate human oversight such as visibility/approval controls"
-        },
-        {
-          "letter": "C",
-          "text": "Resources must be converted to prompts first"
-        },
-        {
-          "letter": "D",
-          "text": "The tool name must start with rpc."
-        }
-      ],
-      "answer": "B",
-      "explanation": "Tools are model-controlled in the control model and may cause side effects. Human oversight mechanisms such as visibility, per-call approval, pre-approval settings, and logs are important safety controls.",
-      "tags": [
-        "tools",
-        "safety",
-        "tester-scenario"
-      ]
-    },
-    {
-      "id": "ch3-scenario-extra-3",
-      "chapter": 3,
-      "type": "scenario",
-      "difficulty": "easy",
-      "question": "A product UI labels a read-only document exposed at file:///docs/readme.md as a 'tool'. What is the most useful testing correction?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "Treat it as a resource because it is data identified by a URI"
-        },
-        {
-          "letter": "B",
-          "text": "Treat it as a prompt because users can read it"
-        },
-        {
-          "letter": "C",
-          "text": "Treat it as a tool because all server features are tools"
-        },
-        {
-          "letter": "D",
-          "text": "Treat it as OAuth metadata"
-        }
-      ],
-      "answer": "A",
-      "explanation": "Resources represent data the application can read, commonly identified by URIs. Tools are callable functions/actions; prompts are reusable interaction templates.",
-      "tags": [
-        "resources",
-        "control-model",
-        "tester-scenario"
-      ]
+      "domain": "Interactions & Execution",
+      "source": "specification/2026-07-28/server/tools",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     }
   ]
 }

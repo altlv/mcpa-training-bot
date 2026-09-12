@@ -4,766 +4,827 @@
     "protocolVersion": "2026-07-28",
     "chapter": 1,
     "chapterName": "MCP Fundamentals",
-    "questionCount": 24
+    "examDomain": "MCP Fundamentals",
+    "mode": "single_select",
+    "questionCount": 24,
+    "revision": "v2.1 (curated 2026-09-12, 200 items, verified against the 2026-07-28 specification)"
   },
   "questions": [
     {
       "id": "ch1-q1",
       "chapter": 1,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "easy",
-      "question": "What does MCP stand for?",
+      "question": "Your company runs 5 AI applications that each need access to the same 8 internal systems. What does adopting MCP change about the number of integrations you build and maintain?",
       "options": [
         {
           "letter": "A",
-          "text": "Model Context Protocol"
+          "text": "40 bespoke connectors become 13 implementations: one client per app, one server per system"
         },
         {
           "letter": "B",
-          "text": "Machine Communication Protocol"
+          "text": "The count is unchanged, but each connector becomes smaller because MCP handles transport"
         },
         {
           "letter": "C",
-          "text": "Model Control Process"
+          "text": "40 bespoke connectors become 8, because each app reuses the same connector code"
         },
         {
           "letter": "D",
-          "text": "Multi-Channel Platform"
+          "text": "40 bespoke connectors become 5, because one server can front all 8 systems"
         }
       ],
-      "answer": "A",
-      "explanation": "MCP stands for Model Context Protocol, an open-source standard for connecting AI applications to external systems such as data sources, tools, and workflows.",
+      "explanation": "MCP turns an M x N integration problem into M + N: each application ships one MCP client, each system one MCP server, and any client can talk to any server. Reusing connector code (B) or fronting several systems behind one server (D) are implementation choices, not what the protocol changes.",
       "tags": [
         "mcp-basics",
-        "definitions"
-      ]
+        "integration-problem"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch1-q2",
       "chapter": 1,
       "type": "mcq",
       "difficulty": "easy",
-      "question": "The official documentation compares MCP to which everyday technology?",
+      "question": "Which existing standard is MCP explicitly modelled on, and what is the parallel?",
       "options": [
         {
           "letter": "A",
-          "text": "A Wi-Fi router for AI models"
+          "text": "OpenAPI: one description format replaces hand-written API client libraries"
         },
         {
           "letter": "B",
-          "text": "A USB-C port for AI applications"
+          "text": "GraphQL: one query endpoint replaces many resource-specific REST endpoints"
         },
         {
           "letter": "C",
-          "text": "A power adapter for LLMs"
+          "text": "OAuth 2.1: one authorization framework replaces per-service credential schemes"
         },
         {
           "letter": "D",
-          "text": "An HDMI cable for data sources"
+          "text": "Language Server Protocol: one protocol replaces per-editor, per-language plugins"
         }
       ],
-      "answer": "B",
-      "explanation": "The docs describe MCP as being like a USB-C port for AI applications: just as USB-C standardizes how devices connect, MCP standardizes how AI applications connect to external systems.",
+      "explanation": "The specification says MCP takes inspiration from the Language Server Protocol, which standardized how language support is added across the whole ecosystem of development tools. MCP does use OAuth 2.1 for HTTP authorization, but that is one component, not the protocol's model.",
       "tags": [
         "mcp-basics",
-        "analogies"
-      ]
+        "lsp"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch1-q3",
       "chapter": 1,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "easy",
-      "question": "Which of the following is NOT one of the categories of external systems MCP is designed to connect AI applications to?",
+      "question": "Your team maintains an internal ticketing API and wants Claude Desktop users to reach it. Which MCP participant do you implement?",
       "options": [
         {
           "letter": "A",
-          "text": "Data sources (e.g., local files, databases)"
+          "text": "A server, which exposes the ticketing API through tools, resources or prompts"
         },
         {
           "letter": "B",
-          "text": "Tools (e.g., search engines, calculators)"
+          "text": "A host, because the host is what holds the connection to external systems"
         },
         {
           "letter": "C",
-          "text": "Workflows (e.g., specialized prompts)"
+          "text": "Both a client and a server, since every MCP connection needs one of each end"
         },
         {
           "letter": "D",
-          "text": "GPU compute clusters for model training"
+          "text": "A client, because the client is the component that connects out to an API"
         }
       ],
-      "answer": "D",
-      "explanation": "MCP connects AI applications to data sources, tools, and workflows. It does not concern itself with model training infrastructure.",
+      "explanation": "Servers expose capabilities; hosts (the AI application) create clients that connect to them. Claude Desktop already provides the host and the client, so you only write the server.",
       "tags": [
-        "mcp-basics",
-        "scope"
-      ]
+        "participants",
+        "roles"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28/architecture",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch1-q4",
       "chapter": 1,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "Which of the following projects is NOT part of the Model Context Protocol's official scope?",
+      "difficulty": "easy",
+      "question": "Which set correctly lists what a server may offer versus what a client may offer?",
       "options": [
         {
           "letter": "A",
-          "text": "The MCP Specification"
+          "text": "Server: tools, elicitation, sampling. Client: resources and prompts"
         },
         {
           "letter": "B",
-          "text": "Language-specific MCP SDKs"
+          "text": "Server: resources, prompts, tools. Client: elicitation"
         },
         {
           "letter": "C",
-          "text": "A hosted LLM inference API"
+          "text": "Server: tools and prompts. Client: resources, roots and logging"
         },
         {
           "letter": "D",
-          "text": "MCP reference server implementations"
+          "text": "Server: resources and tools. Client: prompts and elicitation"
         }
       ],
-      "answer": "C",
-      "explanation": "MCP's scope includes the specification, SDKs, development tools (like the Inspector), and reference server implementations. MCP focuses solely on context exchange and does not dictate how AI applications use LLMs, nor does it provide model inference.",
+      "explanation": "Servers offer resources, prompts and tools. In 2026-07-28 the only active client feature is elicitation; sampling and roots still exist but are deprecated, and logging is a server utility.",
       "tags": [
-        "mcp-basics",
-        "scope"
-      ]
+        "primitives",
+        "server-features"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28/server",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch1-q5",
       "chapter": 1,
       "type": "mcq",
-      "difficulty": "medium",
-      "question": "According to the intro docs, what is the main benefit MCP delivers to developers?",
+      "difficulty": "easy",
+      "question": "A server ships a '/incident-review' prompt template. In MCP's control model, who decides when it gets used, and who decides what it contains?",
       "options": [
         {
           "letter": "A",
-          "text": "Free hosting for AI applications"
+          "text": "The user chooses when to invoke it; the server authors its content"
         },
         {
           "letter": "B",
-          "text": "Reduced development time and complexity when building or integrating with AI applications and agents"
+          "text": "The user chooses when to invoke it and the host rewrites its content for the model"
         },
         {
           "letter": "C",
-          "text": "Guaranteed model accuracy improvements"
+          "text": "The host chooses when to invoke it based on conversation heuristics; the user edits it"
         },
         {
           "letter": "D",
-          "text": "Automatic security auditing of servers"
+          "text": "The model chooses when to invoke it; the server authors its content"
         }
       ],
-      "answer": "B",
-      "explanation": "For developers, MCP reduces development time and complexity: you build an integration once against a standard protocol instead of writing custom glue for every AI application.",
+      "explanation": "Prompts are user-controlled: they are exposed so the user can explicitly select them, typically as slash commands. That refers to who decides when a prompt is used, not who writes it; prompt content is defined by the server.",
       "tags": [
-        "mcp-basics",
-        "ecosystem"
-      ]
+        "control-model",
+        "prompts"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28/server/prompts",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch1-q6",
       "chapter": 1,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "easy",
-      "question": "Which of the following applications is listed in the docs as supporting MCP?",
+      "question": "You ship one server over stdio for local use and the same server over Streamable HTTP for your team. What does the specification say about authorization for the two deployments?",
       "options": [
         {
           "letter": "A",
-          "text": "Claude, ChatGPT, Visual Studio Code, and Cursor"
+          "text": "No: it is optional everywhere, and stdio servers may use OAuth if they prefer"
         },
         {
           "letter": "B",
-          "text": "Only Anthropic products"
+          "text": "No: it is optional, HTTP transports SHOULD conform, and stdio SHOULD NOT use it"
         },
         {
           "letter": "C",
-          "text": "Only open-source terminal tools"
+          "text": "Yes for servers that expose tools, no for servers that expose only resources"
         },
         {
           "letter": "D",
-          "text": "MCP has no client support yet"
+          "text": "Yes: every server must implement OAuth 2.1 regardless of transport"
         }
       ],
-      "answer": "A",
-      "explanation": "MCP is an open protocol with broad ecosystem support: AI assistants like Claude and ChatGPT, and development tools like Visual Studio Code, Cursor, and MCPJam all support it — making it possible to build once and integrate everywhere.",
+      "explanation": "Authorization is OPTIONAL. Implementations using HTTP-based transports SHOULD conform to the authorization spec; implementations using stdio SHOULD NOT, and instead retrieve credentials from the environment.",
       "tags": [
-        "mcp-basics",
-        "ecosystem"
-      ]
+        "authorization",
+        "optionality"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28/basic/authorization",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch1-q7",
       "chapter": 1,
       "type": "mcq",
       "difficulty": "easy",
-      "question": "Which of these is an example the docs give of what MCP can enable?",
+      "question": "A server author asks which endpoint they should call to run the model once their tool has gathered its data. What do you tell them?",
       "options": [
         {
           "letter": "A",
-          "text": "Claude Code generating an entire web app from a Figma design"
+          "text": "Servers call the host's completion endpoint, which proxies the request to the model"
         },
         {
           "letter": "B",
-          "text": "Training a new foundation model from scratch"
+          "text": "Servers request inference through sampling, which every host is required to support"
         },
         {
           "letter": "C",
-          "text": "Replacing the operating system kernel"
+          "text": "Servers do not call a model at all; the host runs inference and uses the result"
         },
         {
           "letter": "D",
-          "text": "Compressing model weights for mobile devices"
+          "text": "Servers call the model directly using the credentials passed in the request _meta"
         }
       ],
-      "answer": "A",
-      "explanation": "Examples in the intro include agents accessing Google Calendar and Notion, Claude Code generating a web app from a Figma design, enterprise chatbots connecting to multiple databases, and AI models creating 3D designs in Blender.",
+      "explanation": "MCP gives a model access to context; it does not give servers access to a model. The host owns the model and the conversation. Sampling, which once let servers ask for a completion, is deprecated in 2026-07-28 and was never mandatory.",
       "tags": [
-        "mcp-basics",
-        "use-cases"
-      ]
+        "architecture",
+        "inference"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28/architecture",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch1-q8",
       "chapter": 1,
-      "type": "mcq",
-      "difficulty": "medium",
-      "question": "What benefit does MCP deliver to end users, according to the intro?",
+      "type": "scenario",
+      "difficulty": "easy",
+      "question": "Your host wants to attach the user's calendar, read from one server, as context for a request going to a different server. What does the consent principle require?",
       "options": [
         {
           "letter": "A",
-          "text": "Cheaper API pricing"
+          "text": "Nothing extra, provided the receiving server declares a privacy policy in server/discover"
         },
         {
           "letter": "B",
-          "text": "More capable AI applications that can access their data and take actions on their behalf when necessary"
+          "text": "Nothing extra, because both servers were installed by the same user in the same host"
         },
         {
           "letter": "C",
-          "text": "Faster model inference"
+          "text": "A signed data-sharing assertion from the first server, verified by the second server"
         },
         {
           "letter": "D",
-          "text": "Guaranteed privacy from all servers"
+          "text": "Explicit user consent before user data is exposed to that server, obtained by the host"
         }
       ],
-      "answer": "B",
-      "explanation": "For end users, MCP results in more capable AI applications and agents which can access their data and take actions on their behalf when necessary.",
+      "explanation": "Hosts must obtain explicit user consent before exposing user data to any server, and must not pass data around between servers without it. The user installing a server is consent to connect, not consent to hand it everything.",
       "tags": [
-        "mcp-basics",
-        "ecosystem"
-      ]
+        "consent",
+        "data-privacy"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28/basic/security_best_practices",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch1-q9",
       "chapter": 1,
       "type": "mcq",
       "difficulty": "medium",
-      "question": "Besides servers and clients, what third kind of thing does the getting-started guide invite you to build?",
+      "question": "A teammate says 'our service is MCP-compatible: we expose JSON over REST webhooks and the model calls them'. Why does that not make it an MCP server?",
       "options": [
         {
           "letter": "A",
-          "text": "MCP Apps — interactive apps that run inside AI clients"
+          "text": "MCP requires every server to be published in the official MCP Registry first"
         },
         {
           "letter": "B",
-          "text": "MCP Kernels"
+          "text": "MCP requires servers to be built with one of the official SDKs, in one of the languages it supports"
         },
         {
           "letter": "C",
-          "text": "MCP Databases"
+          "text": "MCP requires JSON-RPC 2.0 messages over a defined transport, not arbitrary REST endpoints"
         },
         {
           "letter": "D",
-          "text": "MCP Browsers"
+          "text": "MCP requires OAuth 2.1, which webhook endpoints cannot provide"
         }
       ],
-      "answer": "A",
-      "explanation": "The Start Building section lists three paths: build servers (expose data and tools), build clients (applications that connect to servers), and build MCP Apps (interactive apps that run inside AI clients).",
+      "explanation": "All MCP messages MUST follow JSON-RPC 2.0 and travel over a defined transport (stdio or Streamable HTTP). SDKs and registry publication are optional, and authorization itself is optional (stdio servers take credentials from the environment).",
       "tags": [
         "mcp-basics",
-        "mcp-apps"
-      ]
+        "scope"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch1-q10",
       "chapter": 1,
       "type": "mcq",
       "difficulty": "medium",
-      "question": "Which languages have official MCP SDKs referenced across the documentation?",
+      "question": "Which three capabilities does the specification say MCP provides a standardized way to do?",
       "options": [
         {
           "letter": "A",
-          "text": "Python, TypeScript, Java, Kotlin, C#, Ruby, Rust, and Go"
+          "text": "Cache prompts, route requests between providers, and meter token consumption per user"
         },
         {
           "letter": "B",
-          "text": "Python and JavaScript only"
+          "text": "Share context with models, expose tools and capabilities, build composable integrations"
         },
         {
           "letter": "C",
-          "text": "C and C++ only"
+          "text": "Authenticate users, encrypt traffic in transit, and audit every action a model takes"
         },
         {
           "letter": "D",
-          "text": "PHP, Perl, and Bash"
+          "text": "Fine-tune models, evaluate their output, and serve inference behind a single API"
         }
       ],
-      "answer": "A",
-      "explanation": "The build-server quickstart provides parallel tutorials in Python, TypeScript, Java (Spring AI), Kotlin, C#, Ruby, Rust (rmcp), and Go — all backed by official SDKs under the modelcontextprotocol GitHub organization.",
+      "explanation": "The overview lists exactly these three: sharing contextual information with language models, exposing tools and capabilities to AI systems, and building composable integrations and workflows. Model training, inference routing and metering are outside MCP's scope.",
       "tags": [
         "mcp-basics",
-        "sdks"
-      ]
+        "standardization"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch1-q11",
       "chapter": 1,
       "type": "mcq",
-      "difficulty": "hard",
-      "question": "Which of the following does MCP deliberately NOT specify?",
+      "difficulty": "medium",
+      "question": "MCP protocol versions look like 2026-07-28. What does that date actually mean?",
       "options": [
         {
           "letter": "A",
-          "text": "How tools are discovered by clients"
+          "text": "The earliest date on which implementations must stop supporting older revisions"
         },
         {
           "letter": "B",
-          "text": "How AI applications use LLMs or manage the provided context"
+          "text": "The last date on which backwards-incompatible changes were made to the protocol"
         },
         {
           "letter": "C",
-          "text": "The message format between clients and servers"
+          "text": "The date the revision was first published as a draft for community review"
         },
         {
           "letter": "D",
-          "text": "How servers describe their capabilities"
+          "text": "The date the specification repository cut its most recent release tag"
         }
       ],
-      "answer": "B",
-      "explanation": "MCP focuses solely on the protocol for context exchange — it does not dictate how AI applications use LLMs or manage the context they receive. Discovery, message format, and capability description are all in scope.",
+      "explanation": "A version string is the date of the last backwards-incompatible change, not a release or deprecation date. Backwards-compatible changes can land without changing the version string.",
       "tags": [
-        "mcp-basics",
-        "scope",
-        "design"
-      ]
+        "versioning",
+        "protocol-version"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28/basic/versioning",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch1-q12",
       "chapter": 1,
       "type": "mcq",
-      "difficulty": "hard",
-      "question": "Which repositories live under the modelcontextprotocol GitHub organization?",
+      "difficulty": "medium",
+      "question": "Who stewards MCP today, and under what legal entity?",
       "options": [
         {
           "letter": "A",
-          "text": "Only the specification"
+          "text": "The OpenJS Foundation, which also hosts the official SDKs and the public registry"
         },
         {
           "letter": "B",
-          "text": "The specification (with the schema), language SDKs, the MCP Inspector, and reference server implementations (servers)"
+          "text": "The Cloud Native Computing Foundation, which took over the project from Anthropic"
         },
         {
           "letter": "C",
-          "text": "Forks of popular LLM frameworks"
+          "text": "The Agentic AI Foundation at the Linux Foundation, as a Series of LF Projects, LLC"
         },
         {
           "letter": "D",
-          "text": "Only closed-source binaries"
+          "text": "Anthropic, which retains ownership and publishes the specification under its own terms"
         }
       ],
-      "answer": "B",
-      "explanation": "github.com/modelcontextprotocol hosts the specification (whose TypeScript schema is authoritative), the SDKs (python-sdk, typescript-sdk, kotlin-sdk, csharp-sdk, go-sdk, etc.), the inspector developer tool, and the servers repository of reference implementations like the filesystem server.",
+      "explanation": "Anthropic created and announced MCP in November 2024 and contributed it to the Agentic AI Foundation when the AAIF launched in December 2025. The project runs as a Series of LF Projects, LLC.",
       "tags": [
-        "mcp-basics",
-        "github",
-        "open-source"
-      ]
+        "governance",
+        "aaif"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "community/governance",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch1-q13",
       "chapter": 1,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "SCENARIO: Your company builds an AI assistant that must integrate with 12 internal systems (databases, ticketing, wikis). Each new AI application you adopt currently requires re-writing all 12 integrations. How does adopting MCP change this?",
+      "type": "mcq",
+      "difficulty": "medium",
+      "question": "A host auto-approves every tool call from servers the user installed, arguing that installation was consent. Which specification principle does that violate?",
       "options": [
         {
           "letter": "A",
-          "text": "It doesn't; every AI application still needs custom integrations"
+          "text": "User consent and control: users must be able to revoke a server at any time"
         },
         {
           "letter": "B",
-          "text": "You build each integration once as an MCP server; any MCP-capable host (Claude, VS Code, ChatGPT, etc.) can then connect to all of them through the standard protocol"
+          "text": "None: pre-approval of an installed server's tools is explicitly permitted"
         },
         {
           "letter": "C",
-          "text": "MCP merges all 12 systems into a single database"
+          "text": "Tool safety: hosts must obtain explicit user consent before invoking any tool"
         },
         {
           "letter": "D",
-          "text": "MCP only works with cloud systems, so internal systems are excluded"
+          "text": "Data privacy: resource data must not leave the host without consent"
         }
       ],
-      "answer": "B",
-      "explanation": "This is MCP's core value proposition — like USB-C, it standardizes the connection. Build each integration once as an MCP server, and the growing ecosystem of MCP hosts can use them without additional glue code, reducing development time and complexity.",
+      "explanation": "Tools represent arbitrary code execution, so hosts must obtain explicit user consent before invoking any tool and users should understand what each tool does. Blanket approval at install time is not the consent the spec means, though hosts may offer per-tool pre-approval UI.",
       "tags": [
-        "mcp-basics",
-        "scenario",
-        "ecosystem"
-      ]
+        "security-principles",
+        "consent"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch1-q14",
       "chapter": 1,
-      "type": "scenario",
+      "type": "mcq",
       "difficulty": "medium",
-      "question": "SCENARIO: An enterprise wants employees to analyze data across several internal databases through a chat interface. Which MCP-enabled pattern from the intro docs matches this need?",
+      "question": "A tool definition carries an annotation claiming it is read-only. How should a client treat that claim?",
       "options": [
         {
           "letter": "A",
-          "text": "An enterprise chatbot connecting to multiple databases across the organization via MCP servers, empowering users to analyze data using chat"
+          "text": "As authoritative for display, but it must still be re-checked after execution"
         },
         {
           "letter": "B",
-          "text": "Exporting all databases to CSV weekly"
+          "text": "As untrusted metadata, unless the server itself is trusted"
         },
         {
           "letter": "C",
-          "text": "Fine-tuning a model on the databases"
+          "text": "As a hint the host must show to the user but may not act on in any way"
         },
         {
           "letter": "D",
-          "text": "Giving every employee direct SQL access"
+          "text": "As authoritative, because annotations are validated by the protocol schema"
         }
       ],
-      "answer": "A",
-      "explanation": "This is one of the intro's flagship examples: enterprise chatbots can connect to multiple databases across an organization through MCP, letting users analyze data conversationally.",
+      "explanation": "Descriptions of tool behaviour, including annotations, must be considered untrusted unless they come from a trusted server. A malicious server can label a destructive tool read-only.",
       "tags": [
-        "mcp-basics",
-        "scenario",
-        "use-cases"
-      ]
+        "annotations",
+        "trust"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28/server/tools",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch1-q15",
       "chapter": 1,
       "type": "mcq",
-      "difficulty": "hard",
-      "question": "For whom does MCP 'reduce development time and complexity', and why is the protocol described as 'build once, integrate everywhere'?",
+      "difficulty": "medium",
+      "question": "In 2026-07-28, what does 'MCP is a stateless protocol' mean in practice for a single request?",
       "options": [
         {
           "letter": "A",
-          "text": "For model trainers, because MCP compresses training data"
+          "text": "Servers must reconstruct prior conversation turns from the client's message history"
         },
         {
           "letter": "B",
-          "text": "For developers, because a server or client written against the open standard works across the whole ecosystem of MCP-supporting applications"
+          "text": "All information needed to process it is in the request, including version and capabilities"
         },
         {
           "letter": "C",
-          "text": "For GPU vendors, because MCP reduces memory usage"
+          "text": "Each request opens a fresh connection, which is closed again as soon as the result is sent back"
         },
         {
           "letter": "D",
-          "text": "For end users, because MCP removes the need for consent dialogs"
+          "text": "Servers may not store any data between calls, so tools cannot have side effects"
         }
       ],
-      "answer": "B",
-      "explanation": "Because MCP is an open protocol supported across many clients and servers, developers build an integration once and it works everywhere MCP is supported — that's the 'build once and integrate everywhere' promise.",
+      "explanation": "Statelessness is about the protocol session, not about storage: every request carries its own protocol version and capabilities in _meta, and a server must not infer context from earlier requests on the same connection. Servers can still hold application state, referenced by explicit handles.",
       "tags": [
-        "mcp-basics",
-        "ecosystem",
-        "developers"
-      ]
+        "statelessness",
+        "meta"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28/basic",
+      "protocolVersion": "2026-07-28",
+      "answer": "B"
     },
     {
       "id": "ch1-q16",
       "chapter": 1,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "medium",
-      "question": "What is the 'M×N integration problem' that MCP solves?",
+      "question": "You are wrapping a public cloud API that many users will reach from different machines. Which transport fits, and why?",
       "options": [
         {
           "letter": "A",
-          "text": "M models cannot share N GPUs"
+          "text": "stdio: it avoids network exposure and is the recommended default for all servers"
         },
         {
           "letter": "B",
-          "text": "Without a standard, M AI applications each need custom integrations with N external systems (M×N connectors); MCP reduces this to M+N — each app implements the protocol once, each system exposes one MCP server"
+          "text": "Either one: transports are interchangeable because the data layer is identical"
         },
         {
           "letter": "C",
-          "text": "M users competing for N licenses"
+          "text": "HTTP+SSE: it is the two-endpoint transport designed for multi-tenant servers"
         },
         {
           "letter": "D",
-          "text": "Matrix multiplication overhead in transformers"
+          "text": "Streamable HTTP: one deployment serves many clients and supports OAuth"
         }
       ],
-      "answer": "B",
-      "explanation": "This is the core economic argument for MCP: instead of every AI application writing bespoke connectors for every tool and data source (M×N pairings), each side implements the open standard once, collapsing the integration work to M+N.",
+      "explanation": "stdio is for local, same-machine servers launched as a subprocess. HTTP+SSE has been deprecated since 2025-03-26. Streamable HTTP is the remote transport, and it is where the MCP authorization framework applies.",
       "tags": [
-        "fundamentals",
-        "mxn-problem",
-        "standardization"
-      ]
+        "transports",
+        "deployment"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28/basic/transports",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch1-q17",
       "chapter": 1,
       "type": "mcq",
       "difficulty": "medium",
-      "question": "MCP explicitly takes inspiration from which earlier protocol, and what is the parallel?",
+      "question": "A server author asks for the full chat transcript so their tool can 'understand context'. What does MCP's design say?",
       "options": [
         {
           "letter": "A",
-          "text": "HTTP/2 — both use binary framing"
+          "text": "Servers receive only necessary context; the full conversation stays with the host"
         },
         {
           "letter": "B",
-          "text": "The Language Server Protocol (LSP) — just as LSP standardized adding programming-language support across an ecosystem of development tools, MCP standardizes integrating context and tools into the ecosystem of AI applications"
+          "text": "Servers get the transcript whenever the user has approved the server at install time"
         },
         {
           "letter": "C",
-          "text": "SMTP — both route messages between servers"
+          "text": "Servers can read it via resources/read on a host-provided conversation resource"
         },
         {
           "letter": "D",
-          "text": "OAuth — both delegate authorization"
+          "text": "Servers may request the transcript through sampling, which the host must satisfy"
         }
       ],
-      "answer": "B",
-      "explanation": "The specification states this directly: LSP solved the same shape of problem for editors and languages that MCP solves for AI applications and external systems — one protocol replacing per-pair integrations.",
+      "explanation": "A core design principle is that servers should not be able to read the whole conversation nor see into other servers. Each server receives only the contextual information it needs, and the host enforces that boundary.",
       "tags": [
-        "fundamentals",
-        "lsp",
-        "history"
-      ]
+        "isolation",
+        "design-principles"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28/architecture",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch1-q18",
       "chapter": 1,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "medium",
-      "question": "According to the specification overview, MCP provides a standardized way for applications to do which three things?",
+      "question": "Your server can expose a customer record two ways: as something the model calls whenever it decides it needs data, or as context the host attaches to the conversation. Which primitives are those, in that order?",
       "options": [
         {
           "letter": "A",
-          "text": "Share contextual information with language models, expose tools and capabilities to AI systems, and build composable integrations and workflows"
+          "text": "A prompt, which is model-controlled; and a resource, which is user-controlled"
         },
         {
           "letter": "B",
-          "text": "Train models, deploy models, and monitor models"
+          "text": "A resource, which is model-controlled; and a tool, which is application-controlled"
         },
         {
           "letter": "C",
-          "text": "Encrypt data, compress data, and cache data"
+          "text": "A tool, which is model-controlled; and a prompt, which is application-controlled"
         },
         {
           "letter": "D",
-          "text": "Render UIs, store files, and send emails"
+          "text": "A tool, which is model-controlled; and a resource, which is application-controlled"
         }
       ],
-      "answer": "A",
-      "explanation": "The spec's Overview names exactly these three: sharing contextual information with LLMs, exposing tools and capabilities to AI systems, and building composable integrations and workflows.",
+      "explanation": "Tools are model-controlled: the model decides when to invoke them. Resources are application-controlled: the host decides what to attach. Prompts are user-controlled, surfaced as an explicit choice such as a slash command.",
       "tags": [
-        "fundamentals",
-        "standardization",
-        "spec"
-      ]
+        "primitives",
+        "design"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28/server",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     },
     {
       "id": "ch1-q19",
       "chapter": 1,
-      "type": "mcq",
+      "type": "scenario",
       "difficulty": "medium",
-      "question": "Which top-level areas make up the MCP project and its documentation site?",
+      "question": "You are writing a client for 2026-07-28 and must decide what goes in the _meta of every single request. Which fields are REQUIRED there?",
       "options": [
         {
           "letter": "A",
-          "text": "Only the specification"
+          "text": "protocolVersion only, since capabilities are negotiated once per connection"
         },
         {
           "letter": "B",
-          "text": "Documentation, the Specification, Extensions, the Registry, SEPs (Specification Enhancement Proposals), and Community/governance"
+          "text": "clientCapabilities and a progressToken, with protocolVersion in a header only"
         },
         {
           "letter": "C",
-          "text": "A model zoo and a benchmark suite"
+          "text": "protocolVersion and clientCapabilities, on every request"
         },
         {
           "letter": "D",
-          "text": "Frontend, backend, and database sections"
+          "text": "protocolVersion and clientInfo, with clientCapabilities optional"
         }
       ],
-      "answer": "B",
-      "explanation": "The project spans the docs/guides, the versioned specification, the optional Extensions framework, the MCP Registry for server discovery, the SEP process for proposing changes, and community governance (working groups, contributor ladder, policies).",
+      "explanation": "Because there is no handshake, each request carries its own context: protocolVersion and clientCapabilities are REQUIRED in _meta, clientInfo SHOULD be present, and logLevel and progressToken are optional. Nothing is negotiated once per connection any more.",
       "tags": [
-        "fundamentals",
-        "project-structure",
-        "seps"
-      ]
+        "meta",
+        "statelessness"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28/basic",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
       "id": "ch1-q20",
       "chapter": 1,
-      "type": "mcq",
-      "difficulty": "hard",
-      "question": "What is a Specification Enhancement Proposal (SEP)?",
+      "type": "scenario",
+      "difficulty": "medium",
+      "question": "Your host is about to invoke a tool whose description says it deletes records. What does the specification expect of the host at that moment?",
       "options": [
         {
           "letter": "A",
-          "text": "A paid support ticket"
+          "text": "Show the user what will run and get approval, because tool results drive real-world effects"
         },
         {
           "letter": "B",
-          "text": "The formal mechanism for proposing changes to the MCP specification — markdown documents with PR-derived numbering, sponsors, and status labels (e.g., SEP-2575 made MCP stateless, SEP-1865 defined MCP Apps)"
+          "text": "Run it and log the call, since the user consented when they installed the server"
         },
         {
           "letter": "C",
-          "text": "A server performance benchmark"
+          "text": "Refuse the call outright, because destructive operations are not permitted over MCP"
         },
         {
           "letter": "D",
-          "text": "A security exploit report"
+          "text": "Run it only if the tool omits a destructiveHint annotation, which signals a safe operation"
         }
       ],
-      "answer": "B",
-      "explanation": "SEPs drive protocol evolution: 2026-07-28 formalized a PR-based SEP workflow (SEP-1850) with markdown files in the seps/ directory, sponsor responsibilities, and status via PR labels. Major changes like statelessness (SEP-2575), MRTR (SEP-2322), and deprecations (SEP-2577) all arrived as SEPs.",
+      "explanation": "The specification requires hosts to obtain explicit user consent before invoking tools and to show the user what is about to happen. Installation is not blanket consent, annotations are untrusted hints, and MCP does not forbid destructive tools.",
       "tags": [
-        "fundamentals",
-        "seps",
-        "governance"
-      ]
+        "security-principles",
+        "human-in-the-loop"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28/basic/security_best_practices",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
       "id": "ch1-q21",
       "chapter": 1,
-      "type": "scenario",
-      "difficulty": "hard",
-      "question": "SCENARIO: A team of 5 AI products needs to integrate with 8 internal systems. Roughly how many integrations are needed without MCP versus with MCP?",
-      "options": [
-        {
-          "letter": "A",
-          "text": "40 custom integrations without MCP; 13 protocol implementations (5 clients + 8 servers) with MCP"
-        },
-        {
-          "letter": "B",
-          "text": "13 without; 40 with"
-        },
-        {
-          "letter": "C",
-          "text": "8 either way"
-        },
-        {
-          "letter": "D",
-          "text": "5 either way"
-        }
-      ],
-      "answer": "A",
-      "explanation": "The M×N problem concretely: 5×8 = 40 bespoke connectors without a standard. With MCP, each product implements the client side once and each system exposes one server — 5+8 = 13 — and every future addition costs one implementation, not a row or column of connectors.",
-      "tags": [
-        "fundamentals",
-        "mxn-problem",
-        "scenario"
-      ]
-    },
-    {
-      "id": "ch1-scenario-extra-1",
-      "chapter": 1,
-      "type": "scenario",
+      "type": "mcq",
       "difficulty": "medium",
-      "question": "A QA team supports 5 AI applications and 8 internal systems. Today each app has a custom connector to each system. They are evaluating MCP. Which change best captures the architectural benefit MCP is intended to provide?",
+      "question": "A colleague claims an MCP server can pop a question to the user whenever it likes, the way a desktop app shows a notification. Why is that wrong?",
       "options": [
         {
           "letter": "A",
-          "text": "Move model training to a shared GPU cluster"
+          "text": "A server can only ask while handling a request, and the client may still decline or cancel"
         },
         {
           "letter": "B",
-          "text": "Implement a common protocol boundary so apps and systems do not each need pairwise integrations"
+          "text": "A server can ask at any time, but only through the host's logging channel"
         },
         {
           "letter": "C",
-          "text": "Replace all eight systems with one database"
+          "text": "A server can never ask the user anything; all input must arrive as tool arguments"
         },
         {
           "letter": "D",
-          "text": "Require every AI app to use the same model"
+          "text": "A server can ask at any time as long as the client declared the elicitation capability"
         }
       ],
-      "answer": "B",
-      "explanation": "MCP standardizes the connection between AI applications and external tools/data. The key benefit is reducing pairwise M×N integration work toward M+N implementations; it does not standardize models or replace backend systems.",
+      "explanation": "Elicitation happens inside the handling of a request the client made, and the client mediates it: it may present, decline or cancel the prompt. Servers have no channel for spontaneously interrupting the user.",
       "tags": [
-        "mcp-basics",
-        "integration",
-        "tester-scenario"
-      ]
+        "elicitation",
+        "initiative"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28/client/elicitation",
+      "protocolVersion": "2026-07-28",
+      "answer": "A"
     },
     {
-      "id": "ch1-scenario-extra-2",
+      "id": "ch1-q22",
       "chapter": 1,
-      "type": "scenario",
-      "difficulty": "easy",
-      "question": "During acceptance testing, a product manager says, 'MCP should guarantee that two different LLMs give identical answers when connected to the same server.' What is the best response?",
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "How are MCP's security principles enforced?",
       "options": [
         {
           "letter": "A",
-          "text": "Correct; deterministic model output is an MCP requirement"
+          "text": "By the protocol: a server cannot execute a tool until the client sends a consent token"
         },
         {
           "letter": "B",
-          "text": "Correct, but only over stdio"
+          "text": "By the registry: servers that fail a consent conformance test cannot be published"
         },
         {
           "letter": "C",
-          "text": "Incorrect; MCP standardizes integration with tools/data, not model inference behavior"
+          "text": "Not at the protocol level: implementors SHOULD build consent and access controls"
         },
         {
           "letter": "D",
-          "text": "Incorrect only when OAuth is enabled"
+          "text": "By the host runtime: MCP SDKs refuse tool calls that lack a recorded user approval"
         }
       ],
-      "answer": "C",
-      "explanation": "MCP defines how AI applications connect to tools, data, and workflows. It does not define or guarantee the reasoning or determinism of the underlying model.",
+      "explanation": "The specification states plainly that MCP itself cannot enforce these principles at the protocol level, and lists implementation guidelines that implementors SHOULD follow. There is no consent token in the wire protocol.",
       "tags": [
-        "scope",
-        "mcp-basics",
-        "tester-scenario"
-      ]
+        "security-principles",
+        "enforcement"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28",
+      "protocolVersion": "2026-07-28",
+      "answer": "C"
     },
     {
-      "id": "ch1-scenario-extra-3",
+      "id": "ch1-q23",
       "chapter": 1,
-      "type": "scenario",
-      "difficulty": "easy",
-      "question": "A test plan says: 'Verify the MCP server can be reused by more than one compatible host without rewriting the server for each host.' Which MCP value is this primarily testing?",
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "What is true of every MCP extension, such as Tasks or MCP Apps?",
       "options": [
         {
           "letter": "A",
-          "text": "Portability and reduced vendor-specific integration"
+          "text": "It is negotiated once per connection, like capabilities were before 2026-07-28"
         },
         {
           "letter": "B",
-          "text": "SSE resumability"
+          "text": "It becomes mandatory for conformance one revision after it reaches Final"
         },
         {
           "letter": "C",
-          "text": "Model training throughput"
+          "text": "It is enabled by default once the SDK version supports it, and can be switched off"
         },
         {
           "letter": "D",
-          "text": "Prompt determinism"
+          "text": "It is disabled by default and needs explicit support declared by both client and server"
         }
       ],
-      "answer": "A",
-      "explanation": "A core ecosystem benefit is that a server implements MCP once and can be consumed by compatible MCP clients/hosts, reducing vendor-specific connectors.",
+      "explanation": "Extensions are always opt-in and disabled by default. Clients advertise them in clientCapabilities.extensions on each request and servers in their server/discover capabilities; if only one side supports one, the supporting side falls back to core behaviour.",
       "tags": [
-        "portability",
-        "use-case",
-        "tester-scenario"
-      ]
+        "extensions",
+        "negotiation"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "extensions/overview",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
+    },
+    {
+      "id": "ch1-q24",
+      "chapter": 1,
+      "type": "mcq",
+      "difficulty": "hard",
+      "question": "Two implementations disagree about a message shape. Which artifact is the authoritative source of truth?",
+      "options": [
+        {
+          "letter": "A",
+          "text": "The official SDK implementations, which define the behaviour in practice"
+        },
+        {
+          "letter": "B",
+          "text": "The prose specification pages, since the schema is only a convenience generated for tooling authors"
+        },
+        {
+          "letter": "C",
+          "text": "The JSON Schema file, from which the TypeScript definitions are generated"
+        },
+        {
+          "letter": "D",
+          "text": "The TypeScript schema (schema.ts) for the revision, from which the JSON Schema is generated"
+        }
+      ],
+      "explanation": "The specification states that the protocol is defined by the TypeScript schema, which is the source of truth for all protocol messages and structures; the JSON Schema is generated from it automatically.",
+      "tags": [
+        "spec",
+        "normative"
+      ],
+      "domain": "MCP Fundamentals",
+      "source": "specification/2026-07-28",
+      "protocolVersion": "2026-07-28",
+      "answer": "D"
     }
   ]
 }
