@@ -61,6 +61,55 @@
 
 ---
 
+## 🔲 Sidequest: MCP Protocol Lab (added 2026-09-15)
+
+**Goal:** learn the protocol by defining resources, tools and prompts, and by *watching*
+the message exchange — including what goes on the wire when something fails.
+
+**Inspiration:** [ShawhinT/YouTube-Blog `agents/4-mcp`](https://github.com/ShawhinT/YouTube-Blog/tree/main/agents/4-mcp)
+— Python, stdio, Gmail tools behind Google OAuth, run with `uv run mcp dev` (which opens
+the MCP Inspector). Only its file list and a summary were read, not the code. The idea
+to borrow is the Inspector-first workflow; the Gmail/OAuth parts are not needed here.
+
+### Starting point (checked 2026-09-15)
+- `src/mcp/server.js` — `McpServer` + `StdioServerTransport`. A grep finds **8**
+  `server.tool`, **3** `server.resource`, **2** `server.prompt` calls. The README says 8
+  tools; Phase 2 above and the Architecture diagram still say 6 — stale, not yet fixed.
+- `test/mcp-server.test.js` — already contains a client (`createMcpClient()`);
+  `npm run test:mcp` runs it.
+- Missing: any way to see the raw JSON-RPC messages, and any deliberate failure cases.
+- No `isError`, `sendLoggingMessage` or Inspector mention was confirmed — that search
+  was interrupted, so re-run it before relying on this line.
+
+### Steps
+- [ ] **1. Look, no code.** Run the existing server under the Inspector and walk
+      `initialize` → `tools/list` → `tools/call` → `resources/list` / `resources/read` →
+      `prompts/list` / `prompts/get` in its history pane.
+      `npx @modelcontextprotocol/inspector node src/mcp/server.js` (downloads the Inspector)
+- [ ] **2. Tracing client** — e.g. `scripts/mcp-trace.js`: spawn the server, print every
+      JSON-RPC message in both directions with a timestamp and direction arrow, run the
+      same sequence as step 1. Goal: the raw protocol, not the SDK's parsed results.
+- [ ] **3. Failure catalogue** — trigger each on purpose, record what the trace shows and
+      which layer caught it:
+  - [ ] Tool fails → returns `isError: true` (a *result* the model reads, not a protocol error)
+  - [ ] Invalid arguments → JSON-RPC error `-32602` from schema validation
+  - [ ] Unknown tool / resource URI / prompt name
+  - [ ] `console.log` inside the stdio server → stdout corrupted, client parse failure
+  - [ ] Server crashes or exits mid-session → transport closed
+  - [ ] Handler never answers → client request timeout
+  - [ ] Protocol version mismatch during `initialize`
+- [ ] **4. Tests for the catalogue** — one test per failure in `test/`, so each behaviour
+      stays proven rather than remembered.
+- [ ] **5. (Optional) Streamable HTTP transport** beside stdio — sessions, headers, SSE.
+- [ ] Fix the stale 6-tools counts in Phase 2 and the Architecture diagram.
+
+### Notes
+- A harness project (`cc-pw-qe-harness`, PLAN item 11) may later use this repo's tests
+  as ground truth for agent findings; if that happens it should pin a commit. Nothing
+  here needs to wait for it.
+
+---
+
 ## What We Built vs Original Plan
 
 | Original Plan | What Actually Happened |
